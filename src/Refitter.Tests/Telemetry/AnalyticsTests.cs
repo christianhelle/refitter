@@ -117,6 +117,74 @@ public class AnalyticsTests
 
     [TestMethod]
     [DoNotParallelize]
+    public void LogFeatureUsage_Should_Send_Sanitized_Settings_File()
+    {
+        var previousClient = Analytics.GetTelemetryClient();
+        var captured = new List<ITelemetry>();
+        Analytics.SetTelemetryClient(CreateTelemetryClient(captured));
+        var settingsFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.refitter");
+
+        try
+        {
+            File.WriteAllText(
+                settingsFile,
+                """
+                {
+                  "openApiPath": "https://user:password@example.com/openapi.json",
+                  "namespace": "Contoso.Secret",
+                  "multipleInterfaces": "ByTag",
+                  "customKey": true
+                }
+                """);
+            var settings = new Settings { SettingsFilePath = settingsFile };
+
+            Analytics.LogFeatureUsage(settings, new RefitGeneratorSettings());
+
+            var reported = captured
+                .OfType<EventTelemetry>()
+                .Single(e => e.Name == "settings-file" && e.Properties.ContainsKey("settings"))
+                .Properties["settings"];
+            reported.Should().NotContain("password").And.NotContain("Contoso");
+            reported.Should().Contain("\"openApiPath\":\"<redacted>\"");
+            reported.Should().Contain("\"namespace\":\"<redacted>\"");
+            reported.Should().Contain("\"multipleInterfaces\":\"ByTag\"");
+            reported.Should().Contain("\"unknown-settings\":1");
+            reported.Should().NotContain("generateContracts", "settings the file leaves out are not reported");
+        }
+        finally
+        {
+            Analytics.SetTelemetryClient(previousClient);
+            File.Delete(settingsFile);
+        }
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    [DataRow("")]
+    [DataRow("   ")]
+    public void LogFeatureUsage_Should_Skip_Settings_File_Event_Without_A_Path(string settingsFilePath)
+    {
+        var previousClient = Analytics.GetTelemetryClient();
+        var captured = new List<ITelemetry>();
+        Analytics.SetTelemetryClient(CreateTelemetryClient(captured));
+
+        try
+        {
+            var action = () => Analytics.LogFeatureUsage(
+                new Settings { SettingsFilePath = settingsFilePath },
+                new RefitGeneratorSettings());
+
+            action.Should().NotThrow();
+            captured.OfType<EventTelemetry>().Should().NotContain(e => e.Properties.ContainsKey("settings"));
+        }
+        finally
+        {
+            Analytics.SetTelemetryClient(previousClient);
+        }
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
     public async Task LogError_Should_Apply_Msbuild_Telemetry_Source()
     {
         var previousClient = Analytics.GetTelemetryClient();

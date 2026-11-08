@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using AwesomeAssertions;
 using Refitter.Core;
-using Refitter.SourceGenerator.Telemetry;
 
 namespace Refitter.Tests.MSBuild;
 

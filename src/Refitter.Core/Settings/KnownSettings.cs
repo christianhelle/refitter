@@ -1,8 +1,8 @@
-namespace Refitter.SourceGenerator.Telemetry;
+namespace Refitter.Core;
 
 /// <summary>
 /// The .refitter setting paths that telemetry may report, with the members of enum settings.
-/// Kept in sync with Refitter.Core's RefitGeneratorSettings by KnownSettingsTests.
+/// Kept in sync with <see cref="RefitGeneratorSettings"/> by KnownSettingsTests.
 /// </summary>
 internal static class KnownSettings
 {
