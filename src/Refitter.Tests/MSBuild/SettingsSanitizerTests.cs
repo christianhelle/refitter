@@ -76,6 +76,10 @@ public class SettingsSanitizerTests
     [DataRow("{ \"a\": \"\\u12g4\" }")]
     [DataRow("{ \"a\": 1 \"b\": 2 }")]
     [DataRow("{ \"a\" 1 }")]
+    [DataRow("{")]
+    [DataRow("{ \"a\": 1,")]
+    [DataRow("{ \"a\": [ 1,")]
+    [DataRow("{ \"a")]
     public void Sanitize_Returns_Null_For_Invalid_Settings(string contents) =>
         SettingsSanitizer.Sanitize(contents).Should().BeNull();
 
