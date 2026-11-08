@@ -1,11 +1,13 @@
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Reflection;
 using AwesomeAssertions;
 
 namespace Refitter.Tests.MSBuild;
 
 /// <summary>
-/// Runs the telemetry target from Refitter.SourceGenerator.targets with the same layout as the NuGet package.
+/// Runs the telemetry target from Refitter.SourceGenerator.targets out of the packed NuGet package, or out of the same
+/// layout built from the build output when the generator was not packed.
 /// Only opted-out builds are run so that the tests never send telemetry.
 /// </summary>
 [TestClass]
@@ -22,12 +24,17 @@ public class RefitterTelemetryTargetTests
         Directory.CreateDirectory(Path.Combine(workspace, "build"));
         Directory.CreateDirectory(Path.Combine(workspace, "analyzers", "dotnet", "cs"));
 
-        File.Copy(
-            Path.Combine(FindRepositoryRoot(), "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.targets"),
-            Path.Combine(workspace, "build", "Refitter.SourceGenerator.targets"));
-        File.Copy(
-            GetSourceGeneratorAssembly(),
-            Path.Combine(workspace, "analyzers", "dotnet", "cs", "Refitter.SourceGenerator.dll"));
+        if (FindSourceGeneratorPackage() is { } package)
+        {
+            ExtractPackage(package, workspace);
+        }
+        else
+        {
+            File.Copy(
+                Path.Combine(FindRepositoryRoot(), "src", "Refitter.SourceGenerator", "Refitter.SourceGenerator.targets"),
+                Path.Combine(workspace, "build", "Refitter.SourceGenerator.targets"));
+            CopySourceGeneratorPackageAssemblies(Path.Combine(workspace, "analyzers", "dotnet", "cs"));
+        }
 
         File.WriteAllText(Path.Combine(workspace, "petstore.refitter"), """{ "openApiPath": "./openapi.json" }""");
         File.WriteAllText(
@@ -119,6 +126,77 @@ public class RefitterTelemetryTargetTests
         var result = output.GetAwaiter().GetResult() + error.GetAwaiter().GetResult();
         process.ExitCode.Should().Be(0, result);
         return result;
+    }
+
+    // Release builds pack the generator (GeneratePackageOnBuild), so test the package that ships when it exists.
+    // Only a package written after the generator was built comes from this build; an older one is left over.
+    private static string? FindSourceGeneratorPackage()
+    {
+        var assembly = GetSourceGeneratorAssembly();
+        var builtAt = File.GetLastWriteTimeUtc(assembly);
+        var packageDirectory = Path.GetDirectoryName(Path.GetDirectoryName(assembly))!;
+        return Directory.Exists(packageDirectory)
+            ? Directory.GetFiles(packageDirectory, "Refitter.SourceGenerator.*.nupkg")
+                .Where(path => !path.EndsWith(".symbols.nupkg", StringComparison.OrdinalIgnoreCase))
+                .Where(path => File.GetLastWriteTimeUtc(path) >= builtAt)
+                .OrderByDescending(File.GetLastWriteTimeUtc)
+                .FirstOrDefault()
+            : null;
+    }
+
+    private static void ExtractPackage(string package, string destination)
+    {
+        var root = Path.GetFullPath(destination) + Path.DirectorySeparatorChar;
+        using var archive = ZipFile.OpenRead(package);
+        foreach (var entry in archive.Entries.Where(entry =>
+                     entry.Name.Length > 0 &&
+                     (entry.FullName.StartsWith("analyzers/dotnet/cs/", StringComparison.Ordinal) ||
+                      entry.FullName.StartsWith("build/", StringComparison.Ordinal))))
+        {
+            // Never write outside the workspace, whatever the entry name contains
+            var path = Path.GetFullPath(Path.Combine(root, entry.FullName));
+            if (!path.StartsWith(root, StringComparison.Ordinal))
+                throw new InvalidOperationException($"Package entry '{entry.FullName}' is outside the package");
+
+            entry.ExtractToFile(path, overwrite: true);
+        }
+    }
+
+    [TestMethod]
+    public void Package_Ships_The_Task_Dependencies_Next_To_The_Generator()
+    {
+        var package = FindSourceGeneratorPackage();
+        if (package is null)
+        {
+            Assert.Inconclusive("The generator is only packed in Release builds");
+            return;
+        }
+
+        using var archive = ZipFile.OpenRead(package);
+        archive.Entries
+            .Select(entry => entry.FullName)
+            .Should()
+            .Contain(
+            [
+                "analyzers/dotnet/cs/Refitter.SourceGenerator.dll",
+                "analyzers/dotnet/cs/Microsoft.OpenApi.dll",
+                "analyzers/dotnet/cs/Microsoft.ApplicationInsights.dll",
+                "build/Refitter.SourceGenerator.targets",
+            ]);
+    }
+
+    // The package ships the generator's dependencies next to it, and MSBuild may need them to load the task
+    // assembly (for example to resolve the base types of its public types), so lay them out the same way.
+    // The compiler provides Roslyn, so the package leaves it out.
+    private static void CopySourceGeneratorPackageAssemblies(string analyzersDirectory)
+    {
+        var buildOutput = Path.GetDirectoryName(GetSourceGeneratorAssembly())!;
+        foreach (var assembly in Directory.GetFiles(buildOutput, "*.dll"))
+        {
+            var fileName = Path.GetFileName(assembly);
+            if (!fileName.StartsWith("Microsoft.CodeAnalysis", StringComparison.Ordinal))
+                File.Copy(assembly, Path.Combine(analyzersDirectory, fileName));
+        }
     }
 
     // The task ships inside the generator assembly, so load it from the built generator rather than the linked sources
