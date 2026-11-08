@@ -92,7 +92,7 @@ internal sealed class RefitCodeGenerator
         {
             generatedFiles.Add(
                 new(
-                    JsonSerializerContextGenerator.GetContextTypeName(naming, document.Info?.Title),
+                    ClientNaming.Create(naming.Naming, document.Info?.Title).SerializerContextTypeName,
                     result.SerializerContext));
         }
 

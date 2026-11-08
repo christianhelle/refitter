@@ -21,7 +21,7 @@ public class NumericBoundsSanitizerTests
     {
         var json = $$"""{ "type": "number", "{{keyword}}": {{value}} }""";
 
-        var result = Parse(NumericBoundsSanitizer.Sanitize(json));
+        var result = Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
 
         result[keyword]!.Value<decimal>().Should().Be(sign > 0 ? decimal.MaxValue : decimal.MinValue);
         result["type"]!.Value<string>().Should().Be("number");
@@ -47,7 +47,7 @@ public class NumericBoundsSanitizerTests
             }
             """;
 
-        var result = Parse(NumericBoundsSanitizer.Sanitize(json));
+        var result = Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
         var properties = result["components"]!["schemas"]!["M"]!["properties"]!;
 
         properties["a"]!["minimum"]!.Value<int>().Should().Be(0);
@@ -70,7 +70,7 @@ public class NumericBoundsSanitizerTests
             }
             """;
 
-        var result = Parse(NumericBoundsSanitizer.Sanitize(json));
+        var result = Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
 
         result["description"]!.Value<string>().Should().Be("maximum: 1e300, then more");
         result["maximum"]!.Value<decimal>().Should().Be(decimal.MaxValue);
@@ -83,7 +83,7 @@ public class NumericBoundsSanitizerTests
             { "properties": { "maximum": { "type": "number", "maximum": 1e300 } } }
             """;
 
-        var result = Parse(NumericBoundsSanitizer.Sanitize(json));
+        var result = Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
 
         var maximumProperty = result["properties"]!["maximum"]!;
         maximumProperty["type"]!.Value<string>().Should().Be("number");
@@ -98,7 +98,7 @@ public class NumericBoundsSanitizerTests
     [DataRow("\"maximum: 1e300\"")]
     public void Returns_Same_Instance_When_Nothing_To_Clamp(string content)
     {
-        NumericBoundsSanitizer.Sanitize(content).Should().BeSameAs(content);
+        OpenApiJsonNormalizer.NormalizeDocument(content).Should().BeSameAs(content);
     }
 
     // NJsonSchema reads bounds as decimals, so parse the same way

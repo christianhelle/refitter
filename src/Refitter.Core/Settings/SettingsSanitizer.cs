@@ -1,8 +1,7 @@
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 
-namespace Refitter.SourceGenerator.Telemetry;
+namespace Refitter.Core;
 
 /// <summary>
 /// Reduces a .refitter file to which settings are used, so that telemetry never carries
@@ -16,7 +15,6 @@ internal static class SettingsSanitizer
 
     internal const string UnknownSettingsKey = "unknown-settings";
 
-    private static readonly Regex JsonNumber = new(@"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
 
     /// <summary>
     /// Returns a flat JSON object of setting paths and sanitized values, or null if the file can't be read as JSON.
@@ -97,34 +95,9 @@ internal static class SettingsSanitizer
         }
     }
 
-    private static string Quote(string value)
-    {
-        var builder = new StringBuilder("\"");
-        foreach (var c in value)
-        {
-            switch (c)
-            {
-                case '"': builder.Append("\\\""); break;
-                case '\\': builder.Append("\\\\"); break;
-                case '\n': builder.Append("\\n"); break;
-                case '\r': builder.Append("\\r"); break;
-                case '\t': builder.Append("\\t"); break;
-                default:
-                    if (c < ' ')
-                    {
-                        builder.Append("\\u").Append(((int)c).ToString("x4", CultureInfo.InvariantCulture));
-                    }
-                    else
-                    {
-                        builder.Append(c);
-                    }
-
-                    break;
-            }
-        }
-
-        return builder.Append('"').ToString();
-    }
+    // Only known setting names, enum member names, the redaction marker and item counts are quoted, and none of
+    // them contain characters that need escaping in JSON
+    private static string Quote(string value) => "\"" + value + "\"";
 
     /// <summary>A JSON true, false, null or number, kept as written.</summary>
     private sealed class Literal(string text)
@@ -137,6 +110,10 @@ internal static class SettingsSanitizer
     /// </summary>
     private sealed class Reader(string text)
     {
+        // The escapes JSON allows besides \u, and the characters they stand for
+        private const string SimpleEscapes = "nrtbf\"\\/";
+        private const string SimpleEscapeValues = "\n\r\t\b\f\"\\/";
+
         private int position;
 
         public object? ReadDocument()
@@ -265,16 +242,11 @@ internal static class SettingsSanitizer
             position++;
             if (escaped != 'u')
             {
-                return escaped switch
-                {
-                    'n' => '\n',
-                    'r' => '\r',
-                    't' => '\t',
-                    'b' => '\b',
-                    'f' => '\f',
-                    '"' or '\\' or '/' => escaped,
-                    _ => throw new FormatException($"Invalid escape sequence '\\{escaped}'"),
-                };
+                var simpleEscape = SimpleEscapes.IndexOf(escaped);
+                if (simpleEscape < 0)
+                    throw new FormatException($"Invalid escape sequence '\\{escaped}'");
+
+                return SimpleEscapeValues[simpleEscape];
             }
 
             if (position + 4 > text.Length || !text.Skip(position).Take(4).All(Uri.IsHexDigit))
@@ -287,16 +259,46 @@ internal static class SettingsSanitizer
             return unicode;
         }
 
+        // A JSON number: -?(0|[1-9][0-9]*)(.[0-9]+)?([eE][+-]?[0-9]+)?
         private static bool IsJsonNumber(string literal)
         {
-            try
-            {
-                return JsonNumber.IsMatch(literal);
-            }
-            catch (RegexMatchTimeoutException)
-            {
+            var index = literal.StartsWith("-", StringComparison.Ordinal) ? 1 : 0;
+
+            // An integer part without leading zeros
+            var integerStart = index;
+            index = SkipDigits(literal, index);
+            if (index == integerStart || (literal[integerStart] == '0' && index - integerStart > 1))
                 return false;
+
+            if (index < literal.Length && literal[index] == '.')
+            {
+                var fractionStart = ++index;
+                index = SkipDigits(literal, index);
+                if (index == fractionStart)
+                    return false;
             }
+
+            if (index < literal.Length && literal[index] is 'e' or 'E')
+            {
+                index++;
+                if (index < literal.Length && literal[index] is '+' or '-')
+                    index++;
+
+                var exponentStart = index;
+                index = SkipDigits(literal, index);
+                if (index == exponentStart)
+                    return false;
+            }
+
+            return index == literal.Length;
+        }
+
+        private static int SkipDigits(string literal, int index)
+        {
+            while (index < literal.Length && literal[index] is >= '0' and <= '9')
+                index++;
+
+            return index;
         }
 
         private Literal ReadLiteral()
@@ -344,8 +346,13 @@ internal static class SettingsSanitizer
         private bool StartsWith(string value) =>
             string.CompareOrdinal(text, position, value, 0, value.Length) == 0;
 
-        private char Peek() =>
-            position < text.Length ? text[position] : throw new FormatException("Unexpected end of JSON");
+        private char Peek()
+        {
+            if (position >= text.Length)
+                throw new FormatException("Unexpected end of JSON");
+
+            return text[position];
+        }
 
         private void Expect(char expected)
         {
