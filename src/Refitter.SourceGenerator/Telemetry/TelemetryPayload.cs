@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Refitter.Core;
 
 namespace Refitter.SourceGenerator.Telemetry;
 
