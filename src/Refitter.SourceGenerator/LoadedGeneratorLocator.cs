@@ -23,7 +23,8 @@ internal static class LoadedGeneratorLocator
             compilation,
             "Refit",
             "InterfaceStubGeneratorV2",
-            "Refit.Generator.InterfaceStubGeneratorV2");
+            "Refit.Generator.InterfaceStubGeneratorV2",
+            acceptSourceBuild: false);
 
     /// <summary>
     /// Creates an instance of the Refit interface analyzer matching the Refit version referenced by the compilation.
@@ -35,7 +36,8 @@ internal static class LoadedGeneratorLocator
             compilation,
             "Refit",
             "Refit.Analyzers",
-            "Refit.Analyzers.RefitInterfaceAnalyzer");
+            "Refit.Analyzers.RefitInterfaceAnalyzer",
+            acceptSourceBuild: false);
 
     /// <summary>
     /// Creates an instance of the System.Text.Json source generator matching the System.Text.Json version
@@ -48,7 +50,8 @@ internal static class LoadedGeneratorLocator
             compilation,
             "System.Text.Json",
             "System.Text.Json.SourceGeneration",
-            "System.Text.Json.SourceGeneration.JsonSourceGenerator");
+            "System.Text.Json.SourceGeneration.JsonSourceGenerator",
+            acceptSourceBuild: true);
 
     [SuppressMessage(
         "MicrosoftCodeAnalysisCorrectness",
@@ -58,7 +61,8 @@ internal static class LoadedGeneratorLocator
         Compilation compilation,
         string referenceAssemblyName,
         string loadedAssemblyName,
-        string typeName)
+        string typeName,
+        bool acceptSourceBuild)
         where T : class
     {
         var reference = compilation.ReferencedAssemblyNames
@@ -75,7 +79,7 @@ internal static class LoadedGeneratorLocator
             .Where(a => string.Equals(a.Name.Name, loadedAssemblyName, StringComparison.Ordinal) && a.Name.Version is not null)
             .ToList();
 
-        var candidates = OrderCandidates(loaded.Select(a => a.Name.Version!), reference.Version)
+        var candidates = OrderCandidates(loaded.Select(a => a.Name.Version!), reference.Version, acceptSourceBuild)
             .SelectMany(version => loaded.Where(a => a.Name.Version == version));
 
         foreach (var candidate in candidates)
@@ -92,16 +96,21 @@ internal static class LoadedGeneratorLocator
 
     /// <summary>
     /// Orders the versions of the loaded generator assemblies by preference for a referenced library version: the
-    /// newest with the same major version first, then source-built ones. Other major versions are left out.
+    /// newest with the same major version first, then, when <paramref name="acceptSourceBuild"/> is set, source-built
+    /// ones. Other major versions are left out.
     /// </summary>
     /// <remarks>
     /// Source-built .NET SDKs, like the ones Linux distributions ship, version the analyzers in their targeting
-    /// packs 42.42.42.42, so their major version never matches the library the compilation references.
+    /// packs 42.42.42.42, so their major version never matches the library the compilation references. Only generators
+    /// that ship in the targeting pack, like System.Text.Json's, can be source-built.
     /// </remarks>
-    internal static IReadOnlyList<Version> OrderCandidates(IEnumerable<Version> loadedVersions, Version referenceVersion) =>
+    internal static IReadOnlyList<Version> OrderCandidates(
+        IEnumerable<Version> loadedVersions,
+        Version referenceVersion,
+        bool acceptSourceBuild) =>
         loadedVersions
             .Distinct()
-            .Where(version => version.Major == referenceVersion.Major || version == SourceBuildVersion)
+            .Where(version => version.Major == referenceVersion.Major || (acceptSourceBuild && version == SourceBuildVersion))
             .OrderBy(version => version == SourceBuildVersion)
             .ThenByDescending(version => version)
             .ToList();

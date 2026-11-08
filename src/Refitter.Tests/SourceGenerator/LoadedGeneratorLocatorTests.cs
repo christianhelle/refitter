@@ -12,7 +12,7 @@ public class LoadedGeneratorLocatorTests
     public void Prefers_The_Generator_Matching_The_Referenced_Major_Version()
     {
         LoadedGeneratorLocator
-            .OrderCandidates([new Version(9, 0, 0, 0), new Version(10, 0, 0, 0), new Version(42, 42, 42, 42)], Reference)
+            .OrderCandidates([new Version(9, 0, 0, 0), new Version(10, 0, 0, 0), new Version(42, 42, 42, 42)], Reference, acceptSourceBuild: true)
             .Should()
             .Equal(new Version(10, 0, 0, 0), new Version(42, 42, 42, 42));
     }
@@ -22,7 +22,7 @@ public class LoadedGeneratorLocatorTests
     {
         // Source-built .NET SDKs, like the ones Linux distributions ship, version their analyzers 42.42.42.42
         LoadedGeneratorLocator
-            .OrderCandidates([new Version(42, 42, 42, 42)], Reference)
+            .OrderCandidates([new Version(42, 42, 42, 42)], Reference, acceptSourceBuild: true)
             .Should()
             .Equal(new Version(42, 42, 42, 42));
     }
@@ -31,7 +31,7 @@ public class LoadedGeneratorLocatorTests
     public void Rejects_Generators_For_Other_Major_Versions()
     {
         LoadedGeneratorLocator
-            .OrderCandidates([new Version(9, 0, 0, 0), new Version(11, 0, 0, 0)], Reference)
+            .OrderCandidates([new Version(9, 0, 0, 0), new Version(11, 0, 0, 0)], Reference, acceptSourceBuild: true)
             .Should()
             .BeEmpty();
     }
@@ -40,8 +40,18 @@ public class LoadedGeneratorLocatorTests
     public void Prefers_The_Newest_Matching_Generator()
     {
         LoadedGeneratorLocator
-            .OrderCandidates([new Version(10, 0, 0, 0), new Version(10, 0, 1, 0)], Reference)
+            .OrderCandidates([new Version(10, 0, 0, 0), new Version(10, 0, 1, 0)], Reference, acceptSourceBuild: true)
             .Should()
             .Equal(new Version(10, 0, 1, 0), new Version(10, 0, 0, 0));
+    }
+
+    [TestMethod]
+    public void Rejects_Source_Built_Generators_Unless_Accepted()
+    {
+        // Only the System.Text.Json lookup accepts them; a source-built generator of an older Refit must not run
+        LoadedGeneratorLocator
+            .OrderCandidates([new Version(42, 42, 42, 42), new Version(16, 0, 0, 0)], new Version(16, 0, 0, 0), acceptSourceBuild: false)
+            .Should()
+            .Equal(new Version(16, 0, 0, 0));
     }
 }
