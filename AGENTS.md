@@ -32,7 +32,7 @@ dotnet test --solution src/Refitter.slnx -c Release
 |---|---|---|
 | `Refitter.Core` | `netstandard2.0` | Core generation logic (NSwag-based) |
 | `Refitter` | `net8.0;net9.0;net10.0` | CLI tool (`PackAsTool`, container support) |
-| `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; references `Refitter.Core` directly (in-process); no CLI binary dependency |
+| `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; runs the packaged CLI (`refitter.dll`) as a `dotnet` subprocess and reads the generated file paths from its output |
 | `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` and runs the consumer's Refit generator itself (see its `.targets`) |
 | `Refitter.Tests` | `net10.0` | Unit tests |
 | `Refitter.SourceGenerator.Tests` | `net8.0;net10.0` | Source generator integration tests |

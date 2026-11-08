@@ -320,7 +320,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
             .Select(result => result with
             {
                 Sources = result.Sources
-                    .Select(source => source with { HintName = MakeUnique(source.HintName, usedHintNames) })
+                    .Select(source => source with { HintName = HintNames.MakeUnique(source.HintName, usedHintNames) })
                     .ToImmutableArray()
                     .AsEquatableArray()
             })
@@ -352,18 +352,10 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
             diagnostics.Add(CreateFileContentsDiagnostic(json));
 
-            var settings = TryDeserialize(json, diagnostics);
+            var settings = TryLoadSettingsFile(json, file.Path, diagnostics);
             if (settings is null)
             {
                 return CreateFailedResult(file.Path, diagnostics);
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            ResolveRelativeSpecPaths(file.Path, settings);
-
-            if (string.IsNullOrWhiteSpace(settings.OutputFilename))
-            {
-                settings.OutputFilename = GetFileNameWithoutExtension(file.Path) + ".g.cs";
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -380,7 +372,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
             foreach (var warning in result.Warnings)
             {
-                if (warning.Title == "Date Format Override")
+                if (warning.Kind == WarningKind.DateFormatOverride)
                 {
                     diagnostics.Add(CreateIsoDateFormatOverrideDiagnostic());
                 }
@@ -400,7 +392,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
                 var hintNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var plannedFile in result.GeneratedFiles)
                 {
-                    var hintName = CreateHintName(file.Path, plannedFile.Path, hintNames);
+                    var hintName = HintNames.Create(file.Path, plannedFile.Path, hintNames);
                     sources.Add(new GeneratedSource(hintName, plannedFile.Content));
                 }
             }
@@ -441,11 +433,14 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static RefitGeneratorSettings? TryDeserialize(string json, List<GeneratedDiagnostic> diagnostics)
+    private static RefitGeneratorSettings? TryLoadSettingsFile(
+        string json,
+        string settingsFilePath,
+        List<GeneratedDiagnostic> diagnostics)
     {
         try
         {
-            return Serializer.Deserialize<RefitGeneratorSettings>(json);
+            return RefitterSettingsLoader.LoadSettingsFile(json, settingsFilePath);
         }
         catch (Exception e)
         {
@@ -453,29 +448,6 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
             return null;
         }
-    }
-
-    private static void ResolveRelativeSpecPaths(string settingsFilePath, RefitGeneratorSettings settings)
-    {
-        var lastSep = settingsFilePath.LastIndexOfAny(new[] { '/', '\\' });
-        string settingsFileDirectory;
-        if (lastSep < 0)
-        {
-            settingsFileDirectory = string.Empty;
-        }
-        else if (lastSep == 0)
-        {
-            settingsFileDirectory = settingsFilePath.Substring(0, 1);
-        }
-        else if (lastSep == 2 && settingsFilePath.Length > 1 && settingsFilePath[1] == ':')
-        {
-            settingsFileDirectory = settingsFilePath.Substring(0, lastSep + 1);
-        }
-        else
-        {
-            settingsFileDirectory = settingsFilePath.Substring(0, lastSep);
-        }
-        RefitterSettingsLoader.ResolveRelativeSpecPaths(settings, settingsFileDirectory);
     }
 
     internal static GeneratedDiagnostic CreateNoRefitterFilesFoundDiagnostic() =>
@@ -552,66 +524,11 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
                 diagnostic.EnabledByDefault),
             Location.None);
 
-    private static string GetFileNameWithoutExtension(string path)
-    {
-        var lastSep = path.LastIndexOfAny(new[] { '/', '\\' });
-        var fileName = lastSep >= 0 ? path.Substring(lastSep + 1) : path;
-        var lastDot = fileName.LastIndexOf('.');
-        return lastDot >= 0 ? fileName.Substring(0, lastDot) : fileName;
-    }
-
     private static GeneratedCode CreateFailedResult(string settingsFilePath, List<GeneratedDiagnostic> diagnostics) =>
         new(
             settingsFilePath,
             diagnostics.ToImmutableArray().AsEquatableArray(),
             ImmutableArray<GeneratedSource>.Empty.AsEquatableArray());
-
-    private static string CreateHintName(string settingsFilePath, string plannedFilePath, HashSet<string> usedHintNames)
-    {
-        var settingsName = GetFileNameWithoutExtension(settingsFilePath);
-        var plannedName = GetFileNameWithoutExtension(plannedFilePath);
-        if (plannedName.EndsWith(".g", StringComparison.OrdinalIgnoreCase))
-        {
-            plannedName = plannedName.Substring(0, plannedName.Length - 2);
-        }
-
-        var baseName = SanitizeHintName(
-            string.Equals(settingsName, plannedName, StringComparison.OrdinalIgnoreCase)
-                ? settingsName
-                : settingsName + "." + plannedName);
-
-        return MakeUnique(baseName + ".g.cs", usedHintNames);
-    }
-
-    private static string MakeUnique(string hintName, HashSet<string> usedHintNames)
-    {
-        const string extension = ".g.cs";
-        var baseName = hintName.Substring(0, hintName.Length - extension.Length);
-        var uniqueName = hintName;
-        var counter = 2;
-        while (!usedHintNames.Add(uniqueName))
-        {
-            uniqueName = $"{baseName}{counter}{extension}";
-            counter++;
-        }
-
-        return uniqueName;
-    }
-
-    private static string SanitizeHintName(string name)
-    {
-        var chars = name.ToCharArray();
-        for (var i = 0; i < chars.Length; i++)
-        {
-            var c = chars[i];
-            if (!char.IsLetterOrDigit(c) && c != '.' && c != '_' && c != '-')
-            {
-                chars[i] = '_';
-            }
-        }
-
-        return new string(chars);
-    }
 
     internal readonly record struct GeneratedCode(
         string SettingsFilePath,
