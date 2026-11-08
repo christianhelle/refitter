@@ -12,6 +12,8 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Collapse pass-through generator modules ([#1375](https://github.com/christianhelle/refitter/pull/1375)) ([@christianhelle](https://github.com/christianhelle/))
+- Build method parameters as records and render them to C# once ([#1373](https://github.com/christianhelle/refitter/pull/1373)) ([@christianhelle](https://github.com/christianhelle/))
 - Load .refitter files and read run results the same way in every host ([#1372](https://github.com/christianhelle/refitter/pull/1372)) ([@christianhelle](https://github.com/christianhelle/))
 - Share one settings sanitizer between CLI and source generator telemetry ([#1374](https://github.com/christianhelle/refitter/pull/1374)) ([@christianhelle](https://github.com/christianhelle/))
 - Derive client names from the OpenAPI title in one place ([#1370](https://github.com/christianhelle/refitter/pull/1370)) ([@christianhelle](https://github.com/christianhelle/))
