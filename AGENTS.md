@@ -66,7 +66,7 @@ dotnet test --solution src/Refitter.slnx -c Release
 - **New CLI arguments** must be documented in `README.md` and in the `.refitter` file format docs.
 - **`.refitter` files** are the settings format for all three distribution forms (CLI, MSBuild, Source Generator).
 - **Source generator `.refitter` files** are automatically included as `AdditionalFiles` via the package props. The test project explicitly excludes `PropertyNamingPolicy.refitter` during design-time builds (`Condition="'$(DesignTimeBuild)' != 'true'"`).
-- **MSBuild** package includes a custom `.targets` file that runs `RefitterGenerateTask` before `BeforeCompile`.
+- **MSBuild** package includes a custom `.targets` file that runs `RefitterGenerateTask` before `CoreCompile`.
 
 ## Commit Discipline
 
