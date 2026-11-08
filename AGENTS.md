@@ -57,7 +57,7 @@ dotnet test --solution src/Refitter.slnx -c Release
 - `.editorconfig` is authoritative.
 - 4-space indentation; `crlf` line endings for C# files per `.editorconfig`.
 - `var` is discouraged (`csharp_style_var_* = false:silent`).
-- `TreatWarningsAsErrors` is enabled on most production projects.
+- `TreatWarningsAsErrors` is enabled for all projects under `src/` via `src/Directory.Build.props`.
 - **Private fields must NOT be prefixed with `_`** — use camelCase without underscore prefix (e.g., `openApiPath` not `_openApiPath`).
 
 ## Key Conventions
