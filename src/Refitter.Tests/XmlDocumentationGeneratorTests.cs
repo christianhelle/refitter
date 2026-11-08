@@ -146,6 +146,36 @@ public class XmlDocumentationGeneratorTests
     }
 
     [TestMethod]
+    public void Obsolete_String_Overload_Decodes_Escaped_Aliases()
+    {
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation
+        {
+            Parameters = { new OpenApiParameter { Name = "page\"size", Kind = OpenApiParameterKind.Query, Description = "Page size" } },
+        });
+
+#pragma warning disable CS0618
+        this.generator.AppendMethodDocumentation(method, ["[AliasAs(\"page\\\"size\")] int pageSize"], false, docs);
+#pragma warning restore CS0618
+
+        docs.ToString().Should().Contain("/// <param name=\"pageSize\">Page size</param>");
+    }
+
+    [TestMethod]
+    public void Obsolete_String_Overload_Returns_Early_When_Disabled()
+    {
+        var generator = new XmlDocumentationGenerator(new RefitGeneratorSettings { GenerateXmlDocCodeComments = false });
+        var docs = new StringBuilder();
+        var method = CreateOperationModel(new OpenApiOperation { Summary = "Test Summary" });
+
+#pragma warning disable CS0618
+        generator.AppendMethodDocumentation(method, ["[Query] string @class"], false, docs);
+#pragma warning restore CS0618
+
+        docs.ToString().Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void Obsolete_String_Overload_Reads_Names_And_Aliases()
     {
         var docs = new StringBuilder();
