@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-103-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-104-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1623,6 +1623,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rcdailey"><img src="https://avatars.githubusercontent.com/u/1768054?v=4?s=100" width="100px;" alt="Robert Dailey"/><br /><sub><b>Robert Dailey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arcdailey" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=rcdailey" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://allanritchie.com"><img src="https://avatars.githubusercontent.com/u/1431555?v=4?s=100" width="100px;" alt="Allan Ritchie"/><br /><sub><b>Allan Ritchie</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=aritchie" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kemocca"><img src="https://avatars.githubusercontent.com/u/203678923?v=4?s=100" width="100px;" alt="kemocca"/><br /><sub><b>kemocca</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akemocca" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AkazaRenn"><img src="https://avatars.githubusercontent.com/u/8340896?v=4?s=100" width="100px;" alt="Renn"/><br /><sub><b>Renn</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AAkazaRenn" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
