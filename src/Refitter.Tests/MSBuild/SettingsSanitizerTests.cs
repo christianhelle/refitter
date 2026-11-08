@@ -99,6 +99,34 @@ public class SettingsSanitizerTests
         settings["includeTags"].GetString().Should().Be(expected);
     }
 
+    [TestMethod]
+    [DataRow("0")]
+    [DataRow("-0")]
+    [DataRow("12")]
+    [DataRow("-1.5")]
+    [DataRow("1e5")]
+    [DataRow("1E+5")]
+    [DataRow("2.5e-3")]
+    public void Sanitize_Keeps_Json_Numbers(string number)
+    {
+        var settings = Parse(SettingsSanitizer.Sanitize($$"""{ "dependencyInjectionSettings": { "maxRetryCount": {{number}} } }""")!);
+
+        settings["dependencyInjectionSettings.maxRetryCount"].GetRawText().Should().Be(number);
+    }
+
+    [TestMethod]
+    [DataRow("1.")]
+    [DataRow(".5")]
+    [DataRow("1e")]
+    [DataRow("1e+")]
+    [DataRow("-")]
+    [DataRow("--1")]
+    [DataRow("1.5.2")]
+    [DataRow("1x")]
+    [DataRow("1-2")]
+    public void Sanitize_Rejects_Malformed_Numbers(string number) =>
+        SettingsSanitizer.Sanitize($$"""{ "dependencyInjectionSettings": { "maxRetryCount": {{number}} } }""").Should().BeNull();
+
     private static Dictionary<string, JsonElement> Parse(string json) =>
         JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json)!;
 }
