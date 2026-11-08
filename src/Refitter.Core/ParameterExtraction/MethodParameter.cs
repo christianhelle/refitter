@@ -45,6 +45,12 @@ internal sealed record MethodParameter(string Type, string Name)
         new(Name.TrimStart('@').Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.Format).ToArray());
 
     /// <summary>
+    /// The name sent over the wire: the alias, or the parameter name as written, keeping any formatting characters
+    /// that <see cref="Identifier"/> drops.
+    /// </summary>
+    public string WireName => Alias ?? Name.TrimStart('@');
+
+    /// <summary>
     /// The name Refit binds the parameter by, like a route placeholder or query key.
     /// </summary>
     public string BoundName => Alias ?? Identifier;

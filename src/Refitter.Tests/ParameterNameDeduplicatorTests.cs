@@ -127,6 +127,6 @@ public class ParameterNameDeduplicatorTests
     {
         Deduplicate([new("string", "id"), new("string", "i\u200Cd")], hasAppendedParameter: false)
             .Should()
-            .Equal("string id", "[AliasAs(\"id\")] string id2");
+            .Equal("string id", "[AliasAs(\"i\u200Cd\")] string id2");
     }
 }

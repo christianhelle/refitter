@@ -45,7 +45,7 @@ internal static class ParameterNameDeduplicator
             }
 
             result.Add(parameter.IsBoundByName
-                ? parameter with { Name = uniqueName, Alias = name, IsAliasSeparate = true }
+                ? parameter with { Name = uniqueName, Alias = parameter.WireName, IsAliasSeparate = true }
                 : parameter with { Name = uniqueName });
         }
 
