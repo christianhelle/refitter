@@ -49,7 +49,7 @@ dotnet test --solution src/Refitter.slnx -c Release
 ## CI / Smoke Tests
 
 - Build workflow: `.github/workflows/build.yml`
-- Smoke tests: `.github/workflows/smoke-tests.yml` runs `test/smoke-tests.ps1`
+- Smoke tests: `.github/workflows/smoke-tests.yml` runs `test/smoke-tests.sh`
 - The smoke test script publishes the CLI from source, generates clients against dozens of OpenAPI specs (v2.0, v3.0, v3.1, v3.4), and compiles them against console apps in `test/ConsoleApp/`.
 
 ## Code Style
