@@ -90,6 +90,12 @@ public static class SettingsValidator
                 $"  - See documentation for valid values: https://refitter.github.io");
         }
 
+        if (refitGeneratorSettings is null)
+        {
+            refitSettings = null;
+            return ValidationResult.Error("The settings file does not contain any settings");
+        }
+
         // First validate the file/output settings (includes check for both OpenApiPath and OpenApiPaths)
         var fileAndOutputResult = ValidateFileAndOutputSettings(
             settings,
@@ -101,9 +107,7 @@ public static class SettingsValidator
             return fileAndOutputResult;
         }
 
-        RefitterSettingsLoader.ApplyDefaults(settings.SettingsFilePath!, refitGeneratorSettings);
-        var settingsFileDirectory = Path.GetDirectoryName(Path.GetFullPath(settings.SettingsFilePath!)) ?? string.Empty;
-        RefitterSettingsLoader.ResolveRelativeSpecPaths(refitGeneratorSettings, settingsFileDirectory);
+        RefitterSettingsLoader.PrepareSettings(refitGeneratorSettings, settings.SettingsFilePath!);
         refitSettings = refitGeneratorSettings;
 
         // Then populate settings.OpenApiPath and validate file existence
