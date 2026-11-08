@@ -128,13 +128,17 @@ public class RefitterTelemetryTargetTests
         return result;
     }
 
-    // Release builds pack the generator (GeneratePackageOnBuild), so test the package that ships when it exists
+    // Release builds pack the generator (GeneratePackageOnBuild), so test the package that ships when it exists.
+    // Only a package written after the generator was built comes from this build; an older one is left over.
     private static string? FindSourceGeneratorPackage()
     {
-        var packageDirectory = Path.GetDirectoryName(Path.GetDirectoryName(GetSourceGeneratorAssembly()))!;
+        var assembly = GetSourceGeneratorAssembly();
+        var builtAt = File.GetLastWriteTimeUtc(assembly);
+        var packageDirectory = Path.GetDirectoryName(Path.GetDirectoryName(assembly))!;
         return Directory.Exists(packageDirectory)
             ? Directory.GetFiles(packageDirectory, "Refitter.SourceGenerator.*.nupkg")
                 .Where(path => !path.EndsWith(".symbols.nupkg", StringComparison.OrdinalIgnoreCase))
+                .Where(path => File.GetLastWriteTimeUtc(path) >= builtAt)
                 .OrderByDescending(File.GetLastWriteTimeUtc)
                 .FirstOrDefault()
             : null;
