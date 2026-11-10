@@ -132,7 +132,7 @@ The task does not try to predict output paths from the `.refitter` file. It trus
 | Line written to stderr | Logged as an MSBuild **error** |
 | Non-zero exit code | That `.refitter` file fails |
 | Process exceeds 5 minutes | Process is killed; that file fails |
-| Exit code 0 but no `GeneratedFile:` lines | Error: Refitter did not report any generated files |
+| Exit code 0 but no `GeneratedFile:` lines | Error: Refitter did not report any generated files. This also happens when the `.refitter` file sets `"silent": true`, because the CLI then uses the silent reporter even with `--simple-output`. Don't use `silent` with `Refitter.MSBuild` |
 | Invalid `RefitterJsonLibraryVersion` | Error before the CLI is started |
 | No usable CLI runtime found | Error for each file |
 
@@ -140,7 +140,7 @@ The task keeps processing the remaining files after a failure and returns `false
 
 ## Incremental builds
 
-The `RefitterGenerate` target has no `Inputs`/`Outputs` and no up-to-date check: every build runs the CLI once per `.refitter` file. Generation is usually fast, and always regenerating avoids stale output when a remote OpenAPI specification changes. If that cost matters, set `RefitterAutoScan` to `false` and run `dotnet build -t:RefitterGenerate` when the specification changes.
+The `RefitterGenerate` target has no `Inputs`/`Outputs` and no up-to-date check: every build runs the CLI once per `.refitter` file. Generation is usually fast, and always regenerating avoids stale output when a remote OpenAPI specification changes. If that cost matters, set `RefitterAutoScan` to `false` and run `dotnet build -t:RefitterGenerate` when the specification changes. Note that the `Compile` items are only added inside the build that runs `RefitterGenerate`; they don't persist to later builds. With auto-scan off, later normal builds only compile the generated files if the SDK picks them up by default (output in the project folder) or the project includes them explicitly. Output under `obj`, as recommended for multi-targeting, is not included by default, so add a `<Compile Include="obj/..." />` item for it.
 
 ## Testability
 
