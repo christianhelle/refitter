@@ -114,7 +114,7 @@ It always returns a `RunResult` and never throws. Exceptions are captured as err
 | Output | Files on disk | Files on disk, added to `Compile` items | In-memory syntax trees via `AddSource()` |
 | `outputFolder` / `outputFilename` | Honoured | Honoured | Only used to derive hint names |
 | OpenAPI validation | Yes, unless `--skip-validation` | Yes, unless `RefitterSkipValidation` is `true` | No |
-| Refit source generator | Runs normally in the consuming project's build | Runs normally on the generated files | Disabled in the regular pass and re-run by Refitter over its own output |
+| Refit source generator | Runs normally in the consuming project's build | Runs normally on the generated files | Disabled in the regular pass and re-run by Refitter over its own output, unless the project sets `DisableRefitSourceGenerator=true` itself (then Refit generation stays off) |
 | Incremental | No | No, regenerates on every build | Roslyn incremental pipeline |
 | Reports problems as | Console output and exit code | MSBuild errors and messages | `REFITTER000`–`REFITTER008` compiler diagnostics |
 | Telemetry | Analytics in the CLI process | CLI process, tagged `msbuild` | A post-build MSBuild task, tagged `sourcegenerator` |
