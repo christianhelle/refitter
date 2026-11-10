@@ -24,3 +24,9 @@
 
 - name: XML Code Documentation
   href: xml-code-docs.md
+
+- name: Technical Documentation
+  href: technical/architecture.md
+  items:
+    - name: Architecture Overview
+      href: technical/architecture.md
