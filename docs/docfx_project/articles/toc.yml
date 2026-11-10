@@ -24,19 +24,3 @@
 
 - name: XML Code Documentation
   href: xml-code-docs.md
-
-- name: Technical Documentation
-  href: technical/architecture.md
-  items:
-    - name: Architecture Overview
-      href: technical/architecture.md
-    - name: Code Generation Pipeline
-      href: technical/core-pipeline.md
-    - name: CLI Tool Internals
-      href: technical/cli-internals.md
-    - name: MSBuild Task Internals
-      href: technical/msbuild-internals.md
-    - name: Source Generator Internals
-      href: technical/source-generator-internals.md
-    - name: Testing and Regression Prevention
-      href: technical/testing.md

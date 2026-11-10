@@ -1,0 +1,17 @@
+- name: Architecture Overview
+  href: architecture.md
+
+- name: Code Generation Pipeline
+  href: core-pipeline.md
+
+- name: CLI Tool Internals
+  href: cli-internals.md
+
+- name: MSBuild Task Internals
+  href: msbuild-internals.md
+
+- name: Source Generator Internals
+  href: source-generator-internals.md
+
+- name: Testing and Regression Prevention
+  href: testing.md
