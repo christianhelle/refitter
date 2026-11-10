@@ -284,7 +284,7 @@ make_file_tag() {
 # Variant definitions
 # ==========================================
 
-# Standard variants: compile on all frameworks (net462-net10).
+# Standard variants: compile on all frameworks (net462-net11).
 # Each entry is "Suffix|Prefix|Args".
 STANDARD_VARIANTS=(
     "Cancellation|WithCancellation|--cancellation-tokens"
@@ -467,8 +467,8 @@ run_tests() {
     # Phase 0: Build refitter from source
     # ==========================================
     if [[ "$build_from_source" == true && "$use_docker" != true ]]; then
-        verbose_log "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
-        invoke_child_process dotnet "dotnet publish" publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0 --nologo -v q
+        verbose_log "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net11.0"
+        invoke_child_process dotnet "dotnet publish" publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net11.0 --nologo -v q
         if [[ $? -ne 0 ]]; then
             echo "Publish failed!" >&2
             exit 1
@@ -575,7 +575,7 @@ run_tests() {
 
     # ==========================================
     # Phase 5: Generate netCore variants (accumulate on top of standard code)
-    # Net8/Net9/Net10 can compile both standard and netCore code
+    # Net8/Net9/Net10/Net11 can compile both standard and netCore code
     # ==========================================
     verbose_log "Generating netCore variants"
     run_generation_tasks "${NETCORE_TASKS[@]}"

@@ -2,7 +2,7 @@
 
 The `refitter` .NET tool ([`src/Refitter`](https://github.com/christianhelle/refitter/tree/main/src/Refitter)) is a thin host around [`RefitterRunner`](core-pipeline.md#refitterrunner). Its job is to turn command line arguments or a `.refitter` file into `RefitGeneratorSettings`, validate them, run the generation, write files, and report what happened. It is also the engine behind [`Refitter.MSBuild`](msbuild-internals.md), which runs it as a child process.
 
-The CLI targets `net8.0`, `net9.0` and `net10.0` and is published as a .NET tool and as a Docker image.
+The CLI targets `net8.0`, `net9.0`, `net10.0` and `net11.0` and is published as a .NET tool and as a Docker image.
 
 ## End-to-end flow
 

@@ -133,6 +133,17 @@ public class JsonLibraryVersionTests
     }
 
     [TestMethod]
+    [TestCategory("Integration")]
+    public async Task Can_Build_Generated_Code_With_JsonLibraryVersion_9_0_On_Net11()
+    {
+        string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);
+        BuildHelper
+            .BuildCSharpForTargetFramework("net11.0", generatedCode)
+            .Should()
+            .BeTrue();
+    }
+
+    [TestMethod]
     public async Task Can_Generate_Code_With_JsonLibraryVersion_9_0()
     {
         string generatedCode = await GenerateCode(jsonLibraryVersion: 9.0m);

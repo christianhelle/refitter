@@ -11,7 +11,7 @@ flowchart BT
     B["Compilation tests<br/>BuildHelper: dotnet build of generated code<br/>[TestCategory Integration]"]
     R["Runtime tests<br/>RefitRequestCapture: Roslyn compile + call through Refit"]
     SG["Source generator tests<br/>real analyzer + targets in a test project"]
-    SM["Smoke tests<br/>CLI against ~37 real specs × many option sets,<br/>.NET Framework 4.6.2 → .NET 10"]
+    SM["Smoke tests<br/>CLI against ~37 real specs × many option sets,<br/>.NET Framework 4.6.2 → .NET 11"]
     PK["Package tests<br/>Refitter.MSBuild nupkg on Windows, Linux, macOS"]
     PR["Production tests (nightly)<br/>published tool, Docker image, NuGet packages"]
 
@@ -143,7 +143,7 @@ The project template references `Refit.HttpClientFactory`, `System.Text.Json`, t
 |---|---|
 | `BuildCSharp(code)` | `net8.0` (the lowest supported modern target) |
 | `BuildCSharp(warningsAsErrors: true, ...)` | With warnings treated as errors, for example to catch obsolete-member warnings from deprecated schemas or malformed XML documentation. Missing-documentation warnings (`CS1591`, `CS1573`) are suppressed in the template |
-| `BuildCSharpForTargetFramework("net9.0" / "net10.0", ...)` | Newer target frameworks |
+| `BuildCSharpForTargetFramework("net9.0" / "net10.0" / "net11.0", ...)` | Newer target frameworks |
 | `BuildApizrCSharp` | Against the Apizr packages |
 | `BuildRefit11CSharp` | Against an older Refit major version |
 | `BuildCSharpWithoutImplicitUsings` | With implicit usings disabled, to catch missing `using` directives |
@@ -180,7 +180,7 @@ Every bug fix comes with a test that fails without the fix. Small fixes add case
 
 ## Source generator tests
 
-`src/Refitter.SourceGenerator.Tests` (targeting `net8.0` and `net10.0`) tests the generator the way a consuming project uses it:
+`src/Refitter.SourceGenerator.Tests` (targeting `net8.0`, `net10.0` and `net11.0`) tests the generator the way a consuming project uses it:
 
 ```mermaid
 flowchart LR
@@ -206,7 +206,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    P0["Publish CLI from source<br/>(or use the published tool / Docker image)"] --> P1["Restore ConsoleApp solutions<br/>net462, net472, net48, net481, net8.0, net9.0, net10.0"]
+    P0["Publish CLI from source<br/>(or use the published tool / Docker image)"] --> P1["Restore ConsoleApp solutions<br/>net462, net472, net48, net481, net8.0, net9.0, net10.0, net11.0"]
     P1 --> P2[".refitter file scenarios<br/>petstore, Apizr, multiple files,<br/>multiple sources, Mastodon, streaming"]
     P2 --> P3["CLI option variants × every spec<br/>OpenAPI 2.0 / 3.0 (JSON + YAML) and 3.1"]
     P3 --> P5["net8.0+ only variants<br/>immutable records, polymorphism, ...<br/>(JsonSerializerContext variants: generated only)"]
@@ -223,7 +223,7 @@ flowchart TD
 - **Specifications:** `test/OpenAPI` contains about 37 specifications across OpenAPI 2.0, 3.0 and 3.1, from small samples (Petstore, Uber, USPTO) to large real-world APIs (Asana, Mastodon, Ingram Micro, e-conomic, LM Studio).
 - **Option variants:** dozens of CLI option sets (cancellation tokens, internal types, `IApiResponse`, tag filtering, multiple interfaces, contracts only, interfaces only, and so on) are run against every specification.
 - **Matrix builds use `SmokeTest=true`**, which excludes generated `JsonSerializerCtx*.cs` files from compilation, so the `JsonSerializerContext` variants are only checked for successful generation there. Their compilation is covered by the unit tests in `src/Refitter.Tests`.
-- **Target frameworks:** generated code is compiled in console apps for .NET Framework 4.6.2 to 4.8.1 and .NET 8, 9 and 10, which catches language features or APIs that aren't available on older frameworks.
+- **Target frameworks:** generated code is compiled in console apps for .NET Framework 4.6.2 to 4.8.1 and .NET 8, 9, 10 and 11, which catches language features or APIs that aren't available on older frameworks.
 - The same script runs in three modes: from source (`pr.yml`, `smoke-tests.yml`, `regression-tests.yml`), against the published `refitter` tool (`-UseProduction`) and against the Docker image (`-UseDocker`).
 
 ## MSBuild package tests

@@ -16,6 +16,7 @@ flowchart LR
     TASKS --> T8["net8.0/<br/>refitter.dll + dependencies"]
     TASKS --> T9["net9.0/<br/>refitter.dll + dependencies"]
     TASKS --> T10["net10.0/<br/>refitter.dll + dependencies"]
+    TASKS --> T11["net11.0/<br/>refitter.dll + dependencies"]
 ```
 
 [`Refitter.MSBuild.csproj`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.MSBuild/Refitter.MSBuild.csproj) has no project reference to the CLI. It packs the CLI's existing build output (`../Refitter/bin/$(Configuration)/<tfm>/**`) into `tasks/<tfm>`, so the CLI has to be built before the package is packed. The CI workflows do exactly that: build the solution, then `dotnet pack --no-build`.
@@ -92,9 +93,9 @@ The CLI is a framework-dependent application, so the task has to choose a build 
 
 ```mermaid
 flowchart TD
-    S["dotnet --list-runtimes"] --> L{"for net10.0, net9.0, net8.0 (newest first):<br/>bundled refitter.dll exists AND<br/>matching Microsoft.NETCore.App installed?"}
+    S["dotnet --list-runtimes"] --> L{"for net11.0, net10.0, net9.0, net8.0 (newest first):<br/>bundled refitter.dll exists AND<br/>matching Microsoft.NETCore.App installed?"}
     L -- "found" --> USE["use that build"]
-    L -- "none" --> FB{"fallback: first bundled build that exists<br/>net8.0 → net9.0 → net10.0"}
+    L -- "none" --> FB{"fallback: first bundled build that exists<br/>net8.0 → net9.0 → net10.0 → net11.0"}
     FB -- "found" --> USE
     FB -- "none" --> CO{"refitter.dll next to the task assembly?"}
     CO -- yes --> USE

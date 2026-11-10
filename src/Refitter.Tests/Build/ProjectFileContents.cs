@@ -181,6 +181,14 @@ public static class ProjectFileContents
   </ItemGroup>
 </Project>";
 
+    public static readonly string Net110App = Net100App
+        .Replace("<TargetFramework>net10.0</TargetFramework>", "<TargetFramework>net11.0</TargetFramework>")
+        .Replace(@"Version=""10.0.13""", @"Version=""11.0.0""");
+
+    public static readonly string Net110AppWithWarningsAsErrors = Net100AppWithWarningsAsErrors
+        .Replace("<TargetFramework>net10.0</TargetFramework>", "<TargetFramework>net11.0</TargetFramework>")
+        .Replace(@"Version=""10.0.13""", @"Version=""11.0.0""");
+
     // Apizr 6.x is compiled against the strong-named Refit 8.0.0 assembly, while newer Refit
     // releases are not strong-named, so Apizr output only compiles against Refit 8.
     public static readonly string Net80ApizrApp = Regex
