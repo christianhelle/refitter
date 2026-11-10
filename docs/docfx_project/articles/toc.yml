@@ -32,3 +32,5 @@
       href: technical/architecture.md
     - name: Code Generation Pipeline
       href: technical/core-pipeline.md
+    - name: CLI Tool Internals
+      href: technical/cli-internals.md
