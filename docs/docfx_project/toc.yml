@@ -3,3 +3,6 @@
 - name: Api Documentation
   href: api/
   homepage: api/index.md
+- name: Technical Documentation
+  href: articles/technical/
+  homepage: articles/technical/architecture.md

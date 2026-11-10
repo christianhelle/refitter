@@ -149,3 +149,5 @@ To generate different code per target framework, for example a different `jsonLi
 ```
 
 The files only differ in `outputFolder` and the settings that should change per target framework. Keep `outputFolder` under `obj`: the .NET SDK doesn't include files from `obj` in compilation by default, so each inner build compiles only the file it generated. A folder in the project directory, such as `./Generated`, is picked up by every inner build from the second build on and causes duplicate type errors.
+
+For details on how the MSBuild task works internally, see [MSBuild Task Internals](technical/msbuild-internals.md).
