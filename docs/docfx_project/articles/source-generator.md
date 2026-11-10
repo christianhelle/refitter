@@ -46,3 +46,5 @@ To opt out, add the following to your `.csproj` file:
 ```
 
 Setting the `DOTNET_CLI_TELEMETRY_OPTOUT` environment variable to `1` or `true` also disables it.
+
+For details on how the source generator works internally, see [Source Generator Internals](technical/source-generator-internals.md).

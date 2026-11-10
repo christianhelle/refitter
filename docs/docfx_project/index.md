@@ -7,6 +7,8 @@ Refitter comes in 2 forms:
 - A [.NET CLI Tool](articles/cli-tool.md) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
 - A [C# Source Generator](articles/source-generator.md) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](articles/refitter-file-format.md) within the project directory.
 
+For details on how code generation works internally in each of these forms, and how Refitter is tested, see the [Technical Documentation](articles/technical/architecture.md).
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
