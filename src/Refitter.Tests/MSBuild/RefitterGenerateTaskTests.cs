@@ -370,11 +370,11 @@ public class RefitterGenerateTaskTests
     {
         try
         {
-            var packageFolder = Path.Combine("C:", "repo", "tasks");
-            var messages = new List<string>();
+            string packageFolder = Path.Combine("C:", "repo", "tasks");
+            List<string> messages = new();
             RefitterGenerateTask.FileExists = _ => true;
 
-            var result = RefitterGenerateTask.ResolveRefitterDll(
+            string? result = RefitterGenerateTask.ResolveRefitterDll(
                 packageFolder,
                 ["Microsoft.NETCore.App 10.0.1", "Microsoft.NETCore.App 11.0.0"],
                 messages.Add);
