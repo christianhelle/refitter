@@ -151,7 +151,7 @@ All diagnostics use the category `Refitter`.
 
 ## Telemetry
 
-The source generator itself never makes network calls. Telemetry is sent by [`RefitterTelemetryTask`](https://github.com/christianhelle/refitter/tree/main/src/Refitter.SourceGenerator/Telemetry), an MSBuild task in the same assembly that runs after `Build`:
+The source generator never sends telemetry itself. (It can still make network calls: when `openApiPath` is an `http(s)` URL, the specification is downloaded during compilation, whether telemetry is enabled or not.) Telemetry is sent by [`RefitterTelemetryTask`](https://github.com/christianhelle/refitter/tree/main/src/Refitter.SourceGenerator/Telemetry), an MSBuild task in the same assembly that runs after `Build`:
 
 ```mermaid
 flowchart TD
