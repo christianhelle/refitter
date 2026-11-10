@@ -22,8 +22,8 @@ Lower layers run on every build and give feedback in seconds. Upper layers are s
 
 | Layer | Where | When it runs |
 |---|---|---|
-| Unit, scenario, compilation, runtime | `src/Refitter.Tests` | Every build and pull request |
-| Source generator | `src/Refitter.SourceGenerator.Tests` | Every build and pull request |
+| Unit, scenario, compilation, runtime | `src/Refitter.Tests` | Pull requests and pushes to `main` that change `src/**/*.cs`, `src/**/*.csproj` or `build.yml` |
+| Source generator | `src/Refitter.SourceGenerator.Tests` | Same as above. Changes to only `.refitter` or specification files don't trigger it, so run the tests locally |
 | Smoke tests | `test/smoke-tests.sh`, `test/ConsoleApp` | Pull requests and pushes to `main` that change generator code; on demand on Windows, Linux and macOS |
 | MSBuild package | `test/MSBuild` | Pull requests touching the MSBuild task, on Windows, Linux and macOS |
 | Production | `.github/workflows/production-tests.yml` | Nightly, and on demand |
@@ -142,16 +142,19 @@ The project template references `Refit.HttpClientFactory`, `System.Text.Json`, t
 | Method | Builds |
 |---|---|
 | `BuildCSharp(code)` | `net8.0` (the lowest supported modern target) |
-| `BuildCSharp(warningsAsErrors: true, ...)` | With warnings treated as errors, for example to catch missing XML documentation |
+| `BuildCSharp(warningsAsErrors: true, ...)` | With warnings treated as errors, for example to catch obsolete-member warnings from deprecated schemas or malformed XML documentation. Missing-documentation warnings (`CS1591`, `CS1573`) are suppressed in the template |
 | `BuildCSharpForTargetFramework("net9.0" / "net10.0", ...)` | Newer target frameworks |
 | `BuildApizrCSharp` | Against the Apizr packages |
 | `BuildRefit11CSharp` | Against an older Refit major version |
 | `BuildCSharpWithoutImplicitUsings` | With implicit usings disabled, to catch missing `using` directives |
 
-Because these tests start `dotnet build`, they are much slower than the rest, and they are the only tests marked `[TestCategory("Integration")]`. That allows a fast feedback loop:
+Because these tests start `dotnet build`, they are much slower than the rest. The convention is to mark them `[TestCategory("Integration")]`, but not every existing compilation test follows it yet (the real `ArrayTypeReturnTests.Can_Build_Generated_Code` has no category), so the filtered run is faster but not strictly free of `dotnet build` calls:
 
 ```shell
-# unit tests only (seconds)
+# build once
+dotnet build -c Release src/Refitter.slnx
+
+# tests not marked Integration
 dotnet test --filter "TestCategory!=Integration" --solution src/Refitter.slnx -c Release --no-build
 
 # full suite
@@ -206,7 +209,7 @@ flowchart TD
     P0["Publish CLI from source<br/>(or use the published tool / Docker image)"] --> P1["Restore ConsoleApp solutions<br/>net462, net472, net48, net481, net8.0, net9.0, net10.0"]
     P1 --> P2[".refitter file scenarios<br/>petstore, Apizr, multiple files,<br/>multiple sources, Mastodon, streaming"]
     P2 --> P3["CLI option variants × every spec<br/>OpenAPI 2.0 / 3.0 (JSON + YAML) and 3.1"]
-    P3 --> P5["net8.0+ only variants<br/>immutable records, polymorphism,<br/>JsonSerializerContext, ..."]
+    P3 --> P5["net8.0+ only variants<br/>immutable records, polymorphism, ...<br/>(JsonSerializerContext variants: generated only)"]
     P5 --> P7["Generate from live petstore3.swagger.io URLs"]
     P7 --> P8["Operation name generators<br/>collection formats<br/>option combinations"]
     P8 --> P11["Named regressions<br/>e.g. Asana spec, issue #359"]
@@ -219,6 +222,7 @@ flowchart TD
 
 - **Specifications:** `test/OpenAPI` contains about 37 specifications across OpenAPI 2.0, 3.0 and 3.1, from small samples (Petstore, Uber, USPTO) to large real-world APIs (Asana, Mastodon, Ingram Micro, e-conomic, LM Studio).
 - **Option variants:** dozens of CLI option sets (cancellation tokens, internal types, `IApiResponse`, tag filtering, multiple interfaces, contracts only, interfaces only, and so on) are run against every specification.
+- **Matrix builds use `SmokeTest=true`**, which excludes generated `JsonSerializerCtx*.cs` files from compilation, so the `JsonSerializerContext` variants are only checked for successful generation there. Their compilation is covered by the unit tests in `src/Refitter.Tests`.
 - **Target frameworks:** generated code is compiled in console apps for .NET Framework 4.6.2 to 4.8.1 and .NET 8, 9 and 10, which catches language features or APIs that aren't available on older frameworks.
 - The same script runs in three modes: from source (`pr.yml`, `smoke-tests.yml`, `regression-tests.yml`), against the published `refitter` tool (`-UseProduction`) and against the Docker image (`-UseDocker`).
 
@@ -238,9 +242,9 @@ sequenceDiagram
     Script->>App: dotnet add package (local source)
     Script->>App: dotnet run (build runs RefitterGenerateTask)
     Script->>Script: assert files in expected folders (issue #998)<br/>assert interfaceName honoured<br/>assert no stray output files
-    Script->>App: build with an invalid .refitter file
-    Script->>Script: assert the build fails (issue #1012)
 ```
+
+A separate script, `test/MSBuild/test-exit-code.ps1`, checks that a build with an invalid `.refitter` file fails (issue #1012). It is run manually and is not part of the `msbuild.yml` workflow.
 
 ## Continuous integration
 
@@ -276,7 +280,7 @@ flowchart LR
 ## Other safeguards
 
 - **Warnings are errors.** `src/Directory.Build.props` enables `TreatWarningsAsErrors`, nullable reference types and the .NET analyzers for every project. The source generator also enables `EnforceExtendedAnalyzerRules`.
-- **Generated code is held to the same standard.** Smoke-test console apps compile generated code with warnings as errors (outside the broad smoke-test matrix), and `BuildCSharp(warningsAsErrors: true)` is used for features such as XML documentation.
+- **Generated code is checked for warnings in unit tests.** `BuildCSharp(warningsAsErrors: true)` compiles generated code with warnings as errors for features such as deprecated schemas and XML documentation. The smoke tests don't do this: every smoke-test build passes `WarningLevel=0`, so they only catch compiler errors.
 - **Static analysis and review.** SonarQube Cloud quality gates and automated code review run on pull requests, followed by review from the maintainer.
 - **Dependency updates.** Dependabot and Renovate keep NuGet packages, GitHub Actions and dev containers up to date. Each update goes through the full CI pipeline, and the nightly production tests catch breakage caused by new releases of dependencies.
 - **Definition of Done.** [`CONTRIBUTING.md`](https://github.com/christianhelle/refitter/blob/main/CONTRIBUTING.md) requires scenario tests with a compilation check for new features, a failing-without-the-fix regression test for every bug fix, tests for interacting options, new options being off by default, and documentation of new settings in the README, the [`.refitter` file format](../refitter-file-format.md) docs and the JSON schema.
