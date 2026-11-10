@@ -3,6 +3,9 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Add technical documentation to the docfx site ([#1382](https://github.com/christianhelle/refitter/pull/1382)) ([@christianhelle](https://github.com/christianhelle/))
+- docs: add AkazaRenn as a contributor for bug ([#1381](https://github.com/christianhelle/refitter/pull/1381)) (@allcontributors[bot])
+- Update dependency Polly to 8.9.1 ([#1369](https://github.com/christianhelle/refitter/pull/1369)) (@renovate[bot])
 - Update dependency AutoMapper to 16.3.0 ([#1368](https://github.com/christianhelle/refitter/pull/1368)) (@renovate[bot])
 - Update dependency Polly to 8.9.0 ([#1362](https://github.com/christianhelle/refitter/pull/1362)) (@renovate[bot])
 - Update dependency MSTest to 4.5.2 ([#1361](https://github.com/christianhelle/refitter/pull/1361)) (@renovate[bot])
@@ -12,6 +15,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Add .NET 11 support ([#1384](https://github.com/christianhelle/refitter/pull/1384)) ([@christianhelle](https://github.com/christianhelle/))
 - Convert snake_case tags to PascalCase in ByTag interface names ([#1380](https://github.com/christianhelle/refitter/pull/1380)) ([@christianhelle](https://github.com/christianhelle/))
 - Collapse pass-through generator modules ([#1375](https://github.com/christianhelle/refitter/pull/1375)) ([@christianhelle](https://github.com/christianhelle/))
 - Build method parameters as records and render them to C# once ([#1373](https://github.com/christianhelle/refitter/pull/1373)) ([@christianhelle](https://github.com/christianhelle/))
