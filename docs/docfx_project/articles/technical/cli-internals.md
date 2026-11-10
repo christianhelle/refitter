@@ -118,14 +118,14 @@ classDiagram
     }
     class SimpleGenerationReporter {
         plain text
-        prints "GeneratedFile: full path"
+        prints GeneratedFile marker lines
     }
     class SilentGenerationReporter {
         no output
     }
     IGenerationReporter <|.. RichGenerationReporter : default
     IGenerationReporter <|.. SimpleGenerationReporter : --simple-output
-    IGenerationReporter <|.. SilentGenerationReporter : --silent / "silent": true
+    IGenerationReporter <|.. SilentGenerationReporter : --silent
 ```
 
 | Reporter | Selected by | Used for |
