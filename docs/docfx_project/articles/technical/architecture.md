@@ -55,7 +55,7 @@ flowchart TB
 Two details in this picture are easy to miss:
 
 - **`Refitter.MSBuild` does not reference `Refitter.Core`.** It contains a small MSBuild task and the complete build output of the CLI for each supported runtime. At build time it starts the CLI as a `dotnet` child process. See [MSBuild Task Internals](msbuild-internals.md).
-- **`Refitter.SourceGenerator` does not reference the `Refitter.Core` package either.** Analyzers cannot reliably load arbitrary package dependencies, so the generator project compiles the `Refitter.Core` source files (`<Compile Include="../Refitter.Core/**/*.cs" />`) into its own assembly and ships its third-party dependencies inside the analyzer folder. See [Source Generator Internals](source-generator-internals.md).
+- **`Refitter.SourceGenerator` does not reference the `Refitter.Core` package either.** Analyzers cannot reliably load arbitrary package dependencies, so the generator project compiles the `Refitter.Core` source files (`<Compile Include="../Refitter.Core/..." />`) into its own assembly and ships its third-party dependencies inside the analyzer folder. See [Source Generator Internals](source-generator-internals.md).
 
 ## One shared entry point
 
