@@ -45,6 +45,8 @@ public static class BuildHelper
             ("net9.0", false) => ProjectFileContents.Net90App,
             ("net10.0", true) => ProjectFileContents.Net100AppWithWarningsAsErrors,
             ("net10.0", false) => ProjectFileContents.Net100App,
+            ("net11.0", true) => ProjectFileContents.Net110AppWithWarningsAsErrors,
+            ("net11.0", false) => ProjectFileContents.Net110App,
             (_, true) => ProjectFileContents.Net80AppWithWarningsAsErrors,
             _ => ProjectFileContents.Net80App
         };
