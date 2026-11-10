@@ -34,3 +34,5 @@
       href: technical/core-pipeline.md
     - name: CLI Tool Internals
       href: technical/cli-internals.md
+    - name: MSBuild Task Internals
+      href: technical/msbuild-internals.md
