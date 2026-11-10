@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Update dotnet monorepo to v11 ([#1383](https://github.com/christianhelle/refitter/pull/1383)) (@renovate[bot])
 - Add technical documentation to the docfx site ([#1382](https://github.com/christianhelle/refitter/pull/1382)) ([@christianhelle](https://github.com/christianhelle/))
 - docs: add AkazaRenn as a contributor for bug ([#1381](https://github.com/christianhelle/refitter/pull/1381)) (@allcontributors[bot])
 - Update dependency Polly to 8.9.1 ([#1369](https://github.com/christianhelle/refitter/pull/1369)) (@renovate[bot])
