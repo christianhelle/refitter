@@ -18,23 +18,23 @@ Refitter is a single solution (`src/Refitter.slnx`) with four shipping projects 
 | Project | Target framework | Ships as | Role |
 |---|---|---|---|
 | `Refitter.Core` | `netstandard2.0` | `Refitter.Core` NuGet package | All code generation logic, built on NSwag |
-| `Refitter` | `net8.0;net9.0;net10.0` | `refitter` .NET tool and Docker image | Command line interface |
+| `Refitter` | `net8.0;net9.0;net10.0;net11.0` | `refitter` .NET tool and Docker image | Command line interface |
 | `Refitter.MSBuild` | `netstandard2.0` | `Refitter.MSBuild` NuGet package | MSBuild task that runs the bundled CLI before `CoreCompile` |
 | `Refitter.SourceGenerator` | `netstandard2.0` | `Refitter.SourceGenerator` NuGet package (analyzer) | Roslyn incremental source generator |
-| `Refitter.Tests` | `net10.0` | – | Unit, scenario and compilation tests |
-| `Refitter.SourceGenerator.Tests` | `net8.0;net10.0` | – | Source generator integration tests |
+| `Refitter.Tests` | `net11.0` | – | Unit, scenario and compilation tests |
+| `Refitter.SourceGenerator.Tests` | `net8.0;net10.0;net11.0` | – | Source generator integration tests |
 
 ```mermaid
 flowchart TB
     subgraph Packages["Shipped packages"]
-        CLI["refitter<br/>.NET tool / Docker<br/>net8.0 · net9.0 · net10.0"]
+        CLI["refitter<br/>.NET tool / Docker<br/>net8.0 · net9.0 · net10.0 · net11.0"]
         MSB["Refitter.MSBuild<br/>MSBuild task<br/>netstandard2.0"]
         SG["Refitter.SourceGenerator<br/>Roslyn analyzer<br/>netstandard2.0"]
         CORE["Refitter.Core<br/>netstandard2.0"]
     end
 
     CLI -- "ProjectReference" --> CORE
-    MSB -- "bundles CLI build output<br/>tasks/net8.0 · net9.0 · net10.0" --> CLI
+    MSB -- "bundles CLI build output<br/>tasks/net8.0 · net9.0 · net10.0 · net11.0" --> CLI
     SG -- "compiles Core source files<br/>directly into the analyzer" --> CORE
 
     subgraph Libraries["Third-party libraries"]
