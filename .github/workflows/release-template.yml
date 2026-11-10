@@ -33,6 +33,7 @@ jobs:
             8.0.x
             9.0.x
             10.0.x
+            11.0.x
       - name: Build
         run: |
           dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ inputs.version }}" -p:Version="${{ inputs.version }}"

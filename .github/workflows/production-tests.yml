@@ -32,6 +32,7 @@ jobs:
           8.0.x
           9.0.x
           10.0.x
+          11.0.x
 
     - name: 🛠️ Run smoke test script (NuGet)
       run: ./smoke-tests.sh -UseProduction
@@ -50,6 +51,7 @@ jobs:
           8.0.x
           9.0.x
           10.0.x
+          11.0.x
 
     - name: 🛠️ Run smoke test script (Docker)
       run: ./smoke-tests.sh -UseDocker
@@ -73,6 +75,7 @@ jobs:
           8.0.x
           9.0.x
           10.0.x
+          11.0.x
 
     - name: 🛠️ Build
       run: dotnet build -p:UseProductionRefitter=true
@@ -93,6 +96,7 @@ jobs:
           8.0.x
           9.0.x
           10.0.x
+          11.0.x
     - name: 🛠️ Add Refitter.MSBuild package
       run: dotnet add package Refitter.MSBuild --prerelease
       working-directory: test/MSBuild
