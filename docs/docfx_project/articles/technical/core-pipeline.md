@@ -107,7 +107,10 @@ flowchart TD
 
 ### Reference guard
 
-Before a specification is parsed, [`ReferenceGuard`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/ReferenceGuard.cs) scans its `$ref` values. Remote `http(s)` references are rejected (to avoid server-side request forgery when Refitter runs on a build server), and so are absolute or `../` references that escape the specification's directory. Setting `allowRemoteReferences` in the `.refitter` file lifts the restriction.
+Before a specification is parsed, [`ReferenceGuard`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/ReferenceGuard.cs) scans its `$ref` values. It enforces two separate rules:
+
+- Remote `http(s)` references are rejected, to avoid server-side request forgery when Refitter runs on a build server. Setting `allowRemoteReferences` in the `.refitter` file allows them.
+- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead.
 
 ### Loading strategies
 
@@ -205,7 +208,7 @@ flowchart LR
     P -- "ByTag" --> T["ByTagInterfacePartitioning<br/>key: first tag (or title)<br/>I{Tag}"]
 ```
 
-Interface names are de-duplicated against the generated contract type names (adding an `Endpoint` or `Api` suffix where needed), and in multi-interface modes a group whose operations are all deprecated is skipped.
+Interface names are de-duplicated against the generated contract type names (adding an `Endpoint` or `Api` suffix where needed), and in multi-interface modes, when `generateDeprecatedOperations` is `false`, a group whose operations are all deprecated is skipped.
 
 ### Generating a method
 
@@ -264,7 +267,7 @@ With `apizrSettings`, [`ApizrRegistrationGenerator`](https://github.com/christia
 
 ## Planning the output paths
 
-[`OutputPlanner`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Pipeline/OutputPlanner.cs) turns generated code into `PlannedFile` objects with absolute paths. It only computes paths; whether they are written is up to the host.
+[`OutputPlanner`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Pipeline/OutputPlanner.cs) turns generated code into `PlannedFile` objects. For settings-file runs, paths are resolved against the `.refitter` file's directory. For direct CLI runs, the `--output` value (or `Output.cs`) is used as given, so it may be relative to the current directory. The planner only computes paths; whether they are written is up to the host.
 
 ```mermaid
 flowchart TD
@@ -291,7 +294,7 @@ After generation, `RefitterRunner` adds:
 | `RunnerDiagnosticKind.AllPathsFiltered` | `includePathMatches` removed every path from the specification |
 | Validation diagnostics | Errors and warnings from the optional `IValidator` |
 
-Hosts translate these into console output (CLI), MSBuild errors (through the CLI's stderr) or compiler diagnostics (source generator).
+Hosts decide which of these to surface. The CLI prints warnings, the all-paths-filtered warning and diagnostics, and `Refitter.MSBuild` inherits that output through the CLI. The source generator reports error diagnostics as `REFITTER000` and the date-format warning as `REFITTER002`, but it does **not** report `AllPathsFiltered`, so a filter that removes every path silently produces an empty interface there.
 
 ## Validation
 
