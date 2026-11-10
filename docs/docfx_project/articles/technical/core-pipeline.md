@@ -110,7 +110,7 @@ flowchart TD
 Before a specification is parsed, [`ReferenceGuard`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/ReferenceGuard.cs) scans its `$ref` values. It enforces two separate rules:
 
 - Remote `http(s)` references are rejected, to avoid server-side request forgery when Refitter runs on a build server. Setting `allowRemoteReferences` in the `.refitter` file allows them.
-- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead.
+- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths and does not resolve symbolic links, so a link inside the directory that points elsewhere is followed. Treat it as a guard against accidental or crafted `../` references, not as complete filesystem confinement.
 
 ### Loading strategies
 
@@ -267,7 +267,7 @@ With `apizrSettings`, [`ApizrRegistrationGenerator`](https://github.com/christia
 
 ## Planning the output paths
 
-[`OutputPlanner`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Pipeline/OutputPlanner.cs) turns generated code into `PlannedFile` objects. For settings-file runs, paths are resolved against the `.refitter` file's directory. For direct CLI runs, the `--output` value (or `Output.cs`) is used as given, so it may be relative to the current directory. The planner only computes paths; whether they are written is up to the host.
+[`OutputPlanner`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Pipeline/OutputPlanner.cs) turns generated code into `PlannedFile` objects. For settings-file runs, paths are resolved against the `.refitter` file's directory. For direct CLI runs, paths are used as given and may be relative to the current directory: in single-file mode `--output` is the file path (default `Output.cs`); in multi-file mode `--output` is a directory (default the current directory) and each file is written as `{TypeName}.cs` inside it. The planner only computes paths; whether they are written is up to the host.
 
 ```mermaid
 flowchart TD
@@ -294,7 +294,7 @@ After generation, `RefitterRunner` adds:
 | `RunnerDiagnosticKind.AllPathsFiltered` | `includePathMatches` removed every path from the specification |
 | Validation diagnostics | Errors and warnings from the optional `IValidator` |
 
-Hosts decide which of these to surface. The CLI prints warnings, the all-paths-filtered warning and diagnostics, and `Refitter.MSBuild` inherits that output through the CLI. The source generator reports error diagnostics as `REFITTER000` and the date-format warning as `REFITTER002`, but it does **not** report `AllPathsFiltered`, so a filter that removes every path silently produces an empty interface there.
+Hosts decide which of these to surface. On success, the CLI prints the configuration warnings and the all-paths-filtered warning; validation errors and warnings are only printed when validation fails. `Refitter.MSBuild` inherits that output through the CLI. The source generator reports error diagnostics as `REFITTER000` and the date-format warning as `REFITTER002`, but it does **not** report `AllPathsFiltered`, so a filter that removes every path silently produces an empty interface there.
 
 ## Validation
 
