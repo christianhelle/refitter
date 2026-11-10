@@ -38,3 +38,5 @@
       href: technical/msbuild-internals.md
     - name: Source Generator Internals
       href: technical/source-generator-internals.md
+    - name: Testing and Regression Prevention
+      href: technical/testing.md
