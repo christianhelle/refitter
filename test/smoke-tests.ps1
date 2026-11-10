@@ -204,7 +204,7 @@ $script:V34WebhookFilenames = @(
     "webhook-example"
 )
 
-# Standard variants: compile on all frameworks (net462-net10)
+# Standard variants: compile on all frameworks (net462-net11)
 $script:StandardVariants = @(
     @{ Suffix="Cancellation"; Prefix="WithCancellation"; Args="--cancellation-tokens" },
     @{ Suffix="Internal"; Prefix="Internal"; Args="--internal" },
@@ -357,10 +357,10 @@ function CollectGenerationTasks
 
 function PublishRefitterFromSource
 {
-    Write-Verbose "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0"
+    Write-Verbose "dotnet publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net11.0"
     $exitCode = Invoke-ChildProcess `
         -FilePath "dotnet" `
-        -Arguments "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net10.0 --nologo -v q" `
+        -Arguments "publish ../src/Refitter/Refitter.csproj -c Release -o bin -f net11.0 --nologo -v q" `
         -Description "dotnet publish"
     if ($exitCode -ne 0) { throw "Publish failed!" }
 
@@ -640,7 +640,7 @@ function RunTests
     RunGenerateOnlyTest -processPath $processPath -useDocker $UseDocker
 
     # Phase 5: Generate netCore variants (accumulate on top of standard code)
-    # Net8/Net9/Net10 can compile both standard and netCore code
+    # Net8/Net9/Net10/Net11 can compile both standard and netCore code
     Write-Verbose "Generating netCore variants"
     RunGenerationTasks -tasks $tasks.NetCore -processPath $processPath -useDocker $UseDocker
 

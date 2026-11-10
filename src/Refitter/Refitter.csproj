@@ -9,7 +9,7 @@
     <Product>Refit API Client Code Generator</Product>
     <Description>Refitter is a CLI tool for generating a C# REST API Client using the Refit library from OpenAPI specifications.</Description>
     <PackAsTool>true</PackAsTool>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
     <ContainerRepository>christianhelle/refitter</ContainerRepository>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -24,8 +24,8 @@
     <PackageReference Include="Exceptionless" Version="6.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer" Version="2.23.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.57.2" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.402" PrivateAssets="all" />
-    <PackageReference Include="System.Text.Json" Version="10.0.13" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.100" PrivateAssets="all" />
+    <PackageReference Include="System.Text.Json" Version="11.0.0" />
   </ItemGroup>
 
 </Project>

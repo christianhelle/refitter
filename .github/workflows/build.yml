@@ -20,7 +20,7 @@ on:
       - '*'
 
 env:
-  VERSION: 2.3.2.${{ github.run_number }}
+  VERSION: 2.4.0.${{ github.run_number }}
 
 permissions:
   contents: read
@@ -39,6 +39,7 @@ jobs:
           8.0.x
           9.0.x
           10.0.x
+          11.0.x
     - name: 🛠️ Build
       run: dotnet build -c Release src/Refitter.slnx -p:UseSourceLink=true -p:PackageVersion="${{ env.VERSION }}" -p:Version="${{ env.VERSION }}"
     - name: 📦 Pack MSBuild task

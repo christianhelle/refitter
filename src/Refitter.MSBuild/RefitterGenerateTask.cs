@@ -17,6 +17,7 @@ public class RefitterGenerateTask : MSBuildTask
 
     private static readonly (string TargetFramework, string RuntimePrefix)[] PreferredRuntimeOrder =
     [
+        ("net11.0", "Microsoft.NETCore.App 11."),
         ("net10.0", "Microsoft.NETCore.App 10."),
         ("net9.0", "Microsoft.NETCore.App 9."),
         ("net8.0", "Microsoft.NETCore.App 8.")
@@ -26,7 +27,8 @@ public class RefitterGenerateTask : MSBuildTask
     [
         "net8.0",
         "net9.0",
-        "net10.0"
+        "net10.0",
+        "net11.0"
     ];
 
     internal sealed class ProcessExecutionResult(

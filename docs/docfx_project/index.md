@@ -7,6 +7,8 @@ Refitter comes in 2 forms:
 - A [.NET CLI Tool](articles/cli-tool.md) distributed via [nuget.org](http://www.nuget.org/packages/refitter) that outputs a single C# file on disk
 - A [C# Source Generator](articles/source-generator.md) via the [Refitter.SourceGenerator](http://www.nuget.org/packages/refitter.sourcegenerator) package that generates code on compile time based on a [.refitter](articles/refitter-file-format.md) within the project directory.
 
+For details on how code generation works internally in each of these forms, and how Refitter is tested, see the [Technical Documentation](articles/technical/architecture.md).
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -146,6 +148,7 @@ Refitter comes in 2 forms:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rcdailey"><img src="https://avatars.githubusercontent.com/u/1768054?v=4?s=100" width="100px;" alt="Robert Dailey"/><br /><sub><b>Robert Dailey</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Arcdailey" title="Bug reports">🐛</a> <a href="https://github.com/christianhelle/refitter/commits?author=rcdailey" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://allanritchie.com"><img src="https://avatars.githubusercontent.com/u/1431555?v=4?s=100" width="100px;" alt="Allan Ritchie"/><br /><sub><b>Allan Ritchie</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=aritchie" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kemocca"><img src="https://avatars.githubusercontent.com/u/203678923?v=4?s=100" width="100px;" alt="kemocca"/><br /><sub><b>kemocca</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akemocca" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AkazaRenn"><img src="https://avatars.githubusercontent.com/u/8340896?v=4?s=100" width="100px;" alt="Renn"/><br /><sub><b>Renn</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AAkazaRenn" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>

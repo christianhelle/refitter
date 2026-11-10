@@ -5,7 +5,7 @@ OpenAPI-to-Refit code generator. Multi-package solution: CLI tool, MSBuild task,
 ## Build & Test
 
 - Solution: `src/Refitter.slnx`
-- SDK: `10.0.100` with `rollForward: latestFeature` (see `global.json`)
+- SDK: `11.0.100` with `rollForward: latestFeature` (see `global.json`)
 - Build: `dotnet build -c Release src/Refitter.slnx`
 - Test: `dotnet test --solution src/Refitter.slnx -c Release`
 
@@ -31,11 +31,11 @@ dotnet test --solution src/Refitter.slnx -c Release
 | Project | TFM | Role |
 |---|---|---|
 | `Refitter.Core` | `netstandard2.0` | Core generation logic (NSwag-based) |
-| `Refitter` | `net8.0;net9.0;net10.0` | CLI tool (`PackAsTool`, container support) |
+| `Refitter` | `net8.0;net9.0;net10.0;net11.0` | CLI tool (`PackAsTool`, container support) |
 | `Refitter.MSBuild` | `netstandard2.0` | MSBuild task; runs the packaged CLI (`refitter.dll`) as a `dotnet` subprocess and reads the generated file paths from its output |
 | `Refitter.SourceGenerator` | `netstandard2.0` | Roslyn source generator; emits code in-memory via `AddSource()` and runs the consumer's Refit generator itself (see its `.targets`) |
-| `Refitter.Tests` | `net10.0` | Unit tests |
-| `Refitter.SourceGenerator.Tests` | `net8.0;net10.0` | Source generator integration tests |
+| `Refitter.Tests` | `net11.0` | Unit tests |
+| `Refitter.SourceGenerator.Tests` | `net8.0;net10.0;net11.0` | Source generator integration tests |
 
 ## Testing
 
@@ -43,13 +43,13 @@ dotnet test --solution src/Refitter.slnx -c Release
 - **Runner**: `Microsoft.Testing.Platform` (configured in `global.json`). Both test projects set `OutputType=Exe`, `GenerateProgramFile=false` and `EnableMSTestRunner=true`.
 - **Unit test pattern**: Scenario tests under `Refitter.Tests.Scenarios` contain an OpenAPI spec as a `const string`, generate code via `RefitGenerator.CreateAsync(...).Generate()`, assert string patterns, and verify compilation with `BuildHelper.BuildCSharp(generatedCode)`.
 - **Temp file helper**: `SwaggerFileHelper.CreateSwaggerFile(contents)` creates a temp YAML file; `CreateSwaggerJsonFile` for JSON.
-- **Build helper**: `BuildHelper.BuildCSharp()` writes generated code to a temp project and invokes `dotnet build` to verify it compiles. It defaults to `net8.0` but supports `net9.0` and `net10.0`.
+- **Build helper**: `BuildHelper.BuildCSharp()` writes generated code to a temp project and invokes `dotnet build` to verify it compiles. It defaults to `net8.0` but supports `net9.0`, `net10.0` and `net11.0`.
 - **Source generator tests**: Reference the generator as an `Analyzer` with `ReferenceOutputAssembly=false` and import `Refitter.SourceGenerator.targets` explicitly. They verify generated types exist at runtime, have Refit HTTP attributes, and get Refit generated implementations in the same build.
 
 ## CI / Smoke Tests
 
 - Build workflow: `.github/workflows/build.yml`
-- Smoke tests: `.github/workflows/smoke-tests.yml` runs `test/smoke-tests.ps1`
+- Smoke tests: `.github/workflows/smoke-tests.yml` runs `test/smoke-tests.sh`
 - The smoke test script publishes the CLI from source, generates clients against dozens of OpenAPI specs (v2.0, v3.0, v3.1, v3.4), and compiles them against console apps in `test/ConsoleApp/`.
 
 ## Code Style
@@ -57,7 +57,7 @@ dotnet test --solution src/Refitter.slnx -c Release
 - `.editorconfig` is authoritative.
 - 4-space indentation; `crlf` line endings for C# files per `.editorconfig`.
 - `var` is discouraged (`csharp_style_var_* = false:silent`).
-- `TreatWarningsAsErrors` is enabled on most production projects.
+- `TreatWarningsAsErrors` is enabled for all projects under `src/` via `src/Directory.Build.props`.
 - **Private fields must NOT be prefixed with `_`** — use camelCase without underscore prefix (e.g., `openApiPath` not `_openApiPath`).
 
 ## Key Conventions
@@ -66,7 +66,7 @@ dotnet test --solution src/Refitter.slnx -c Release
 - **New CLI arguments** must be documented in `README.md` and in the `.refitter` file format docs.
 - **`.refitter` files** are the settings format for all three distribution forms (CLI, MSBuild, Source Generator).
 - **Source generator `.refitter` files** are automatically included as `AdditionalFiles` via the package props. The test project explicitly excludes `PropertyNamingPolicy.refitter` during design-time builds (`Condition="'$(DesignTimeBuild)' != 'true'"`).
-- **MSBuild** package includes a custom `.targets` file that runs `RefitterGenerateTask` before `BeforeCompile`.
+- **MSBuild** package includes a custom `.targets` file that runs `RefitterGenerateTask` before `CoreCompile`.
 
 ## Commit Discipline
 

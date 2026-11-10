@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+  </PropertyGroup>
+  <!-- Refit resolves Microsoft.Extensions 11.x on net11.0, so lift the shared 10.x references to avoid NU1605 downgrades -->
+  <ItemGroup>
+    <!-- Part of the net11.0 shared framework; referencing it fails with NU1510 -->
+    <PackageReference Remove="System.ComponentModel.Annotations" />
+    <PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="11.0.0" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
+    <PackageReference Update="Microsoft.Extensions.Http.Polly" Version="11.0.0" />
+  </ItemGroup>
+</Project>

@@ -366,6 +366,29 @@ public class RefitterGenerateTaskTests
     }
 
     [TestMethod]
+    public void ResolveRefitterDll_Should_Prefer_Net11_When_Runtime_Is_Installed()
+    {
+        try
+        {
+            string packageFolder = Path.Combine("C:", "repo", "tasks");
+            List<string> messages = new();
+            RefitterGenerateTask.FileExists = _ => true;
+
+            string? result = RefitterGenerateTask.ResolveRefitterDll(
+                packageFolder,
+                ["Microsoft.NETCore.App 10.0.1", "Microsoft.NETCore.App 11.0.0"],
+                messages.Add);
+
+            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net11.0", "refitter.dll")));
+            messages.Should().Contain(message => message.Contains("Detected .NET 11.0 runtime", StringComparison.Ordinal));
+        }
+        finally
+        {
+            RefitterGenerateTask.ResetTestHooks();
+        }
+    }
+
+    [TestMethod]
     public void ResolveRefitterDll_Should_Return_Null_When_PackageFolder_Is_Blank()
     {
         var messages = new List<string>();
@@ -435,7 +458,7 @@ public class RefitterGenerateTaskTests
 
             var result = RefitterGenerateTask.ResolveRefitterDll(packageFolder, null, messages.Add);
 
-            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net10.0", "refitter.dll")));
+            result.Should().Be(Path.GetFullPath(Path.Combine(packageFolder, "..", "net11.0", "refitter.dll")));
             messages.Should().BeEmpty();
         }
         finally
@@ -570,6 +593,7 @@ public class RefitterGenerateTaskTests
     [TestMethod]
     [DataRow("net8.0", "net8.0")]
     [DataRow("net10.0", "net10.0")]
+    [DataRow("net11.0", "net11.0")]
     [DataRow("tools", null)]
     [DataRow("netpreview", null)]
     [DataRow("net8..0", null)]
