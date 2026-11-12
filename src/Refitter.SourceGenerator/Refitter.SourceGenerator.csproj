@@ -23,8 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="H.Generators.Extensions" Version="1.24.2" PrivateAssets="all" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.7.1" PrivateAssets="all" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="14.7.1" PrivateAssets="all" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.8.0" PrivateAssets="all" />
+    <PackageReference Include="NSwag.Core.Yaml" Version="14.8.0" PrivateAssets="all" />
     <PackageReference Include="OasReader" Version="3.10.2.21" PrivateAssets="all" />
     <PackageReference Include="Refit" Version="16.4.0" PrivateAssets="all" />
     <!-- Used only by the telemetry MSBuild task, never by the generator -->
