@@ -510,4 +510,40 @@ paths: [unterminated
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*could not be parsed*");
     }
+
+    private const string CommentPrefixedJson =
+        @"/*c*/{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""http://127.0.0.1:1/schema.json""}}}}";
+
+    private const string CommentBeforeValueJson =
+        @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"": /* c */ ""http://127.0.0.1:1/schema.json""}}}}";
+
+    private const string DuplicateRefKeyJson =
+        @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""#/components/schemas/Other"",""$ref"":""http://127.0.0.1:1/schema.json""}}}}";
+
+    [TestMethod]
+    [DataRow(CommentPrefixedJson)]
+    [DataRow(CommentBeforeValueJson)]
+    [DataRow(DuplicateRefKeyJson)]
+    public async Task Blocks_Remote_Reference_In_Json_With_Comments_Or_Duplicate_Keys(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*Remote '$ref' \"http://127.0.0.1:1/schema.json\"*");
+    }
+
+    [TestMethod]
+    [DataRow(CommentPrefixedJson)]
+    [DataRow(CommentBeforeValueJson)]
+    [DataRow(DuplicateRefKeyJson)]
+    public async Task Allows_Json_With_Comments_Or_Duplicate_Keys_When_Remote_Enabled(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
 }

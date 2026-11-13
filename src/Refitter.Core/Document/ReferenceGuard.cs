@@ -174,17 +174,15 @@ internal static class ReferenceGuard
 
     private static List<string> ExtractReferences(string content, string source)
     {
-        var trimmed = content.TrimStart();
-        if (trimmed.StartsWith("{", StringComparison.Ordinal) || trimmed.StartsWith("[", StringComparison.Ordinal))
+        // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
+        // valid JSON without starting with '{' or '['
+        try
         {
-            try
-            {
-                return ExtractJsonReferences(content);
-            }
-            catch (JsonReaderException)
-            {
-                // Not valid JSON, fall through to the YAML reader
-            }
+            return ExtractJsonReferences(content);
+        }
+        catch (JsonReaderException)
+        {
+            // Not valid JSON, fall through to the YAML reader
         }
 
         try
@@ -205,19 +203,31 @@ internal static class ReferenceGuard
     private static List<string> ExtractJsonReferences(string content)
     {
         var references = new List<string>();
+        var rootCompleted = false;
         using var reader = new JsonTextReader(new StringReader(content)) { DateParseHandling = DateParseHandling.None };
         while (reader.Read())
         {
+            if (reader.Depth == 0 && reader.TokenType is (JsonToken.EndObject or JsonToken.EndArray))
+                rootCompleted = true;
+
             if (reader.TokenType != JsonToken.PropertyName || (string?)reader.Value != "$ref")
                 continue;
 
-            if (reader.Read() && reader.TokenType == JsonToken.String)
+            // Comments may sit between the key and its value
+            bool hasValue;
+            do
+            {
+                hasValue = reader.Read();
+            }
+            while (hasValue && reader.TokenType == JsonToken.Comment);
+
+            if (hasValue && reader.TokenType == JsonToken.String)
                 AddReference(references, (string?)reader.Value);
         }
 
-        // The reader stops quietly at the end of truncated input, so require a complete document
-        if (reader.Depth != 0 || reader.TokenType is not (JsonToken.EndObject or JsonToken.EndArray))
-            throw new JsonReaderException("Unexpected end of JSON content.");
+        // The reader stops quietly at the end of truncated input, so require a complete root object or array
+        if (!rootCompleted)
+            throw new JsonReaderException("Expected a complete JSON object or array.");
 
         return references;
     }
