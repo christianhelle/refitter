@@ -222,7 +222,7 @@ internal static class ReferenceGuard
             while (hasValue && reader.TokenType == JsonToken.Comment);
 
             if (hasValue && reader.TokenType == JsonToken.String)
-                AddReference(references, (string)reader.Value!);
+                AddReference(references, (string)reader.Value);
         }
 
         // The reader stops quietly at the end of truncated input, so require a complete root object or array
@@ -257,25 +257,30 @@ internal static class ReferenceGuard
             if (node is null or string || !visited.Add(node))
                 continue;
 
-            if (node is IDictionary<object, object> mapping)
-            {
-                foreach (var entry in mapping)
-                {
-                    if (Equals(entry.Key, "$ref") && entry.Value is string value)
-                        AddReference(references, value);
-
-                    pending.Push(entry.Key);
-                    pending.Push(entry.Value);
-                }
-            }
-            else if (node is IList<object> sequence)
-            {
-                foreach (var item in sequence)
-                    pending.Push(item);
-            }
+            VisitYamlNode(node, pending, references);
         }
 
         return references;
+    }
+
+    private static void VisitYamlNode(object node, Stack<object?> pending, List<string> references)
+    {
+        if (node is IDictionary<object, object> mapping)
+        {
+            foreach (var entry in mapping)
+            {
+                if (Equals(entry.Key, "$ref") && entry.Value is string value)
+                    AddReference(references, value);
+
+                pending.Push(entry.Key);
+                pending.Push(entry.Value);
+            }
+        }
+        else if (node is IList<object> sequence)
+        {
+            foreach (var item in sequence)
+                pending.Push(item);
+        }
     }
 
     private static void AddReference(List<string> references, string value)
