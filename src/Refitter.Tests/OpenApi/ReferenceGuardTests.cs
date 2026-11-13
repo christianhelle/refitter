@@ -354,4 +354,56 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*Failed to read OpenAPI document*");
     }
+
+    // GHSA-4f49-pm8q-mx4f: JSON escapes are decoded by the parsers that resolve references,
+    // so the guard must see the decoded key and value as well
+    private const string EscapedKeyJson = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": { ""title"": ""t"", ""version"": ""1"" },
+  ""paths"": {},
+  ""components"": { ""schemas"": { ""Pet"": { ""\u0024ref"": ""http://127.0.0.1:1/schema.json"" } } }
+}";
+
+    private const string EscapedValueJson = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": { ""title"": ""t"", ""version"": ""1"" },
+  ""paths"": {},
+  ""components"": { ""schemas"": { ""Pet"": { ""$ref"": ""http:\/\/127.0.0.1:1\/schema.json"" } } }
+}";
+
+    [TestMethod]
+    [DataRow(EscapedKeyJson)]
+    [DataRow(EscapedValueJson)]
+    public async Task Blocks_Json_Escaped_Remote_Reference_By_Default(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyJson)]
+    [DataRow(EscapedValueJson)]
+    public async Task Remote_Validation_Blocks_Json_Escaped_Remote_Reference_By_Default(string contents)
+    {
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", contents, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyJson)]
+    [DataRow(EscapedValueJson)]
+    public async Task Allows_Json_Escaped_Remote_Reference_When_Enabled(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
 }

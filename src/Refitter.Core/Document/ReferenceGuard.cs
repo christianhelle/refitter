@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Refitter.Core;
 
@@ -175,6 +176,49 @@ internal static class ReferenceGuard
     }
 
     private static IEnumerable<string> ExtractReferences(string content)
+    {
+        var trimmed = content.TrimStart();
+        if (trimmed.StartsWith("{", StringComparison.Ordinal) || trimmed.StartsWith("[", StringComparison.Ordinal))
+        {
+            try
+            {
+                return ExtractJsonReferences(content);
+            }
+            catch (JsonReaderException)
+            {
+                // Not valid JSON, fall through to the raw text scan
+            }
+        }
+
+        return ExtractReferencesFromRawText(content);
+    }
+
+    // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
+    // reference resolvers decode them, and duplicate "$ref" keys are all inspected
+    private static List<string> ExtractJsonReferences(string content)
+    {
+        var references = new List<string>();
+        using var reader = new JsonTextReader(new StringReader(content)) { DateParseHandling = DateParseHandling.None };
+        while (reader.Read())
+        {
+            if (reader.TokenType != JsonToken.PropertyName || (string?)reader.Value != "$ref")
+                continue;
+
+            if (reader.Read() && reader.TokenType == JsonToken.String)
+                AddReference(references, (string?)reader.Value);
+        }
+
+        return references;
+    }
+
+    private static void AddReference(List<string> references, string? value)
+    {
+        var trimmed = value?.Trim();
+        if (!string.IsNullOrEmpty(trimmed))
+            references.Add(trimmed!);
+    }
+
+    private static IEnumerable<string> ExtractReferencesFromRawText(string content)
     {
         foreach (Match match in RefPattern.Matches(content))
         {
