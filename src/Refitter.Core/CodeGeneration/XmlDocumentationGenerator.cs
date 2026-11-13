@@ -86,7 +86,9 @@ public class XmlDocumentationGenerator
         var title = document.Info?.Title;
         if (!string.IsNullOrEmpty(title))
         {
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
             AppendXmlCommentBlock(SummaryTag, EscapeSymbols(title!), code, indent: Separator);
+#pragma warning restore S8969
         }
     }
 
@@ -242,7 +244,9 @@ public class XmlDocumentationGenerator
         var summary = fallbackSummary;
         if (!string.IsNullOrWhiteSpace(preferredSummary))
         {
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
             summary = EscapeSymbols(preferredSummary!);
+#pragma warning restore S8969
         }
 
         AppendXmlCommentBlock(SummaryTag, summary, code, indent: Separator);

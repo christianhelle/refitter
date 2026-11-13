@@ -231,7 +231,9 @@ internal class ReturnTypeGenerator(
             schema?.Type == NJsonSchema.JsonObjectType.Array)
         {
             typeName = typeName
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
                 .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)
+#pragma warning restore S8969
                 .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings.ArrayType);
         }
 

@@ -198,7 +198,9 @@ internal sealed class DocumentEquivalenceComparer
         if (string.IsNullOrWhiteSpace(referencePath))
             return null;
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var separatorIndex = referencePath!.LastIndexOf('/');
+#pragma warning restore S8969
         return separatorIndex >= 0 && separatorIndex < referencePath.Length - 1
             ? Uri.UnescapeDataString(referencePath.Substring(separatorIndex + 1))
             : null;

@@ -175,7 +175,9 @@ internal static class IdentifierUtils
             return null;
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var nonEmptyValue = value!;
+#pragma warning restore S8969
 
         if (nonEmptyValue.IndexOf('.') < 0)
         {
@@ -230,7 +232,9 @@ internal static class IdentifierUtils
             return "_";
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var originalValue = value!;
+#pragma warning restore S8969
 
         if (IsValidIdentifier(originalValue))
         {
@@ -297,7 +301,9 @@ internal static class IdentifierUtils
             return false;
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var identifier = value!;
+#pragma warning restore S8969
 
         if (identifier[0] == '@')
         {

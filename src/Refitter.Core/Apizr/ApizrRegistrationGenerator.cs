@@ -116,9 +116,13 @@ internal static class ApizrRegistrationGenerator
     {
         var methodName = iocSettings?.ExtensionMethodName;
         if (!string.IsNullOrWhiteSpace(methodName) && methodName != DependencyInjectionSettings.DefaultExtensionMethodName)
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
             return methodName!;
+#pragma warning restore S8969
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var formatedTitle = !string.IsNullOrWhiteSpace(title) ? title!
+#pragma warning restore S8969
             .Replace(NamingSettings.DefaultInterfaceName, string.Empty)
             .Replace("Swagger", string.Empty)
             .Replace("OpenAPI", string.Empty)
