@@ -433,10 +433,19 @@ components:
       $ref: *url
 ";
 
+    private const string AliasedMappingYaml = YamlHeader + @"x-shared: &shared
+  $ref: http://127.0.0.1:1/schema.json
+components:
+  schemas:
+    Pet: *shared
+    Cat: *shared
+";
+
     [TestMethod]
     [DataRow(EscapedKeyYaml)]
     [DataRow(EscapedValueYaml)]
     [DataRow(AliasedValueYaml)]
+    [DataRow(AliasedMappingYaml)]
     public async Task Blocks_Yaml_Obfuscated_Remote_Reference_By_Default(string contents)
     {
         var path = Write(NewRoot(), "spec.yaml", contents);
