@@ -236,7 +236,7 @@ flowchart TD
     PLB --> EMIT
     OP --> DOCS["XmlDocumentationGenerator"] --> EMIT
     OP --> ATTR["MethodAttributeGenerator<br/>headers, multipart, etc."] --> EMIT
-    EMIT["[Verb(path)] ReturnType Name(parameters);"]
+    EMIT["[Verb(path)] ReturnType Name(parameters);<br/>(QUERY: [QueryMethodAttribute(path)], a generated attribute)"]
 ```
 
 When Apizr is enabled together with `optionalParameters`, an extra overload without the optional parameters is emitted. Wrapper types created for dynamic querystrings and form objects are returned alongside the interfaces as non-interface `GeneratedCode` entries, so they end up in their own files in multi-file mode.
