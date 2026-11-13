@@ -7,7 +7,7 @@ namespace Refitter.Core;
 internal class InterfaceGenerator
 {
     private const string Separator = "    ";
-    private const string QueryMethodAttributeName = "QueryMethod";
+    private const string AttributeSuffix = "Attribute";
 
     private readonly RefitGeneratorSettings settings;
     private readonly OpenApiDocument document;
@@ -16,6 +16,7 @@ internal class InterfaceGenerator
     private readonly ReturnTypeGenerator returnTypeGenerator;
     private readonly MethodAttributeGenerator methodAttributeGenerator;
     private readonly ParameterListBuilder parameterListBuilder;
+    private string queryMethodAttributeName = "QueryMethod";
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -51,6 +52,15 @@ internal class InterfaceGenerator
         var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
         var title = ClientNaming.Create(settings.Naming, document.Info?.Title).Title;
 
+        var hasQueryOperations = operations.Any(IsGeneratedQueryOperation);
+        if (hasQueryOperations)
+        {
+            // The attribute shares the namespace with the contracts too
+            var attributeTypeName = IdentifierUtils.Counted(knownInterfaceIdentifiers, queryMethodAttributeName, AttributeSuffix);
+            knownInterfaceIdentifiers.Add(attributeTypeName);
+            queryMethodAttributeName = attributeTypeName.Substring(0, attributeTypeName.Length - AttributeSuffix.Length);
+        }
+
         if (partitioning.IsSingleInterface)
         {
             var singleGroup = groups.Count > 0 ? groups[0].ToList() : new();
@@ -80,8 +90,7 @@ internal class InterfaceGenerator
             }
         }
 
-        if (operations.Any(op => IsQuery(op.Verb) &&
-                                 (settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated)))
+        if (hasQueryOperations)
         {
             yield return GenerateQueryMethodAttribute();
         }
@@ -110,19 +119,22 @@ internal class InterfaceGenerator
     private static bool IsQuery(string verb) =>
         string.Equals(verb, "query", StringComparison.OrdinalIgnoreCase);
 
+    private bool IsGeneratedQueryOperation(OpenApiOperationInfo op) =>
+        IsQuery(op.Verb) && (settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated);
+
     // The Refit source generator only builds the request inline when Method constructs
     // HttpMethod from a string literal; the target-typed new("QUERY") falls back to reflection (RF006).
     private GeneratedCode GenerateQueryMethodAttribute() =>
         new(
-            QueryMethodAttributeName + "Attribute",
+            queryMethodAttributeName + AttributeSuffix,
             $$"""
             {{Separator}}/// <summary>Sends the request with the HTTP QUERY method.</summary>
             {{Separator}}{{GetGeneratedCodeAttribute()}}
             {{Separator}}[global::System.AttributeUsage(global::System.AttributeTargets.Method)]
-            {{Separator}}{{settings.TypeAccessibility.ToString().ToLowerInvariant()}} sealed class {{QueryMethodAttributeName}}Attribute : global::Refit.HttpMethodAttribute
+            {{Separator}}{{settings.TypeAccessibility.ToString().ToLowerInvariant()}} sealed class {{queryMethodAttributeName}}{{AttributeSuffix}} : global::Refit.HttpMethodAttribute
             {{Separator}}{
             {{Separator}}{{Separator}}/// <summary>Initializes a new instance with the relative path of the endpoint.</summary>
-            {{Separator}}{{Separator}}public {{QueryMethodAttributeName}}Attribute(string path) : base(path)
+            {{Separator}}{{Separator}}public {{queryMethodAttributeName}}{{AttributeSuffix}}(string path) : base(path)
             {{Separator}}{{Separator}}{
             {{Separator}}{{Separator}}}
 
@@ -242,7 +254,7 @@ internal class InterfaceGenerator
         }
 
         var returnType = returnTypeGenerator.Generate(operation);
-        var verb = IsQuery(op.Verb) ? QueryMethodAttributeName : op.Verb.CapitalizeFirstCharacter();
+        var verb = IsQuery(op.Verb) ? queryMethodAttributeName : op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
 
