@@ -406,4 +406,69 @@ components:
 
         await act.Should().NotThrowAsync();
     }
+
+    private const string YamlHeader = @"openapi: 3.0.0
+info:
+  title: t
+  version: '1'
+paths: {}
+";
+
+    private const string EscapedKeyYaml = YamlHeader + @"components:
+  schemas:
+    Pet:
+      ""\x24ref"": http://127.0.0.1:1/schema.json
+";
+
+    private const string EscapedValueYaml = YamlHeader + @"components:
+  schemas:
+    Pet:
+      $ref: ""http:\x2F\x2F127.0.0.1:1\x2Fschema.json""
+";
+
+    private const string AliasedValueYaml = YamlHeader + @"x-url: &url http://127.0.0.1:1/schema.json
+components:
+  schemas:
+    Pet:
+      $ref: *url
+";
+
+    [TestMethod]
+    [DataRow(EscapedKeyYaml)]
+    [DataRow(EscapedValueYaml)]
+    [DataRow(AliasedValueYaml)]
+    public async Task Blocks_Yaml_Obfuscated_Remote_Reference_By_Default(string contents)
+    {
+        var path = Write(NewRoot(), "spec.yaml", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyYaml)]
+    [DataRow(EscapedValueYaml)]
+    [DataRow(AliasedValueYaml)]
+    public async Task Remote_Validation_Blocks_Yaml_Obfuscated_Remote_Reference_By_Default(string contents)
+    {
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyYaml)]
+    [DataRow(EscapedValueYaml)]
+    [DataRow(AliasedValueYaml)]
+    public async Task Allows_Yaml_Obfuscated_Remote_Reference_When_Enabled(string contents)
+    {
+        var path = Write(NewRoot(), "spec.yaml", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
 }

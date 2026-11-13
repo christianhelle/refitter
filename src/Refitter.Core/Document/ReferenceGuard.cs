@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using YamlDotNet.Core;
+using YamlDotNet.Serialization;
 
 namespace Refitter.Core;
 
@@ -186,11 +188,18 @@ internal static class ReferenceGuard
             }
             catch (JsonReaderException)
             {
-                // Not valid JSON, fall through to the raw text scan
+                // Not valid JSON, fall through to the YAML reader
             }
         }
 
-        return ExtractReferencesFromRawText(content);
+        try
+        {
+            return ExtractYamlReferences(content);
+        }
+        catch (YamlException)
+        {
+            return ExtractReferencesFromRawText(content);
+        }
     }
 
     // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
@@ -206,6 +215,45 @@ internal static class ReferenceGuard
 
             if (reader.Read() && reader.TokenType == JsonToken.String)
                 AddReference(references, (string?)reader.Value);
+        }
+
+        return references;
+    }
+
+    // Deserializes the same way NSwag converts YAML, so escapes, anchors and aliases are resolved
+    // before the "$ref" keys and values are inspected
+    private static List<string> ExtractYamlReferences(string content)
+    {
+        var references = new List<string>();
+        var root = new DeserializerBuilder().Build().Deserialize(new StringReader(content));
+        var pending = new Stack<object?>();
+        var visited = new HashSet<object>(ReferenceComparer.Instance);
+        pending.Push(root);
+
+        while (pending.Count > 0)
+        {
+            var node = pending.Pop();
+
+            // Aliases share one node, so each container is inspected once to keep the walk linear
+            if (node is null or string || !visited.Add(node))
+                continue;
+
+            if (node is IDictionary<object, object> mapping)
+            {
+                foreach (var entry in mapping)
+                {
+                    if (entry.Key?.ToString() == "$ref" && entry.Value is string value)
+                        AddReference(references, value);
+
+                    pending.Push(entry.Key);
+                    pending.Push(entry.Value);
+                }
+            }
+            else if (node is IList<object> sequence)
+            {
+                foreach (var item in sequence)
+                    pending.Push(item);
+            }
         }
 
         return references;
@@ -229,6 +277,15 @@ internal static class ReferenceGuard
             if (value.Length > 0)
                 yield return value;
         }
+    }
+
+    private sealed class ReferenceComparer : IEqualityComparer<object>
+    {
+        public static readonly ReferenceComparer Instance = new();
+
+        public new bool Equals(object x, object y) => ReferenceEquals(x, y);
+
+        public int GetHashCode(object obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 
     private static bool IsWithin(string rootDirectory, string candidate)
