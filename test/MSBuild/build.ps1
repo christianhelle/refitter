@@ -21,9 +21,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
-dotnet add package Refitter.MSBuild --source .
-dotnet restore
-dotnet run -v d -filelogger -c Release
+dotnet add package Refitter.MSBuild --version 1.0.0 --no-restore
+dotnet restore --configfile nuget.local.config
+dotnet run --no-restore -v d -filelogger -c Release
 
 # Issue #998 regression assertions
 Write-Host ""
