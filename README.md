@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-104-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-105-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1007,6 +1007,17 @@ await foreach (var e in stream)
 
 Refit >= 14.0.0 auto-detects the frame format at runtime from the response's `Content-Type` header, so both JSON Lines and Server-Sent Events (SSE) responses can be consumed directly.
 
+## HTTP QUERY operations
+
+OpenAPI 3.2 `query` operations are sent with the HTTP `QUERY` method. Refit has no attribute for `QUERY` (`[Query]` is the Refit attribute for query string parameters), so when the document has a `query` operation, Refitter generates a `QueryMethodAttribute` into the client namespace and uses it on the method:
+
+```cs
+[QueryMethodAttribute("/items")]
+Task<ICollection<string>> SearchItems([Body] SearchBody body);
+```
+
+The attribute returns `new HttpMethod("QUERY")`, which the Refit source generator builds inline, so the method works with `RestService.ForGenerated`, `AddRefitGeneratedClient` and Native AOT. Two clients generated into the same namespace each declare `QueryMethodAttribute`; generate them into separate namespaces.
+
 ## ASP.NET Core and HttpClientFactory
 
 Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.nuget.org/packages/Refit.HttpClientFactory) library:
@@ -1624,6 +1635,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://allanritchie.com"><img src="https://avatars.githubusercontent.com/u/1431555?v=4?s=100" width="100px;" alt="Allan Ritchie"/><br /><sub><b>Allan Ritchie</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=aritchie" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kemocca"><img src="https://avatars.githubusercontent.com/u/203678923?v=4?s=100" width="100px;" alt="kemocca"/><br /><sub><b>kemocca</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Akemocca" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AkazaRenn"><img src="https://avatars.githubusercontent.com/u/8340896?v=4?s=100" width="100px;" alt="Renn"/><br /><sub><b>Renn</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3AAkazaRenn" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mvn-dips"><img src="https://avatars.githubusercontent.com/u/111971074?v=4?s=100" width="100px;" alt="mvn-dips"/><br /><sub><b>mvn-dips</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/commits?author=mvn-dips" title="Code">💻</a> <a href="https://github.com/christianhelle/refitter/issues?q=author%3Amvn-dips" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>

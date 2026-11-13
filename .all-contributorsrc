@@ -972,6 +972,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "mvn-dips",
+      "name": "mvn-dips",
+      "avatar_url": "https://avatars.githubusercontent.com/u/111971074?v=4",
+      "profile": "https://github.com/mvn-dips",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- docs: add mvn-dips as a contributor for code, and bug ([#1395](https://github.com/christianhelle/refitter/pull/1395)) (@allcontributors[bot])
 - Block escaped remote $ref references in reference guard ([#1392](https://github.com/christianhelle/refitter/pull/1392)) ([@christianhelle](https://github.com/christianhelle/))
 - Fix MSBuild Tasks CI restore after .NET 11 upgrade ([#1393](https://github.com/christianhelle/refitter/pull/1393)) ([@christianhelle](https://github.com/christianhelle/))
 - Update dependency Swashbuckle.AspNetCore to v11 ([#1385](https://github.com/christianhelle/refitter/pull/1385)) (@renovate[bot])
@@ -20,6 +21,8 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Follow-ups for HTTP QUERY operation support ([#1396](https://github.com/christianhelle/refitter/pull/1396)) ([@christianhelle](https://github.com/christianhelle/))
+- Support OpenAPI 3.2 query operations (HTTP QUERY) ([#1394](https://github.com/christianhelle/refitter/pull/1394)) ([@mvn-dips](https://github.com/mvn-dips/))
 - Convert snake_case tags to PascalCase in ByTag interface names ([#1380](https://github.com/christianhelle/refitter/pull/1380)) ([@christianhelle](https://github.com/christianhelle/))
 - Collapse pass-through generator modules ([#1375](https://github.com/christianhelle/refitter/pull/1375)) ([@christianhelle](https://github.com/christianhelle/))
 - Build method parameters as records and render them to C# once ([#1373](https://github.com/christianhelle/refitter/pull/1373)) ([@christianhelle](https://github.com/christianhelle/))

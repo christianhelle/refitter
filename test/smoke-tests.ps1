@@ -192,7 +192,8 @@ $script:Filenames = @(
     "link-example",
     "uber",
     "uspto",
-    "hubspot-events"
+    "hubspot-events",
+    "query-example"
 )
 
 $script:V31Filenames = @(
@@ -332,6 +333,7 @@ function CollectGenerationTasks
 
     # v3.1 and v3.4 webhook specs may not have regular API paths, so skip MultipleInterfaces variants
     $specSets = @(
+        @{ Version = "v3.2"; Filenames = $script:Filenames; SkipMultipleInterfaces = $false },
         @{ Version = "v3.0"; Filenames = $script:Filenames; SkipMultipleInterfaces = $false },
         @{ Version = "v2.0"; Filenames = $script:Filenames; SkipMultipleInterfaces = $false },
         @{ Version = "v3.1"; Filenames = $script:V31Filenames; SkipMultipleInterfaces = $true },

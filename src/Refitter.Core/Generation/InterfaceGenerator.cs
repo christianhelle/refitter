@@ -50,10 +50,27 @@ internal class InterfaceGenerator
         var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
         var title = ClientNaming.Create(settings.Naming, document.Info?.Title).Title;
 
+        var queryMethodAttributeTypeName = "QueryMethodAttribute";
+        var hasQueryOperations = operations.Any(IsGeneratedQueryOperation);
+        if (hasQueryOperations)
+        {
+            // The attribute shares the namespace with the contracts too. The single-file suffix pass
+            // renames contracts by their original names, so those are reserved as well.
+            var reservedNames = new HashSet<string>(knownInterfaceIdentifiers);
+            reservedNames.UnionWith(generator.GeneratedTypeNames);
+            queryMethodAttributeTypeName = IdentifierUtils.Counted(reservedNames, "QueryMethod", "Attribute");
+            knownInterfaceIdentifiers.Add(queryMethodAttributeTypeName);
+        }
+
         if (partitioning.IsSingleInterface)
         {
             var singleGroup = groups.Count > 0 ? groups[0].ToList() : new();
-            yield return GenerateSingleInterface(singleGroup, partitioning, title, knownInterfaceIdentifiers);
+            yield return GenerateSingleInterface(
+                singleGroup,
+                partitioning,
+                title,
+                knownInterfaceIdentifiers,
+                queryMethodAttributeTypeName);
         }
         else
         {
@@ -70,13 +87,19 @@ internal class InterfaceGenerator
                     nonDeprecatedOperations,
                     partitioning,
                     title,
-                    knownInterfaceIdentifiers);
+                    knownInterfaceIdentifiers,
+                    queryMethodAttributeTypeName);
 
                 foreach (var generatedCode in generateMultipleInterface)
                 {
                     yield return generatedCode;
                 }
             }
+        }
+
+        if (hasQueryOperations)
+        {
+            yield return GenerateQueryMethodAttribute(queryMethodAttributeTypeName);
         }
     }
 
@@ -98,11 +121,44 @@ internal class InterfaceGenerator
     private static bool IsSupportedByRefit(string verb) =>
         !string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase);
 
+    // OpenAPI 3.2 QUERY operations. Refit has no QUERY attribute, and Refit.QueryAttribute
+    // is the parameter attribute, so the client gets its own HttpMethodAttribute subclass.
+    private static bool IsQuery(string verb) =>
+        string.Equals(verb, "query", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsGeneratedQueryOperation(OpenApiOperationInfo op) =>
+        IsQuery(op.Verb) && (settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated);
+
+    // The Refit source generator only builds the request inline when Method constructs
+    // HttpMethod from a string literal; the target-typed new("QUERY") falls back to reflection (RF006).
+    private GeneratedCode GenerateQueryMethodAttribute(string queryMethodAttributeTypeName) =>
+        new(
+            queryMethodAttributeTypeName,
+            $$"""
+            {{Separator}}/// <summary>Sends the request with the HTTP QUERY method.</summary>
+            {{Separator}}{{GetGeneratedCodeAttribute()}}
+            {{Separator}}[global::System.AttributeUsage(global::System.AttributeTargets.Method)]
+            {{Separator}}{{settings.TypeAccessibility.ToString().ToLowerInvariant()}} sealed class {{queryMethodAttributeTypeName}} : global::Refit.HttpMethodAttribute
+            {{Separator}}{
+            {{Separator}}{{Separator}}/// <summary>Initializes a new instance with the relative path of the endpoint.</summary>
+            {{Separator}}{{Separator}}public {{queryMethodAttributeTypeName}}(string path) : base(path)
+            {{Separator}}{{Separator}}{
+            {{Separator}}{{Separator}}}
+
+            {{Separator}}{{Separator}}/// <inheritdoc />
+            {{Separator}}{{Separator}}public override global::System.Net.Http.HttpMethod Method => new global::System.Net.Http.HttpMethod("QUERY");
+            {{Separator}}}
+            """)
+        {
+            IsInterface = false,
+        };
+
     private GeneratedCode GenerateSingleInterface(
         List<OpenApiOperationInfo> operations,
         IInterfacePartitioning partitioning,
         string title,
-        HashSet<string> knownInterfaceIdentifiers)
+        HashSet<string> knownInterfaceIdentifiers,
+        string queryMethodAttributeTypeName)
     {
         var baseOperationName = operations.Count > 0 ? GetBaseOperationName(operations[0]) : string.Empty;
         var rawInterfaceName = partitioning.GetInterfaceName(string.Empty, title, baseOperationName);
@@ -136,6 +192,7 @@ internal class InterfaceGenerator
                 partitioning,
                 knownMethodIdentifiers,
                 knownInterfaceIdentifiers,
+                queryMethodAttributeTypeName,
                 code))
             {
                 dynamicQuerystringParametersCodeBuilder.AppendLine(parameterType.Content);
@@ -152,7 +209,8 @@ internal class InterfaceGenerator
         List<OpenApiOperationInfo> operations,
         IInterfacePartitioning partitioning,
         string title,
-        HashSet<string> knownInterfaceIdentifiers)
+        HashSet<string> knownInterfaceIdentifiers,
+        string queryMethodAttributeTypeName)
     {
         var representativeOperation = operations[0];
         var baseOperationName = GetBaseOperationName(representativeOperation);
@@ -178,6 +236,7 @@ internal class InterfaceGenerator
                 partitioning,
                 knownMethodIdentifiers,
                 knownInterfaceIdentifiers,
+                queryMethodAttributeTypeName,
                 code))
             {
                 yield return parameterType;
@@ -196,6 +255,7 @@ internal class InterfaceGenerator
         IInterfacePartitioning partitioning,
         Dictionary<string, HashSet<string>> knownMethodIdentifiers,
         HashSet<string> knownTypeIdentifiers,
+        string queryMethodAttributeTypeName,
         StringBuilder code)
     {
         var operation = op.Operation;
@@ -206,7 +266,8 @@ internal class InterfaceGenerator
         }
 
         var returnType = returnTypeGenerator.Generate(operation);
-        var verb = op.Verb.CapitalizeFirstCharacter();
+        // The full attribute name, so the suffix pass cannot match it against a contract named QueryMethod
+        var verb = IsQuery(op.Verb) ? queryMethodAttributeTypeName : op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
 
