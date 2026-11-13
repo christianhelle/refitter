@@ -167,7 +167,9 @@ public class RefitterGenerateTask : MSBuildTask
         }
 
         var refitterDll = ResolveRefitterDll(packageFolder, installedRuntimes, TryLogCommandLine);
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         if (string.IsNullOrWhiteSpace(refitterDll) || !FileExists(refitterDll!))
+#pragma warning restore S8969
         {
             failed = true;
             TryLogError("Unable to locate a bundled Refitter CLI runtime for the MSBuild task.");
@@ -189,7 +191,9 @@ public class RefitterGenerateTask : MSBuildTask
 
         var args = $"\"{refitterDll}\" --settings-file \"{file}\" --simple-output";
         args += $" --telemetry-source msbuild --telemetry-file-count {totalFileCount}";
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         string? runtimeTfm = GetRuntimeTfm(refitterDll!);
+#pragma warning restore S8969
         if (runtimeTfm is not null)
         {
             args += $" --telemetry-runtime {runtimeTfm}";
@@ -501,7 +505,9 @@ public class RefitterGenerateTask : MSBuildTask
             return;
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         logError(outputLine!);
+#pragma warning restore S8969
     }
 
     internal static void HandleProcessStandardOutput(string? outputLine, ICollection<string> outputLines, object outputLinesLock, Action<string> logCommandLine)
@@ -513,10 +519,14 @@ public class RefitterGenerateTask : MSBuildTask
 
         lock (outputLinesLock)
         {
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
             outputLines.Add(outputLine!);
+#pragma warning restore S8969
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         logCommandLine(outputLine!);
+#pragma warning restore S8969
     }
 
     internal static List<string> ResolveGeneratedFiles(IEnumerable<string?> outputLines, string settingsFilePath, out bool failed, Action<string> logError)
@@ -535,8 +545,10 @@ public class RefitterGenerateTask : MSBuildTask
     {
         var existingGeneratedFiles = outputLines
             .Select(ParseGeneratedFilePath)
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
             .Where(path => !string.IsNullOrWhiteSpace(path) && FileExists(path!))
             .Select(path => path!)
+#pragma warning restore S8969
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
@@ -551,7 +563,9 @@ public class RefitterGenerateTask : MSBuildTask
     {
         if (!string.IsNullOrWhiteSpace(outputLine))
         {
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
             outputLines.Add(outputLine!);
+#pragma warning restore S8969
         }
     }
 
