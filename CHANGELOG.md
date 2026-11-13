@@ -21,6 +21,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Keep Unicode line breaks in descriptions from escaping doc comments ([#1397](https://github.com/christianhelle/refitter/pull/1397)) ([@christianhelle](https://github.com/christianhelle/))
 - Follow-ups for HTTP QUERY operation support ([#1396](https://github.com/christianhelle/refitter/pull/1396)) ([@christianhelle](https://github.com/christianhelle/))
 - Support OpenAPI 3.2 query operations (HTTP QUERY) ([#1394](https://github.com/christianhelle/refitter/pull/1394)) ([@mvn-dips](https://github.com/mvn-dips/))
 - Convert snake_case tags to PascalCase in ByTag interface names ([#1380](https://github.com/christianhelle/refitter/pull/1380)) ([@christianhelle](https://github.com/christianhelle/))
