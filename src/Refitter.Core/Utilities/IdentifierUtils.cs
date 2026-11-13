@@ -175,7 +175,9 @@ internal static class IdentifierUtils
             return null;
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var nonEmptyValue = value!;
+#pragma warning restore S8969
 
         if (nonEmptyValue.IndexOf('.') < 0)
         {
@@ -230,7 +232,9 @@ internal static class IdentifierUtils
             return "_";
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var originalValue = value!;
+#pragma warning restore S8969
 
         if (IsValidIdentifier(originalValue))
         {
@@ -239,6 +243,11 @@ internal static class IdentifierUtils
                 : EscapeReservedKeyword(originalValue);
         }
 
+        return EscapeReservedKeyword(ReplaceInvalidIdentifierCharacters(originalValue));
+    }
+
+    private static string ReplaceInvalidIdentifierCharacters(string originalValue)
+    {
         var builder = new StringBuilder(originalValue.Length);
         var previousCharacterWasUnderscore = false;
 
@@ -277,9 +286,7 @@ internal static class IdentifierUtils
             }
         }
 
-        var identifier = builder.Length == 0 ? "_" : builder.ToString();
-
-        return EscapeReservedKeyword(identifier);
+        return builder.Length == 0 ? "_" : builder.ToString();
     }
 
     /// <summary>
@@ -294,7 +301,9 @@ internal static class IdentifierUtils
             return false;
         }
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var identifier = value!;
+#pragma warning restore S8969
 
         if (identifier[0] == '@')
         {

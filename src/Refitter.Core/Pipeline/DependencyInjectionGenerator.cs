@@ -126,43 +126,11 @@ internal static class DependencyInjectionGenerator
             code.Append(";");
             AppendGeneratedLine();
 
-            if (iocSettings.TransientErrorHandler == TransientErrorHandler.Polly)
+            var transientErrorHandlerCode = GetTransientErrorHandlerCode(iocSettings, clientBuilderName, newLine);
+            if (transientErrorHandlerCode != null)
             {
-                var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
                 AppendGeneratedLine();
-                AppendGeneratedLine(
-                    NormalizeLineEndings(
-                        $$"""
-                                      {{clientBuilderName}}
-                                          .AddPolicyHandler(
-                                              HttpPolicyExtensions
-                                                  .HandleTransientHttpError()
-                                                  .WaitAndRetryAsync(
-                                                      Backoff.DecorrelatedJitterBackoffV2(
-                                                          TimeSpan.FromSeconds({{durationString}}),
-                                                          {{iocSettings.MaxRetryCount}})));
-                          """,
-                        newLine));
-            }
-            else if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
-            {
-                var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
-                AppendGeneratedLine();
-                AppendGeneratedLine(
-                    NormalizeLineEndings(
-                        $$"""
-                                      {{clientBuilderName}}
-                                          .AddStandardResilienceHandler(config =>
-                                          {
-                                              config.Retry = new HttpRetryStrategyOptions
-                                              {
-                                                  UseJitter = true,
-                                                  MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
-                                                  Delay = TimeSpan.FromSeconds({{durationString}})
-                                              };
-                                          });
-                          """,
-                        newLine));
+                AppendGeneratedLine(transientErrorHandlerCode);
             }
 
             AppendGeneratedLine();
@@ -180,6 +148,50 @@ internal static class DependencyInjectionGenerator
         AppendGeneratedLine("}");
         AppendGeneratedLine();
         return code.ToString();
+    }
+
+    private static string? GetTransientErrorHandlerCode(
+        DependencyInjectionSettings iocSettings,
+        string clientBuilderName,
+        string newLine)
+    {
+        if (iocSettings.TransientErrorHandler == TransientErrorHandler.Polly)
+        {
+            var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
+            return NormalizeLineEndings(
+                $$"""
+                                      {{clientBuilderName}}
+                                          .AddPolicyHandler(
+                                              HttpPolicyExtensions
+                                                  .HandleTransientHttpError()
+                                                  .WaitAndRetryAsync(
+                                                      Backoff.DecorrelatedJitterBackoffV2(
+                                                          TimeSpan.FromSeconds({{durationString}}),
+                                                          {{iocSettings.MaxRetryCount}})));
+                          """,
+                newLine);
+        }
+
+        if (iocSettings.TransientErrorHandler == TransientErrorHandler.HttpResilience)
+        {
+            var durationString = iocSettings.FirstBackoffRetryInSeconds.ToString(CultureInfo.InvariantCulture);
+            return NormalizeLineEndings(
+                $$"""
+                                      {{clientBuilderName}}
+                                          .AddStandardResilienceHandler(config =>
+                                          {
+                                              config.Retry = new HttpRetryStrategyOptions
+                                              {
+                                                  UseJitter = true,
+                                                  MaxRetryAttempts = {{iocSettings.MaxRetryCount}},
+                                                  Delay = TimeSpan.FromSeconds({{durationString}})
+                                              };
+                                          });
+                          """,
+                newLine);
+        }
+
+        return null;
     }
 
     internal static string NormalizeLineEndings(string value, string newLine)

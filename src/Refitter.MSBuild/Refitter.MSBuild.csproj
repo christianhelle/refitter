@@ -13,6 +13,7 @@
         <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
