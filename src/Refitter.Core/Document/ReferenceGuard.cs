@@ -222,7 +222,7 @@ internal static class ReferenceGuard
             while (hasValue && reader.TokenType == JsonToken.Comment);
 
             if (hasValue && reader.TokenType == JsonToken.String)
-                AddReference(references, (string?)reader.Value);
+                AddReference(references, (string)reader.Value!);
         }
 
         // The reader stops quietly at the end of truncated input, so require a complete root object or array
@@ -261,7 +261,7 @@ internal static class ReferenceGuard
             {
                 foreach (var entry in mapping)
                 {
-                    if (entry.Key?.ToString() == "$ref" && entry.Value is string value)
+                    if (Equals(entry.Key, "$ref") && entry.Value is string value)
                         AddReference(references, value);
 
                     pending.Push(entry.Key);
@@ -278,11 +278,11 @@ internal static class ReferenceGuard
         return references;
     }
 
-    private static void AddReference(List<string> references, string? value)
+    private static void AddReference(List<string> references, string value)
     {
-        var trimmed = value?.Trim();
-        if (!string.IsNullOrEmpty(trimmed))
-            references.Add(trimmed!);
+        var trimmed = value.Trim();
+        if (trimmed.Length > 0)
+            references.Add(trimmed);
     }
 
     private sealed class ReferenceComparer : IEqualityComparer<object>

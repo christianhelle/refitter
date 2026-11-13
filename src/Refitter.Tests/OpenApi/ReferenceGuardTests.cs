@@ -564,4 +564,16 @@ paths: [unterminated
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*could not be parsed*");
     }
+
+    [TestMethod]
+    [DataRow("spec.yaml", "openapi: 3.0.0\npaths: {}\nx-extension:\n  $ref:\n    nested: value\n")]
+    [DataRow("spec.json", @"{""openapi"":""3.0.0"",""paths"":{},""x-extension"":{""$ref"":5}}")]
+    public async Task Ignores_Ref_Keys_Whose_Value_Is_Not_A_String(string fileName, string contents)
+    {
+        var path = Write(NewRoot(), fileName, contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
 }
