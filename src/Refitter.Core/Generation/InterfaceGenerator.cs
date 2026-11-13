@@ -15,7 +15,6 @@ internal class InterfaceGenerator
     private readonly ReturnTypeGenerator returnTypeGenerator;
     private readonly MethodAttributeGenerator methodAttributeGenerator;
     private readonly ParameterListBuilder parameterListBuilder;
-    private string queryMethodAttributeTypeName = "QueryMethodAttribute";
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -51,6 +50,7 @@ internal class InterfaceGenerator
         var knownInterfaceIdentifiers = new HashSet<string>(GetContractTypeNames());
         var title = ClientNaming.Create(settings.Naming, document.Info?.Title).Title;
 
+        var queryMethodAttributeTypeName = "QueryMethodAttribute";
         var hasQueryOperations = operations.Any(IsGeneratedQueryOperation);
         if (hasQueryOperations)
         {
@@ -65,7 +65,12 @@ internal class InterfaceGenerator
         if (partitioning.IsSingleInterface)
         {
             var singleGroup = groups.Count > 0 ? groups[0].ToList() : new();
-            yield return GenerateSingleInterface(singleGroup, partitioning, title, knownInterfaceIdentifiers);
+            yield return GenerateSingleInterface(
+                singleGroup,
+                partitioning,
+                title,
+                knownInterfaceIdentifiers,
+                queryMethodAttributeTypeName);
         }
         else
         {
@@ -82,7 +87,8 @@ internal class InterfaceGenerator
                     nonDeprecatedOperations,
                     partitioning,
                     title,
-                    knownInterfaceIdentifiers);
+                    knownInterfaceIdentifiers,
+                    queryMethodAttributeTypeName);
 
                 foreach (var generatedCode in generateMultipleInterface)
                 {
@@ -93,7 +99,7 @@ internal class InterfaceGenerator
 
         if (hasQueryOperations)
         {
-            yield return GenerateQueryMethodAttribute();
+            yield return GenerateQueryMethodAttribute(queryMethodAttributeTypeName);
         }
     }
 
@@ -125,7 +131,7 @@ internal class InterfaceGenerator
 
     // The Refit source generator only builds the request inline when Method constructs
     // HttpMethod from a string literal; the target-typed new("QUERY") falls back to reflection (RF006).
-    private GeneratedCode GenerateQueryMethodAttribute() =>
+    private GeneratedCode GenerateQueryMethodAttribute(string queryMethodAttributeTypeName) =>
         new(
             queryMethodAttributeTypeName,
             $$"""
@@ -151,7 +157,8 @@ internal class InterfaceGenerator
         List<OpenApiOperationInfo> operations,
         IInterfacePartitioning partitioning,
         string title,
-        HashSet<string> knownInterfaceIdentifiers)
+        HashSet<string> knownInterfaceIdentifiers,
+        string queryMethodAttributeTypeName)
     {
         var baseOperationName = operations.Count > 0 ? GetBaseOperationName(operations[0]) : string.Empty;
         var rawInterfaceName = partitioning.GetInterfaceName(string.Empty, title, baseOperationName);
@@ -185,6 +192,7 @@ internal class InterfaceGenerator
                 partitioning,
                 knownMethodIdentifiers,
                 knownInterfaceIdentifiers,
+                queryMethodAttributeTypeName,
                 code))
             {
                 dynamicQuerystringParametersCodeBuilder.AppendLine(parameterType.Content);
@@ -201,7 +209,8 @@ internal class InterfaceGenerator
         List<OpenApiOperationInfo> operations,
         IInterfacePartitioning partitioning,
         string title,
-        HashSet<string> knownInterfaceIdentifiers)
+        HashSet<string> knownInterfaceIdentifiers,
+        string queryMethodAttributeTypeName)
     {
         var representativeOperation = operations[0];
         var baseOperationName = GetBaseOperationName(representativeOperation);
@@ -227,6 +236,7 @@ internal class InterfaceGenerator
                 partitioning,
                 knownMethodIdentifiers,
                 knownInterfaceIdentifiers,
+                queryMethodAttributeTypeName,
                 code))
             {
                 yield return parameterType;
@@ -245,6 +255,7 @@ internal class InterfaceGenerator
         IInterfacePartitioning partitioning,
         Dictionary<string, HashSet<string>> knownMethodIdentifiers,
         HashSet<string> knownTypeIdentifiers,
+        string queryMethodAttributeTypeName,
         StringBuilder code)
     {
         var operation = op.Operation;
