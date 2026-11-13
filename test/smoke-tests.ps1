@@ -198,7 +198,8 @@ function RunTests
         "link-example",
         "uber",
         "uspto",
-        "hubspot-events"
+        "hubspot-events",
+        "query-example"
     )
 
     $v31Filenames = @(
@@ -336,7 +337,7 @@ function RunTests
     }
 
     # Collect generation tasks for v2.0 and v3.0
-    foreach ($version in @("v3.0", "v2.0"))
+    foreach ($version in @("v3.2", "v3.0", "v2.0"))
     {
         foreach ($format in @("json", "yaml"))
         {
