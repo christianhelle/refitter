@@ -7,6 +7,7 @@ namespace Refitter.Core;
 internal class InterfaceGenerator
 {
     private const string Separator = "    ";
+    private const string QueryMethodAttributeName = "QueryMethod";
 
     private readonly RefitGeneratorSettings settings;
     private readonly OpenApiDocument document;
@@ -78,6 +79,12 @@ internal class InterfaceGenerator
                 }
             }
         }
+
+        if (operations.Any(op => IsQuery(op.Verb) &&
+                                 (settings.GenerateDeprecatedOperations || !op.Operation.IsDeprecated)))
+        {
+            yield return GenerateQueryMethodAttribute();
+        }
     }
 
     private IEnumerable<string> GetContractTypeNames()
@@ -97,6 +104,35 @@ internal class InterfaceGenerator
     // Refit has no attribute for TRACE, so those operations cannot be expressed.
     private static bool IsSupportedByRefit(string verb) =>
         !string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase);
+
+    // OpenAPI 3.2 QUERY operations. Refit has no QUERY attribute, and Refit.QueryAttribute
+    // is the parameter attribute, so the client gets its own HttpMethodAttribute subclass.
+    private static bool IsQuery(string verb) =>
+        string.Equals(verb, "query", StringComparison.OrdinalIgnoreCase);
+
+    // The Refit source generator only builds the request inline when Method constructs
+    // HttpMethod from a string literal; the target-typed new("QUERY") falls back to reflection (RF006).
+    private GeneratedCode GenerateQueryMethodAttribute() =>
+        new(
+            QueryMethodAttributeName + "Attribute",
+            $$"""
+            {{Separator}}/// <summary>Sends the request with the HTTP QUERY method.</summary>
+            {{Separator}}{{GetGeneratedCodeAttribute()}}
+            {{Separator}}[global::System.AttributeUsage(global::System.AttributeTargets.Method)]
+            {{Separator}}{{settings.TypeAccessibility.ToString().ToLowerInvariant()}} sealed class {{QueryMethodAttributeName}}Attribute : global::Refit.HttpMethodAttribute
+            {{Separator}}{
+            {{Separator}}{{Separator}}/// <summary>Initializes a new instance with the relative path of the endpoint.</summary>
+            {{Separator}}{{Separator}}public {{QueryMethodAttributeName}}Attribute(string path) : base(path)
+            {{Separator}}{{Separator}}{
+            {{Separator}}{{Separator}}}
+
+            {{Separator}}{{Separator}}/// <inheritdoc />
+            {{Separator}}{{Separator}}public override global::System.Net.Http.HttpMethod Method => new global::System.Net.Http.HttpMethod("QUERY");
+            {{Separator}}}
+            """)
+        {
+            IsInterface = false,
+        };
 
     private GeneratedCode GenerateSingleInterface(
         List<OpenApiOperationInfo> operations,
@@ -206,7 +242,7 @@ internal class InterfaceGenerator
         }
 
         var returnType = returnTypeGenerator.Generate(operation);
-        var verb = op.Verb.CapitalizeFirstCharacter();
+        var verb = IsQuery(op.Verb) ? QueryMethodAttributeName : op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
 
