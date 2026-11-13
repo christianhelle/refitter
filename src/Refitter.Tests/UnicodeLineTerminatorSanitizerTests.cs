@@ -48,6 +48,10 @@ public class UnicodeLineTerminatorSanitizerTests
     [DataRow("c = '\\''; // a<T>b", "c = '\\''; // a b")]
     [DataRow("x = \"\"\"a<T>\"\"\"; // c<T>d", "x = \"\"\"a<T>\"\"\"; // c d")]
     [DataRow("x = \"\"; // c<T>d", "x = \"\"; // c d")]
+    [DataRow("x = @\"\"\"\"; // c<T>d", "x = @\"\"\"\"; // c d")]
+    [DataRow("x = @\"\"\"\"\"\"; // c<T>d", "x = @\"\"\"\"\"\"; // c d")]
+    [DataRow("x = $@\"\"\"\"; // c<T>d", "x = $@\"\"\"\"; // c d")]
+    [DataRow("x = @\"\"\"a<T>\"\"\"; // c<T>d", "x = @\"\"\"a<T>\"\"\"; // c d")]
     public void Sanitize_Replaces_Terminator_In_Comment_After_Literal(string template, string expected)
     {
         string code = template.Replace("<T>", T.ToString());

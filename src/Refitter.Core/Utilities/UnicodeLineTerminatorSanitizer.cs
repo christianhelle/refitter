@@ -68,14 +68,15 @@ internal static class UnicodeLineTerminatorSanitizer
 
     private static int SkipStringLiteral(char[] chars, int start)
     {
-        var quotes = CountQuotes(chars, start);
-        if (quotes >= 3)
-            return SkipRawString(chars, start + quotes, quotes);
-
+        // Raw string literals cannot take an @ prefix, so a prefixed quote run is always verbatim.
         var isVerbatim = Peek(chars, start - 1) == '@' ||
                          (Peek(chars, start - 1) == '$' && Peek(chars, start - 2) == '@');
-        return isVerbatim
-            ? SkipVerbatimString(chars, start + 1)
+        if (isVerbatim)
+            return SkipVerbatimString(chars, start + 1);
+
+        var quotes = CountQuotes(chars, start);
+        return quotes >= 3
+            ? SkipRawString(chars, start + quotes, quotes)
             : SkipQuotedLine(chars, start + 1, Quote);
     }
 
