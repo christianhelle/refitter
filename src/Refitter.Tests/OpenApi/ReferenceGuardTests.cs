@@ -517,12 +517,18 @@ paths: [unterminated
     private const string CommentBeforeValueJson =
         @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"": /* c */ ""http://127.0.0.1:1/schema.json""}}}}";
 
+    private const string TrailingCommentJson =
+        @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""http://127.0.0.1:1/schema.json""}}}}
+// trailing comment
+";
+
     private const string DuplicateRefKeyJson =
         @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""#/components/schemas/Other"",""$ref"":""http://127.0.0.1:1/schema.json""}}}}";
 
     [TestMethod]
     [DataRow(CommentPrefixedJson)]
     [DataRow(CommentBeforeValueJson)]
+    [DataRow(TrailingCommentJson)]
     [DataRow(DuplicateRefKeyJson)]
     public async Task Blocks_Remote_Reference_In_Json_With_Comments_Or_Duplicate_Keys(string contents)
     {
@@ -537,6 +543,7 @@ paths: [unterminated
     [TestMethod]
     [DataRow(CommentPrefixedJson)]
     [DataRow(CommentBeforeValueJson)]
+    [DataRow(TrailingCommentJson)]
     [DataRow(DuplicateRefKeyJson)]
     public async Task Allows_Json_With_Comments_Or_Duplicate_Keys_When_Remote_Enabled(string contents)
     {
