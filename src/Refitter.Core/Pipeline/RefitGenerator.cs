@@ -89,14 +89,18 @@ public class RefitGenerator(
     /// and returns the generated code as a string.
     /// </summary>
     /// <returns>The generated code as a string.</returns>
-    public string Generate() => FormatSingleFile(RunPipeline(document, settings), settings);
+    public string Generate() =>
+        UnicodeLineTerminatorSanitizer.Sanitize(FormatSingleFile(RunPipeline(document, settings), settings));
 
     /// <summary>
     /// Generates multiple files containing Refit interfaces and contracts.
     /// </summary>
     /// <returns>A GeneratorOutput containing all generated code files.</returns>
     public GeneratorOutput GenerateMultipleFiles() =>
-        new(FormatMultipleFiles(RunPipeline(document, settings), settings, document));
+        new(
+            FormatMultipleFiles(RunPipeline(document, settings), settings, document)
+                .Select(f => f with { Content = UnicodeLineTerminatorSanitizer.Sanitize(f.Content) })
+                .ToList());
 
     private static GenerationResult RunPipeline(
         OpenApiDocument document,
