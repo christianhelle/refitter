@@ -345,6 +345,7 @@ FILENAMES=(
     "uber"
     "uspto"
     "hubspot-events"
+    "query-example"
 )
 
 V31_FILENAMES=(
@@ -408,7 +409,7 @@ collect_tasks() {
     reset_tasks
 
     local version format filename spec_path info file_tag ns
-    for version in v3.0 v2.0; do
+    for version in v3.2 v3.0 v2.0; do
         for format in json yaml; do
             for filename in "${FILENAMES[@]}"; do
                 spec_path="./OpenAPI/$version/$filename.$format"
