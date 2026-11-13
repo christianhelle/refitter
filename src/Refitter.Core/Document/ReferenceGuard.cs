@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using YamlDotNet.Core;
+using YamlDotNet.Serialization;
 
 namespace Refitter.Core;
 
@@ -10,10 +12,6 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ReferenceGuard
 {
-    private static readonly Regex RefPattern = new(
-        "[\"']?\\$ref[\"']?\\s*:\\s*(?:[\"']([^\"']+)[\"']|([^\\s#][^\\s]*))",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     public static Task ValidateAsync(
         string openApiPath,
         bool allowRemoteReferences,
@@ -78,7 +76,7 @@ internal static class ReferenceGuard
             }
         }
 
-        foreach (var reference in ExtractReferences(content))
+        foreach (var reference in ExtractReferences(content, url))
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
@@ -145,7 +143,7 @@ internal static class ReferenceGuard
 
         string currentDirectory = Path.GetDirectoryName(filePath);
 
-        foreach (var reference in ExtractReferences(content))
+        foreach (var reference in ExtractReferences(content, filePath))
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
@@ -174,17 +172,131 @@ internal static class ReferenceGuard
         }
     }
 
-    private static IEnumerable<string> ExtractReferences(string content)
+    private static List<string> ExtractReferences(string content, string source)
     {
-        foreach (Match match in RefPattern.Matches(content))
+        // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
+        // valid JSON without starting with '{' or '['
+        try
         {
-            // Group 1 = quoted value, Group 2 = unquoted YAML scalar
-            var value = !string.IsNullOrEmpty(match.Groups[1].Value)
-                ? match.Groups[1].Value.Trim()
-                : match.Groups[2].Value.Trim();
-            if (value.Length > 0)
-                yield return value;
+            return ExtractJsonReferences(content);
         }
+        catch (JsonReaderException)
+        {
+            // Not valid JSON, fall through to the YAML reader
+        }
+
+        try
+        {
+            return ExtractYamlReferences(content);
+        }
+        catch (YamlException ex)
+        {
+            // Fail closed: a document the guard cannot read could still be read by a more lenient
+            // parser further down the pipeline, with references the guard never inspected
+            throw new ReferenceResolutionException(
+                $"OpenAPI document \"{source}\" could not be parsed for '$ref' validation: {ex.Message}", ex);
+        }
+    }
+
+    // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
+    // reference resolvers decode them, and duplicate "$ref" keys are all inspected
+    private static List<string> ExtractJsonReferences(string content)
+    {
+        var references = new List<string>();
+        var rootCompleted = false;
+        using var reader = new JsonTextReader(new StringReader(content)) { DateParseHandling = DateParseHandling.None };
+        while (reader.Read())
+        {
+            if (reader.Depth == 0 && reader.TokenType is (JsonToken.EndObject or JsonToken.EndArray))
+                rootCompleted = true;
+
+            if (reader.TokenType != JsonToken.PropertyName || (string?)reader.Value != "$ref")
+                continue;
+
+            // Comments may sit between the key and its value
+            bool hasValue;
+            do
+            {
+                hasValue = reader.Read();
+            }
+            while (hasValue && reader.TokenType == JsonToken.Comment);
+
+            if (hasValue && reader.TokenType == JsonToken.String)
+                AddReference(references, (string)reader.Value);
+        }
+
+        // The reader stops quietly at the end of truncated input, so require a complete root object or array
+        if (!rootCompleted)
+            throw new JsonReaderException("Expected a complete JSON object or array.");
+
+        return references;
+    }
+
+    // Deserializes the same way NSwag converts YAML, so escapes, anchors and aliases are resolved
+    // before the "$ref" keys and values are inspected. Duplicate keys are rejected because parsers
+    // disagree on which one wins
+    private static List<string> ExtractYamlReferences(string content)
+    {
+        var references = new List<string>();
+        var root = new DeserializerBuilder().WithDuplicateKeyChecking().Build().Deserialize(new StringReader(content));
+
+        // A document read as a bare scalar is text the YAML reader did not understand as a structure,
+        // which a different parser might still read as one
+        if (root is not (null or IDictionary<object, object> or IList<object>))
+            throw new YamlException("Expected a YAML mapping or sequence at the document root.");
+
+        var pending = new Stack<object?>();
+        var visited = new HashSet<object>(ReferenceComparer.Instance);
+        pending.Push(root);
+
+        while (pending.Count > 0)
+        {
+            var node = pending.Pop();
+
+            // Aliases share one node, so each container is inspected once to keep the walk linear
+            if (node is null or string || !visited.Add(node))
+                continue;
+
+            VisitYamlNode(node, pending, references);
+        }
+
+        return references;
+    }
+
+    private static void VisitYamlNode(object node, Stack<object?> pending, List<string> references)
+    {
+        if (node is IDictionary<object, object> mapping)
+        {
+            foreach (var entry in mapping)
+            {
+                if (Equals(entry.Key, "$ref") && entry.Value is string value)
+                    AddReference(references, value);
+
+                pending.Push(entry.Key);
+                pending.Push(entry.Value);
+            }
+        }
+        else if (node is IList<object> sequence)
+        {
+            foreach (var item in sequence)
+                pending.Push(item);
+        }
+    }
+
+    private static void AddReference(List<string> references, string value)
+    {
+        var trimmed = value.Trim();
+        if (trimmed.Length > 0)
+            references.Add(trimmed);
+    }
+
+    private sealed class ReferenceComparer : IEqualityComparer<object>
+    {
+        public static readonly ReferenceComparer Instance = new();
+
+        public new bool Equals(object x, object y) => ReferenceEquals(x, y);
+
+        public int GetHashCode(object obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 
     private static bool IsWithin(string rootDirectory, string candidate)
