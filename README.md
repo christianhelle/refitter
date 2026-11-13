@@ -1007,6 +1007,17 @@ await foreach (var e in stream)
 
 Refit >= 14.0.0 auto-detects the frame format at runtime from the response's `Content-Type` header, so both JSON Lines and Server-Sent Events (SSE) responses can be consumed directly.
 
+## HTTP QUERY operations
+
+OpenAPI 3.2 `query` operations are sent with the HTTP `QUERY` method. Refit has no attribute for `QUERY` (`[Query]` is the Refit attribute for query string parameters), so when the document has a `query` operation, Refitter generates a `QueryMethodAttribute` into the client namespace and uses it on the method:
+
+```cs
+[QueryMethod("/items")]
+Task<ICollection<string>> SearchItems([Body] SearchBody body);
+```
+
+The attribute returns `new HttpMethod("QUERY")`, which the Refit source generator builds inline, so the method works with `RestService.ForGenerated`, `AddRefitGeneratedClient` and Native AOT. Two clients generated into the same namespace each declare `QueryMethodAttribute`; generate them into separate namespaces.
+
 ## ASP.NET Core and HttpClientFactory
 
 Here's an example Minimal API with the [`Refit.HttpClientFactory`](https://www.nuget.org/packages/Refit.HttpClientFactory) library:
