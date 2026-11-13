@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
@@ -13,10 +12,6 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ReferenceGuard
 {
-    private static readonly Regex RefPattern = new(
-        "[\"']?\\$ref[\"']?\\s*:\\s*(?:[\"']([^\"']+)[\"']|([^\\s#][^\\s]*))",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     public static Task ValidateAsync(
         string openApiPath,
         bool allowRemoteReferences,
@@ -81,7 +76,7 @@ internal static class ReferenceGuard
             }
         }
 
-        foreach (var reference in ExtractReferences(content))
+        foreach (var reference in ExtractReferences(content, url))
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
@@ -148,7 +143,7 @@ internal static class ReferenceGuard
 
         string currentDirectory = Path.GetDirectoryName(filePath);
 
-        foreach (var reference in ExtractReferences(content))
+        foreach (var reference in ExtractReferences(content, filePath))
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
@@ -177,7 +172,7 @@ internal static class ReferenceGuard
         }
     }
 
-    private static IEnumerable<string> ExtractReferences(string content)
+    private static List<string> ExtractReferences(string content, string source)
     {
         var trimmed = content.TrimStart();
         if (trimmed.StartsWith("{", StringComparison.Ordinal) || trimmed.StartsWith("[", StringComparison.Ordinal))
@@ -196,9 +191,12 @@ internal static class ReferenceGuard
         {
             return ExtractYamlReferences(content);
         }
-        catch (YamlException)
+        catch (YamlException ex)
         {
-            return ExtractReferencesFromRawText(content);
+            // Fail closed: a document the guard cannot read could still be read by a more lenient
+            // parser further down the pipeline, with references the guard never inspected
+            throw new ReferenceResolutionException(
+                $"OpenAPI document \"{source}\" could not be parsed for '$ref' validation: {ex.Message}", ex);
         }
     }
 
@@ -217,15 +215,20 @@ internal static class ReferenceGuard
                 AddReference(references, (string?)reader.Value);
         }
 
+        // The reader stops quietly at the end of truncated input, so require a complete document
+        if (reader.Depth != 0 || reader.TokenType is not (JsonToken.EndObject or JsonToken.EndArray))
+            throw new JsonReaderException("Unexpected end of JSON content.");
+
         return references;
     }
 
     // Deserializes the same way NSwag converts YAML, so escapes, anchors and aliases are resolved
-    // before the "$ref" keys and values are inspected
+    // before the "$ref" keys and values are inspected. Duplicate keys are rejected because parsers
+    // disagree on which one wins
     private static List<string> ExtractYamlReferences(string content)
     {
         var references = new List<string>();
-        var root = new DeserializerBuilder().Build().Deserialize(new StringReader(content));
+        var root = new DeserializerBuilder().WithDuplicateKeyChecking().Build().Deserialize(new StringReader(content));
         var pending = new Stack<object?>();
         var visited = new HashSet<object>(ReferenceComparer.Instance);
         pending.Push(root);
@@ -264,19 +267,6 @@ internal static class ReferenceGuard
         var trimmed = value?.Trim();
         if (!string.IsNullOrEmpty(trimmed))
             references.Add(trimmed!);
-    }
-
-    private static IEnumerable<string> ExtractReferencesFromRawText(string content)
-    {
-        foreach (Match match in RefPattern.Matches(content))
-        {
-            // Group 1 = quoted value, Group 2 = unquoted YAML scalar
-            var value = !string.IsNullOrEmpty(match.Groups[1].Value)
-                ? match.Groups[1].Value.Trim()
-                : match.Groups[2].Value.Trim();
-            if (value.Length > 0)
-                yield return value;
-        }
     }
 
     private sealed class ReferenceComparer : IEqualityComparer<object>

@@ -471,4 +471,43 @@ components:
 
         await act.Should().NotThrowAsync();
     }
+
+    private const string UnterminatedJson = @"{ ""openapi"": ""3.0.0"", ""paths"": { ""$ref"": ";
+
+    private const string UnterminatedYaml = @"openapi: 3.0.0
+paths: [unterminated
+";
+
+    private const string DuplicateRefKeyYaml = YamlHeader + @"components:
+  schemas:
+    Pet:
+      $ref: '#/components/schemas/Other'
+      $ref: http://127.0.0.1:1/schema.json
+";
+
+    [TestMethod]
+    [DataRow("spec.json", UnterminatedJson)]
+    [DataRow("spec.yaml", UnterminatedYaml)]
+    [DataRow("spec.yaml", DuplicateRefKeyYaml)]
+    public async Task Blocks_Document_That_Cannot_Be_Parsed(string fileName, string contents)
+    {
+        var path = Write(NewRoot(), fileName, contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
+    }
+
+    [TestMethod]
+    [DataRow(UnterminatedJson)]
+    [DataRow(UnterminatedYaml)]
+    [DataRow(DuplicateRefKeyYaml)]
+    public async Task Remote_Validation_Blocks_Document_That_Cannot_Be_Parsed(string contents)
+    {
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
+    }
 }
