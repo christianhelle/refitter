@@ -46,8 +46,9 @@ internal static class ContractTypeSuffixApplier
         {
             var typeName = typeDecl.Identifier.Text;
 
-            // Skip if already has suffix to prevent double-suffixing (#1013)
-            if (!typeName.EndsWith(suffix, StringComparison.Ordinal))
+            // Skip if already has suffix to prevent double-suffixing (#1013), and skip the
+            // generated QUERY verb attribute, which is not a contract
+            if (!typeName.EndsWith(suffix, StringComparison.Ordinal) && !IsHttpMethodAttribute(typeDecl))
             {
                 typeNames.Add(typeName);
             }
@@ -81,6 +82,9 @@ internal static class ContractTypeSuffixApplier
         // Return the modified code with original formatting preserved
         return newRoot.ToFullString();
     }
+
+    private static bool IsHttpMethodAttribute(BaseTypeDeclarationSyntax typeDecl) =>
+        typeDecl.BaseList?.Types.Any(t => t.Type.ToString() == "global::Refit.HttpMethodAttribute") == true;
 
     /// <summary>
     /// Syntax rewriter that renames type declarations and all references to them
