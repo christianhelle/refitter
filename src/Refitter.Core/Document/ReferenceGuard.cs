@@ -239,6 +239,12 @@ internal static class ReferenceGuard
     {
         var references = new List<string>();
         var root = new DeserializerBuilder().WithDuplicateKeyChecking().Build().Deserialize(new StringReader(content));
+
+        // A document read as a bare scalar is text the YAML reader did not understand as a structure,
+        // which a different parser might still read as one
+        if (root is not (null or IDictionary<object, object> or IList<object>))
+            throw new YamlException("Expected a YAML mapping or sequence at the document root.");
+
         var pending = new Stack<object?>();
         var visited = new HashSet<object>(ReferenceComparer.Instance);
         pending.Push(root);

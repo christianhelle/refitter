@@ -553,4 +553,15 @@ paths: [unterminated
 
         await act.Should().NotThrowAsync();
     }
+
+    [TestMethod]
+    public async Task Blocks_Document_That_Is_A_Plain_Yaml_Scalar()
+    {
+        var path = Write(NewRoot(), "spec.yaml", "just some text\n");
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
+    }
 }
