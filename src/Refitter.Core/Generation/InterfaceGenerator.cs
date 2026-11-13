@@ -7,7 +7,6 @@ namespace Refitter.Core;
 internal class InterfaceGenerator
 {
     private const string Separator = "    ";
-    private const string AttributeSuffix = "Attribute";
 
     private readonly RefitGeneratorSettings settings;
     private readonly OpenApiDocument document;
@@ -16,7 +15,7 @@ internal class InterfaceGenerator
     private readonly ReturnTypeGenerator returnTypeGenerator;
     private readonly MethodAttributeGenerator methodAttributeGenerator;
     private readonly ParameterListBuilder parameterListBuilder;
-    private string queryMethodAttributeName = "QueryMethod";
+    private string queryMethodAttributeTypeName = "QueryMethodAttribute";
 
     internal InterfaceGenerator(
         RefitGeneratorSettings settings,
@@ -55,10 +54,12 @@ internal class InterfaceGenerator
         var hasQueryOperations = operations.Any(IsGeneratedQueryOperation);
         if (hasQueryOperations)
         {
-            // The attribute shares the namespace with the contracts too
-            var attributeTypeName = IdentifierUtils.Counted(knownInterfaceIdentifiers, queryMethodAttributeName, AttributeSuffix);
-            knownInterfaceIdentifiers.Add(attributeTypeName);
-            queryMethodAttributeName = attributeTypeName.Substring(0, attributeTypeName.Length - AttributeSuffix.Length);
+            // The attribute shares the namespace with the contracts too. The single-file suffix pass
+            // renames contracts by their original names, so those are reserved as well.
+            var reservedNames = new HashSet<string>(knownInterfaceIdentifiers);
+            reservedNames.UnionWith(generator.GeneratedTypeNames);
+            queryMethodAttributeTypeName = IdentifierUtils.Counted(reservedNames, "QueryMethod", "Attribute");
+            knownInterfaceIdentifiers.Add(queryMethodAttributeTypeName);
         }
 
         if (partitioning.IsSingleInterface)
@@ -126,15 +127,15 @@ internal class InterfaceGenerator
     // HttpMethod from a string literal; the target-typed new("QUERY") falls back to reflection (RF006).
     private GeneratedCode GenerateQueryMethodAttribute() =>
         new(
-            queryMethodAttributeName + AttributeSuffix,
+            queryMethodAttributeTypeName,
             $$"""
             {{Separator}}/// <summary>Sends the request with the HTTP QUERY method.</summary>
             {{Separator}}{{GetGeneratedCodeAttribute()}}
             {{Separator}}[global::System.AttributeUsage(global::System.AttributeTargets.Method)]
-            {{Separator}}{{settings.TypeAccessibility.ToString().ToLowerInvariant()}} sealed class {{queryMethodAttributeName}}{{AttributeSuffix}} : global::Refit.HttpMethodAttribute
+            {{Separator}}{{settings.TypeAccessibility.ToString().ToLowerInvariant()}} sealed class {{queryMethodAttributeTypeName}} : global::Refit.HttpMethodAttribute
             {{Separator}}{
             {{Separator}}{{Separator}}/// <summary>Initializes a new instance with the relative path of the endpoint.</summary>
-            {{Separator}}{{Separator}}public {{queryMethodAttributeName}}{{AttributeSuffix}}(string path) : base(path)
+            {{Separator}}{{Separator}}public {{queryMethodAttributeTypeName}}(string path) : base(path)
             {{Separator}}{{Separator}}{
             {{Separator}}{{Separator}}}
 
@@ -254,7 +255,8 @@ internal class InterfaceGenerator
         }
 
         var returnType = returnTypeGenerator.Generate(operation);
-        var verb = IsQuery(op.Verb) ? queryMethodAttributeName : op.Verb.CapitalizeFirstCharacter();
+        // The full attribute name, so the suffix pass cannot match it against a contract named QueryMethod
+        var verb = IsQuery(op.Verb) ? queryMethodAttributeTypeName : op.Verb.CapitalizeFirstCharacter();
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
 

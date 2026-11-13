@@ -47,16 +47,16 @@ public class QueryOperationTests
     private static readonly string DeprecatedQuerySpec = OpenApiSpec
         .Replace("\"operationId\": \"SearchItems\",", "\"operationId\": \"SearchItems\", \"deprecated\": true,");
 
-    // A contract that takes the attribute's name
-    private static readonly string ContractNamedLikeAttributeSpec = OpenApiSpec
-        .Replace("\"SearchBody\": {", "\"QueryMethodAttribute\": { \"type\": \"object\" }, \"SearchBody\": {")
-        .Replace("\"properties\": { \"q\": { \"type\": \"string\" } }", "\"properties\": { \"q\": { \"type\": \"string\" }, \"a\": { \"$ref\": \"#/components/schemas/QueryMethodAttribute\" } }");
+    // A spec with a contract of the given name, referenced from the request body
+    private static string WithContractNamed(string name) => OpenApiSpec
+        .Replace("\"SearchBody\": {", $"\"{name}\": {{ \"type\": \"object\" }}, \"SearchBody\": {{")
+        .Replace("\"properties\": { \"q\": { \"type\": \"string\" } }", $"\"properties\": {{ \"q\": {{ \"type\": \"string\" }}, \"a\": {{ \"$ref\": \"#/components/schemas/{name}\" }} }}");
 
     [TestMethod]
     public async Task Generates_QueryMethod_Attribute_On_Query_Operation()
     {
         var generatedCode = await GenerateCode();
-        generatedCode.Should().Contain("[QueryMethod(\"/items\")]");
+        generatedCode.Should().Contain("[QueryMethodAttribute(\"/items\")]");
         generatedCode.Should().NotContain("[Query(\"/items\")]");
     }
 
@@ -106,7 +106,7 @@ public class QueryOperationTests
 
         if (generateDeprecatedOperations)
         {
-            generatedCode.Should().Contain("[QueryMethod(\"/items\")]");
+            generatedCode.Should().Contain("[QueryMethodAttribute(\"/items\")]");
             generatedCode.Should().Contain("sealed class QueryMethodAttribute");
             BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
         }
@@ -123,18 +123,34 @@ public class QueryOperationTests
         var generatedCode = await GenerateCode(settings => settings.ContractTypeSuffix = "Dto");
         generatedCode.Should().Contain("class SearchBodyDto");
         generatedCode.Should().Contain("sealed class QueryMethodAttribute : global::Refit.HttpMethodAttribute");
-        generatedCode.Should().Contain("[QueryMethod(\"/items\")]");
+        generatedCode.Should().Contain("[QueryMethodAttribute(\"/items\")]");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
     [TestMethod]
     [TestCategory("Integration")]
-    public async Task Renames_QueryMethodAttribute_When_A_Contract_Has_Its_Name()
+    [DataRow("")]
+    [DataRow("Dto")]
+    public async Task Renames_QueryMethodAttribute_When_A_Contract_Has_Its_Name(string contractTypeSuffix)
     {
-        var generatedCode = await GenerateCode(spec: ContractNamedLikeAttributeSpec);
-        generatedCode.Should().Contain("partial class QueryMethodAttribute");
+        var generatedCode = await GenerateCode(
+            settings => settings.ContractTypeSuffix = contractTypeSuffix,
+            WithContractNamed("QueryMethodAttribute"));
+        generatedCode.Should().Contain($"partial class QueryMethodAttribute{contractTypeSuffix}");
         generatedCode.Should().Contain("sealed class QueryMethod2Attribute : global::Refit.HttpMethodAttribute");
-        generatedCode.Should().Contain("[QueryMethod2(\"/items\")]");
+        generatedCode.Should().Contain("[QueryMethod2Attribute(\"/items\")]");
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [TestMethod]
+    [TestCategory("Integration")]
+    public async Task Keeps_QueryMethodAttribute_Usage_When_A_Suffixed_Contract_Is_Named_QueryMethod()
+    {
+        var generatedCode = await GenerateCode(
+            settings => settings.ContractTypeSuffix = "Dto",
+            WithContractNamed("QueryMethod"));
+        generatedCode.Should().Contain("partial class QueryMethodDto");
+        generatedCode.Should().Contain("[QueryMethodAttribute(\"/items\")]");
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 

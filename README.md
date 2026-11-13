@@ -1012,7 +1012,7 @@ Refit >= 14.0.0 auto-detects the frame format at runtime from the response's `Co
 OpenAPI 3.2 `query` operations are sent with the HTTP `QUERY` method. Refit has no attribute for `QUERY` (`[Query]` is the Refit attribute for query string parameters), so when the document has a `query` operation, Refitter generates a `QueryMethodAttribute` into the client namespace and uses it on the method:
 
 ```cs
-[QueryMethod("/items")]
+[QueryMethodAttribute("/items")]
 Task<ICollection<string>> SearchItems([Body] SearchBody body);
 ```
 
