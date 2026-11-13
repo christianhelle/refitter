@@ -374,4 +374,235 @@ components:
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*Failed to read OpenAPI document*");
     }
+
+    // GHSA-4f49-pm8q-mx4f: JSON escapes are decoded by the parsers that resolve references,
+    // so the guard must see the decoded key and value as well
+    private const string EscapedKeyJson = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": { ""title"": ""t"", ""version"": ""1"" },
+  ""paths"": {},
+  ""components"": { ""schemas"": { ""Pet"": { ""\u0024ref"": ""http://127.0.0.1:1/schema.json"" } } }
+}";
+
+    private const string EscapedValueJson = @"{
+  ""openapi"": ""3.0.0"",
+  ""info"": { ""title"": ""t"", ""version"": ""1"" },
+  ""paths"": {},
+  ""components"": { ""schemas"": { ""Pet"": { ""$ref"": ""http:\/\/127.0.0.1:1\/schema.json"" } } }
+}";
+
+    [TestMethod]
+    [DataRow(EscapedKeyJson)]
+    [DataRow(EscapedValueJson)]
+    public async Task Blocks_Json_Escaped_Remote_Reference_By_Default(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyJson)]
+    [DataRow(EscapedValueJson)]
+    public async Task Remote_Validation_Blocks_Json_Escaped_Remote_Reference_By_Default(string contents)
+    {
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", contents, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyJson)]
+    [DataRow(EscapedValueJson)]
+    public async Task Allows_Json_Escaped_Remote_Reference_When_Enabled(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    private const string YamlHeader = @"openapi: 3.0.0
+info:
+  title: t
+  version: '1'
+paths: {}
+";
+
+    private const string EscapedKeyYaml = YamlHeader + @"components:
+  schemas:
+    Pet:
+      ""\x24ref"": http://127.0.0.1:1/schema.json
+";
+
+    private const string EscapedValueYaml = YamlHeader + @"components:
+  schemas:
+    Pet:
+      $ref: ""http:\x2F\x2F127.0.0.1:1\x2Fschema.json""
+";
+
+    private const string AliasedValueYaml = YamlHeader + @"x-url: &url http://127.0.0.1:1/schema.json
+components:
+  schemas:
+    Pet:
+      $ref: *url
+";
+
+    private const string AliasedMappingYaml = YamlHeader + @"x-shared: &shared
+  $ref: http://127.0.0.1:1/schema.json
+components:
+  schemas:
+    Pet: *shared
+    Cat: *shared
+";
+
+    [TestMethod]
+    [DataRow(EscapedKeyYaml)]
+    [DataRow(EscapedValueYaml)]
+    [DataRow(AliasedValueYaml)]
+    [DataRow(AliasedMappingYaml)]
+    public async Task Blocks_Yaml_Obfuscated_Remote_Reference_By_Default(string contents)
+    {
+        var path = Write(NewRoot(), "spec.yaml", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyYaml)]
+    [DataRow(EscapedValueYaml)]
+    [DataRow(AliasedValueYaml)]
+    public async Task Remote_Validation_Blocks_Yaml_Obfuscated_Remote_Reference_By_Default(string contents)
+    {
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*http://127.0.0.1:1/schema.json*");
+    }
+
+    [TestMethod]
+    [DataRow(EscapedKeyYaml)]
+    [DataRow(EscapedValueYaml)]
+    [DataRow(AliasedValueYaml)]
+    public async Task Allows_Yaml_Obfuscated_Remote_Reference_When_Enabled(string contents)
+    {
+        var path = Write(NewRoot(), "spec.yaml", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    private const string UnterminatedJson = @"{ ""openapi"": ""3.0.0"", ""paths"": { ""$ref"": ";
+
+    private const string UnterminatedYaml = @"openapi: 3.0.0
+paths: [unterminated
+";
+
+    private const string DuplicateRefKeyYaml = YamlHeader + @"components:
+  schemas:
+    Pet:
+      $ref: '#/components/schemas/Other'
+      $ref: http://127.0.0.1:1/schema.json
+";
+
+    [TestMethod]
+    [DataRow("spec.json", UnterminatedJson)]
+    [DataRow("spec.yaml", UnterminatedYaml)]
+    [DataRow("spec.yaml", DuplicateRefKeyYaml)]
+    public async Task Blocks_Document_That_Cannot_Be_Parsed(string fileName, string contents)
+    {
+        var path = Write(NewRoot(), fileName, contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
+    }
+
+    [TestMethod]
+    [DataRow(UnterminatedJson)]
+    [DataRow(UnterminatedYaml)]
+    [DataRow(DuplicateRefKeyYaml)]
+    public async Task Remote_Validation_Blocks_Document_That_Cannot_Be_Parsed(string contents)
+    {
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
+    }
+
+    private const string CommentPrefixedJson =
+        @"/*c*/{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""http://127.0.0.1:1/schema.json""}}}}";
+
+    private const string CommentBeforeValueJson =
+        @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"": /* c */ ""http://127.0.0.1:1/schema.json""}}}}";
+
+    private const string TrailingCommentJson =
+        @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""http://127.0.0.1:1/schema.json""}}}}
+// trailing comment
+";
+
+    private const string DuplicateRefKeyJson =
+        @"{""openapi"":""3.0.0"",""info"":{""title"":""t"",""version"":""1""},""paths"":{},""components"":{""schemas"":{""Pet"":{""$ref"":""#/components/schemas/Other"",""$ref"":""http://127.0.0.1:1/schema.json""}}}}";
+
+    [TestMethod]
+    [DataRow(CommentPrefixedJson)]
+    [DataRow(CommentBeforeValueJson)]
+    [DataRow(TrailingCommentJson)]
+    [DataRow(DuplicateRefKeyJson)]
+    public async Task Blocks_Remote_Reference_In_Json_With_Comments_Or_Duplicate_Keys(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*Remote '$ref' \"http://127.0.0.1:1/schema.json\"*");
+    }
+
+    [TestMethod]
+    [DataRow(CommentPrefixedJson)]
+    [DataRow(CommentBeforeValueJson)]
+    [DataRow(TrailingCommentJson)]
+    [DataRow(DuplicateRefKeyJson)]
+    public async Task Allows_Json_With_Comments_Or_Duplicate_Keys_When_Remote_Enabled(string contents)
+    {
+        var path = Write(NewRoot(), "spec.json", contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [TestMethod]
+    public async Task Blocks_Document_That_Is_A_Plain_Yaml_Scalar()
+    {
+        var path = Write(NewRoot(), "spec.yaml", "just some text\n");
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
+    }
+
+    [TestMethod]
+    [DataRow("spec.yaml", "openapi: 3.0.0\npaths: {}\nx-extension:\n  $ref:\n    nested: value\n")]
+    [DataRow("spec.json", @"{""openapi"":""3.0.0"",""paths"":{},""x-extension"":{""$ref"":5}}")]
+    public async Task Ignores_Ref_Keys_Whose_Value_Is_Not_A_String(string fileName, string contents)
+    {
+        var path = Write(NewRoot(), fileName, contents);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
 }
