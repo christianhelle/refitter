@@ -21,7 +21,7 @@ internal sealed class GeneratorPipeline
         RefitGeneratorSettings settings,
         CustomCSharpClientGenerator generator)
     {
-        var contracts = generator.GenerateFile();
+        var contracts = UnicodeLineTerminatorSanitizer.Sanitize(generator.GenerateFile());
         foreach (var postProcessor in contractsPostProcessors)
             contracts = postProcessor.Process(document, settings, contracts);
 
