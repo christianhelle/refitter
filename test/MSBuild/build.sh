@@ -14,10 +14,8 @@ dotnet clean -c Release ../../src/Refitter.slnx
 dotnet build -c Release ../../src/Refitter/Refitter.csproj
 dotnet build -c Release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c Release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
-# Restore from the normal feeds first: the --source . restore below cannot fetch Refit's dependencies
-dotnet restore
-dotnet add package Refitter.MSBuild --source .
-dotnet restore
-dotnet run -v d -filelogger -c Release
+dotnet add package Refitter.MSBuild --version 1.0.0 --no-restore
+dotnet restore --configfile nuget.local.config
+dotnet run --no-restore -v d -filelogger -c Release
 dotnet remove package Refitter.MSBuild
 rm -f Refitter.MSBuild.*.nupkg
