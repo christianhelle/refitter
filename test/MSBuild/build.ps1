@@ -21,7 +21,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 dotnet build -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
-dotnet add package Refitter.MSBuild --source .
+dotnet add package Refitter.MSBuild --version 1.0.0
 dotnet restore
 dotnet run -v d -filelogger -c Release
 

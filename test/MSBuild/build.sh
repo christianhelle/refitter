@@ -14,7 +14,7 @@ dotnet clean -c Release ../../src/Refitter.slnx
 dotnet build -c Release ../../src/Refitter/Refitter.csproj
 dotnet build -c Release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj
 dotnet pack -c Release ../../src/Refitter.MSBuild/Refitter.MSBuild.csproj -o .
-dotnet add package Refitter.MSBuild --source .
+dotnet add package Refitter.MSBuild --version 1.0.0
 dotnet restore
 dotnet run -v d -filelogger -c Release
 dotnet remove package Refitter.MSBuild
