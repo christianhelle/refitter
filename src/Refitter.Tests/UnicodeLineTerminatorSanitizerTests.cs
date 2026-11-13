@@ -35,6 +35,12 @@ public class UnicodeLineTerminatorSanitizerTests
     [DataRow("x = @$\"a\"\" // <T>\";")]
     [DataRow("x = \"\"\"a \"\" // <T>\"\"\";")]
     [DataRow("/* a<T>b */")]
+    [DataRow("/* a<T>b")]
+    [DataRow("\"a<T>b\"")]
+    [DataRow("x = \"a<T>b")]
+    [DataRow("x = @\"a<T>b")]
+    [DataRow("x = \"\"\"a<T>b \"\" c")]
+    [DataRow("a<T>b /")]
     public void Sanitize_Keeps_Unicode_Line_Terminator_Outside_Line_Comments(string template)
     {
         string code = template.Replace("<T>", T.ToString());
@@ -52,9 +58,13 @@ public class UnicodeLineTerminatorSanitizerTests
     [DataRow("x = @\"\"\"\"\"\"; // c<T>d", "x = @\"\"\"\"\"\"; // c d")]
     [DataRow("x = $@\"\"\"\"; // c<T>d", "x = $@\"\"\"\"; // c d")]
     [DataRow("x = @\"\"\"a<T>\"\"\"; // c<T>d", "x = @\"\"\"a<T>\"\"\"; // c d")]
+    [DataRow("x = \"a<LF>// c<T>d", "x = \"a<LF>// c d")]
+    [DataRow("c = 'a<LF>// c<T>d", "c = 'a<LF>// c d")]
     public void Sanitize_Replaces_Terminator_In_Comment_After_Literal(string template, string expected)
     {
-        string code = template.Replace("<T>", T.ToString());
-        UnicodeLineTerminatorSanitizer.Sanitize(code).Should().Be(expected.Replace("<T>", T.ToString()));
+        UnicodeLineTerminatorSanitizer.Sanitize(Expand(template)).Should().Be(Expand(expected));
     }
+
+    private static string Expand(string template) =>
+        template.Replace("<T>", T.ToString()).Replace("<LF>", ((char)0x000A).ToString());
 }
