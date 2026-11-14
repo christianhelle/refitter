@@ -370,9 +370,9 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `jsonSerializerSettingsTransformationMethod` - Default is null,
   - `generateJsonMethods` - Default is false,
   - `enforceFlagEnums` - Default is false,
-  - `inlineNamedDictionaries` - Default is false,
+  - `inlineNamedDictionaries` - Default is false. When enabled, usages of named dictionary schemas use the dictionary type directly (e.g. `IDictionary<string, T>`) and the named types are not generated
   - `inlineNamedTuples` - Default is true,
-  - `inlineNamedArrays` - Default is false,
+  - `inlineNamedArrays` - Default is false. When enabled, usages of named array schemas use the collection type directly (e.g. `ICollection<T>`) and the named types are not generated
   - `generateOptionalPropertiesAsNullable` - Default is false,
   - `generateNullableReferenceTypes` - Default is false,
   - `generateNativeRecords` - Default is false
