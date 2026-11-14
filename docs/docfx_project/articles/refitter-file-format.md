@@ -249,7 +249,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
   - `inlineJsonConverters` - Default is true. When set to false, enum properties will not have `[JsonConverter(typeof(JsonStringEnumConverter))]` attributes
-  - `excludedTypeNames` - Default is empty
+  - `excludedTypeNames` - Default is empty. Excluded types must be provided by an import or another namespace. When `generateNativeRecords` or `immutableRecords` is enabled, an excluded type that a generated contract derives from must itself be a record, since C# records cannot inherit from classes
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `jsonLibraryVersion` - Default is `8.0`. JSON library version for System.Text.Json. When set to `9.0` or higher, enables .NET 9+ `JsonStringEnumMemberName` support for custom enum value names
