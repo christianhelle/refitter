@@ -82,6 +82,24 @@ components:
         generatedCode.Should().Contain("partial record OAuthScope");
     }
 
+    [TestMethod]
+    public async Task Custom_Base_Types_Are_Generated_As_Class()
+    {
+        string generatedCode = await GenerateCodeWithCustomBaseTypes();
+        generatedCode.Should().Contain(
+            "partial class OAuthScopes : List<OAuthScope>");
+        generatedCode.Should().Contain(
+            "partial class OAuthScopeMap : System.Collections.Concurrent.ConcurrentDictionary<string, OAuthScope>");
+    }
+
+    [TestCategory("Integration")]
+    [TestMethod]
+    public async Task Can_Build_Generated_Code_With_Custom_Base_Types()
+    {
+        string generatedCode = await GenerateCodeWithCustomBaseTypes();
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
     [TestCategory("Integration")]
     [TestMethod]
     [DataRow(true, false)]
@@ -92,7 +110,25 @@ components:
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
-    private static async Task<string> GenerateCode(bool generateNativeRecords, bool immutableRecords)
+    private static Task<string> GenerateCode(bool generateNativeRecords, bool immutableRecords) =>
+        GenerateCode(
+            immutableRecords,
+            new CodeGeneratorSettings
+            {
+                GenerateNativeRecords = generateNativeRecords,
+            });
+
+    private static Task<string> GenerateCodeWithCustomBaseTypes() =>
+        GenerateCode(
+            false,
+            new CodeGeneratorSettings
+            {
+                GenerateNativeRecords = true,
+                ArrayBaseType = "System.Collections.Generic.List",
+                DictionaryBaseType = "System.Collections.Concurrent.ConcurrentDictionary",
+            });
+
+    private static async Task<string> GenerateCode(bool immutableRecords, CodeGeneratorSettings codeGeneratorSettings)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
@@ -101,10 +137,7 @@ components:
             {
                 OpenApiPath = swaggerFile,
                 ImmutableRecords = immutableRecords,
-                CodeGeneratorSettings = new CodeGeneratorSettings
-                {
-                    GenerateNativeRecords = generateNativeRecords,
-                },
+                CodeGeneratorSettings = codeGeneratorSettings,
             };
             var generator = await RefitGenerator.CreateAsync(settings);
             return generator.Generate();

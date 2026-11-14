@@ -1,3 +1,4 @@
+using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag.CodeGeneration.CSharp;
 
@@ -8,12 +9,12 @@ namespace Refitter.Core;
 /// <list type="bullet">
 /// <item>Adds UnknownDerivedTypeHandling = FallBackToBaseType and IgnoreUnrecognizedTypeDiscriminators = true
 /// to the JsonPolymorphic attribute. Remove once NSwag supports setting these.</item>
-/// <item>Keeps types deriving from the array or dictionary base type as classes when native records are generated,
-/// since a record cannot inherit from a class (#1398).</item>
+/// <item>Keeps types deriving from a generic base type (the array, dictionary or tuple base type) as classes
+/// when native records are generated, since a record cannot inherit from a class (#1398).</item>
 /// </list>
 /// </summary>
 internal class CustomTemplateFactory(
-    CSharpGeneratorSettings settings)
+    CodeGeneratorSettingsBase settings)
     : NSwag.CodeGeneration.DefaultTemplateFactory(
         settings,
         [
@@ -24,7 +25,10 @@ internal class CustomTemplateFactory(
 {
     private const string ClassDeclaration = "partial {{ ClassType }} {{ClassName}}";
 
-    private readonly CSharpGeneratorSettings csharpSettings = settings;
+    // NJsonSchema caches parsed templates per process, so the template text must not depend on settings.
+    // Generated contracts are never generic, so a generic base class is a collection type and never a record.
+    private const string ClassDeclarationWithCollectionBaseAsClass =
+        "partial {% if HasInheritance and BaseClassName contains \"<\" %}class{% else %}{{ ClassType }}{% endif %} {{ClassName}}";
 
     protected override string GetEmbeddedLiquidTemplate(string language, string template)
     {
@@ -35,22 +39,8 @@ internal class CustomTemplateFactory(
                 .Replace(
                     "[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"{{ Discriminator }}\")]",
                     "[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = \"{{ Discriminator }}\", UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FallBackToBaseType, IgnoreUnrecognizedTypeDiscriminators = true)]")
-                .Replace(ClassDeclaration, GetClassDeclaration()),
+                .Replace(ClassDeclaration, ClassDeclarationWithCollectionBaseAsClass),
             _ => templateText,
         };
     }
-
-    private string GetClassDeclaration()
-    {
-        // Liquid template text is loaded when the contracts are generated, after the user settings are applied.
-        // Match on the simple type name, as NJsonSchema may render the default base types without their namespace.
-        var arrayBaseType = GetSimpleTypeName(csharpSettings.ArrayBaseType);
-        var dictionaryBaseType = GetSimpleTypeName(csharpSettings.DictionaryBaseType);
-        return "partial {% if HasInheritance and BaseClassName contains \"" + arrayBaseType + "<\" %}class" +
-               "{% elsif HasInheritance and BaseClassName contains \"" + dictionaryBaseType + "<\" %}class" +
-               "{% else %}{{ ClassType }}{% endif %} {{ClassName}}";
-    }
-
-    private static string GetSimpleTypeName(string typeName) =>
-        typeName.Substring(typeName.LastIndexOf('.') + 1);
 }
