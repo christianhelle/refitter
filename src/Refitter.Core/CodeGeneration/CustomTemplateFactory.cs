@@ -8,7 +8,7 @@ namespace Refitter.Core;
 /// <list type="bullet">
 /// <item>Adds UnknownDerivedTypeHandling = FallBackToBaseType and IgnoreUnrecognizedTypeDiscriminators = true
 /// to the JsonPolymorphic attribute. Remove once NSwag supports setting these.</item>
-/// <item>Keeps types deriving from the array base type as classes when native records are generated,
+/// <item>Keeps types deriving from the array or dictionary base type as classes when native records are generated,
 /// since a record cannot inherit from a class (#1398).</item>
 /// </list>
 /// </summary>
@@ -42,8 +42,15 @@ internal class CustomTemplateFactory(
 
     private string GetClassDeclaration()
     {
-        // Liquid template text is loaded when the contracts are generated, after the user settings are applied
-        return "partial {% if HasInheritance and BaseClassName contains \"" + csharpSettings.ArrayBaseType + "<\" %}class" +
+        // Liquid template text is loaded when the contracts are generated, after the user settings are applied.
+        // Match on the simple type name, as NJsonSchema may render the default base types without their namespace.
+        var arrayBaseType = GetSimpleTypeName(csharpSettings.ArrayBaseType);
+        var dictionaryBaseType = GetSimpleTypeName(csharpSettings.DictionaryBaseType);
+        return "partial {% if HasInheritance and BaseClassName contains \"" + arrayBaseType + "<\" %}class" +
+               "{% elsif HasInheritance and BaseClassName contains \"" + dictionaryBaseType + "<\" %}class" +
                "{% else %}{{ ClassType }}{% endif %} {{ClassName}}";
     }
+
+    private static string GetSimpleTypeName(string typeName) =>
+        typeName.Substring(typeName.LastIndexOf('.') + 1);
 }

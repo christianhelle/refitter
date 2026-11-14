@@ -24,6 +24,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OAuthScopes'
+  /scopes/by-name:
+    get:
+      operationId: 'GetScopesByName'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthScopeMap'
 components:
   schemas:
     OAuthScope:
@@ -36,6 +46,11 @@ components:
       description: 'Array of OAuth scopes'
       items:
         $ref: '#/components/schemas/OAuthScope'
+    OAuthScopeMap:
+      type: object
+      description: 'OAuth scopes by name'
+      additionalProperties:
+        $ref: '#/components/schemas/OAuthScope'
 ";
 
     [TestMethod]
@@ -46,6 +61,16 @@ components:
         string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
         generatedCode.Should().Contain(
             "partial class OAuthScopes : System.Collections.ObjectModel.Collection<OAuthScope>");
+    }
+
+    [TestMethod]
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    public async Task Dictionary_Schema_Is_Generated_As_Class(bool generateNativeRecords, bool immutableRecords)
+    {
+        string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
+        generatedCode.Should().Contain(
+            "partial class OAuthScopeMap : Dictionary<string, OAuthScope>");
     }
 
     [TestMethod]
