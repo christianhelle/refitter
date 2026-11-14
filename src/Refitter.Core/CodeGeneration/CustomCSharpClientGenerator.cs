@@ -15,6 +15,18 @@ internal class CustomCSharpClientGenerator(OpenApiDocument document, CSharpClien
 
     internal IEnumerable<string> GeneratedTypeNames => Resolver.Types.Values;
 
+    /// <summary>
+    /// Gets the type names of named array and dictionary schemas that are inlined wherever they are used,
+    /// so the named types themselves are never referenced by the generated code.
+    /// </summary>
+    internal IEnumerable<string> GetInlinedCollectionTypeNames() =>
+        Resolver.Types
+            .Where(
+                type =>
+                    (type.Key.IsArray && Settings.CSharpGeneratorSettings.InlineNamedArrays) ||
+                    (type.Key.IsDictionary && Settings.CSharpGeneratorSettings.InlineNamedDictionaries))
+            .Select(type => type.Value);
+
     internal bool HasGeneratedType(string typeName) =>
         Resolver.Types.Values.Contains(typeName, StringComparer.Ordinal);
 }

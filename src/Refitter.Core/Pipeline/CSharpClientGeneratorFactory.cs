@@ -103,6 +103,13 @@ internal class CSharpClientGeneratorFactory
         var csharpGeneratorSettings = generator.Settings.CSharpGeneratorSettings;
         ApplyCodeGeneratorSettings(codeGeneration.CodeGeneratorSettings, csharpGeneratorSettings);
 
+        // NSwag still emits named collection types that inlining leaves unreferenced (#1398)
+        csharpGeneratorSettings.ExcludedTypeNames =
+        [
+            .. csharpGeneratorSettings.ExcludedTypeNames ?? [],
+            .. generator.GetInlinedCollectionTypeNames(),
+        ];
+
         var useNativeRecords = codeGeneration.ImmutableRecords || csharpGeneratorSettings.GenerateNativeRecords;
         csharpGeneratorSettings.GenerateNativeRecords = useNativeRecords;
         csharpGeneratorSettings.ClassStyle = useNativeRecords
