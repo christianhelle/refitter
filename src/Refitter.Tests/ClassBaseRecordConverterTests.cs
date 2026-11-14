@@ -60,6 +60,38 @@ public class ClassBaseRecordConverterTests
     }
 
     [TestMethod]
+    public void Converts_Record_Deriving_From_Alias_Qualified_Class()
+    {
+        const string contracts = """
+            public partial class Base
+            {
+            }
+
+            public partial record Derived : global::Base
+            {
+            }
+            """;
+
+        ClassBaseRecordConverter.Convert(contracts).Should().Contain("public partial class Derived : global::Base");
+    }
+
+    [TestMethod]
+    public void Leaves_Records_Without_Class_Bases_Unchanged()
+    {
+        const string contracts = """
+            public partial record Base : object
+            {
+            }
+
+            public partial record Derived : Base
+            {
+            }
+            """;
+
+        ClassBaseRecordConverter.Convert(contracts).Should().BeSameAs(contracts);
+    }
+
+    [TestMethod]
     public void Leaves_Contracts_Without_Records_Unchanged()
     {
         const string contracts = """

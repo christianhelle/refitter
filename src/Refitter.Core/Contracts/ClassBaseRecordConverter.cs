@@ -59,9 +59,10 @@ internal sealed class ClassBaseRecordConverter : IContractsPostProcessor
     }
 
     private static string? GetBaseTypeName(RecordDeclarationSyntax record) =>
-        record.BaseList?.Types.FirstOrDefault()?.Type switch
+        record.BaseList?.Types[0].Type switch
         {
             QualifiedNameSyntax qualifiedName => qualifiedName.Right.Identifier.ValueText,
+            AliasQualifiedNameSyntax aliasQualifiedName => aliasQualifiedName.Name.Identifier.ValueText,
             SimpleNameSyntax simpleName => simpleName.Identifier.ValueText,
             _ => null,
         };
