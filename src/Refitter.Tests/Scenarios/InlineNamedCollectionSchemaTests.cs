@@ -111,6 +111,30 @@ components:
     }
 
     [TestMethod]
+    public async Task User_Excluded_Type_Names_Are_Kept()
+    {
+        string generatedCode = await GenerateCode(
+            false,
+            inlineNamedArrays: true,
+            inlineNamedDictionaries: false,
+            settings => settings.ExcludedTypeNames = ["OAuthScopeMap"]);
+        generatedCode.Should().NotContain("partial class OAuthScopes");
+        generatedCode.Should().NotContain("partial class OAuthScopeMap");
+    }
+
+    [TestMethod]
+    public async Task Null_Excluded_Type_Names_Are_Supported()
+    {
+        string generatedCode = await GenerateCode(
+            false,
+            inlineNamedArrays: true,
+            inlineNamedDictionaries: false,
+            settings => settings.ExcludedTypeNames = null!);
+        generatedCode.Should().NotContain("partial class OAuthScopes");
+        generatedCode.Should().Contain("partial class OAuthScopeMap");
+    }
+
+    [TestMethod]
     public async Task Named_Collections_Are_Generated_When_Not_Inlined()
     {
         string generatedCode = await GenerateCode(false, inlineNamedArrays: false, inlineNamedDictionaries: false);
@@ -131,7 +155,8 @@ components:
     private static async Task<string> GenerateCode(
         bool generateNativeRecords,
         bool inlineNamedArrays,
-        bool inlineNamedDictionaries)
+        bool inlineNamedDictionaries,
+        Action<CodeGeneratorSettings>? configure = null)
     {
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
         try
@@ -147,6 +172,7 @@ components:
                     InlineNamedDictionaries = inlineNamedDictionaries,
                 },
             };
+            configure?.Invoke(settings.CodeGeneratorSettings);
             var generator = await RefitGenerator.CreateAsync(settings);
             return generator.Generate();
         }
