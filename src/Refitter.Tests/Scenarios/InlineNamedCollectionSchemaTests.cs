@@ -53,6 +53,24 @@ components:
           $ref: '#/components/schemas/OAuthScopes'
         scopesByName:
           $ref: '#/components/schemas/OAuthScopeMap'
+        ownedScopes:
+          $ref: '#/components/schemas/OwnedScopeMap'
+        ownedScopeList:
+          $ref: '#/components/schemas/OwnedScopes'
+    OwnedScopeMap:
+      allOf:
+        - $ref: '#/components/schemas/OAuthScopeMap'
+        - type: object
+          properties:
+            owner:
+              type: string
+    OwnedScopes:
+      allOf:
+        - $ref: '#/components/schemas/OAuthScopes'
+        - type: object
+          properties:
+            owner:
+              type: string
 ";
 
     [TestMethod]
@@ -74,6 +92,16 @@ components:
         string generatedCode = await GenerateCode(generateNativeRecords, inlineNamedArrays: false, inlineNamedDictionaries: true);
         generatedCode.Should().NotContain("OAuthScopeMap");
         generatedCode.Should().Contain("partial class OAuthScopes");
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public async Task Descendants_Of_Inlined_Collections_Do_Not_Reference_Excluded_Types(bool generateNativeRecords)
+    {
+        string generatedCode = await GenerateCode(generateNativeRecords, inlineNamedArrays: true, inlineNamedDictionaries: true);
+        generatedCode.Should().NotContain(": OAuthScopeMap");
+        generatedCode.Should().NotContain(": OAuthScopes");
     }
 
     [TestMethod]
