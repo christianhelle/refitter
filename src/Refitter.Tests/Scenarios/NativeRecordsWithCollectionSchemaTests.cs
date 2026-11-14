@@ -1,0 +1,95 @@
+using AwesomeAssertions;
+using Refitter.Core;
+using Refitter.Tests.Build;
+using Refitter.Tests.TestUtilities;
+
+namespace Refitter.Tests.Scenarios;
+
+[TestClass]
+public class NativeRecordsWithCollectionSchemaTests
+{
+    private const string OpenApiSpec = @"
+openapi: '3.0.0'
+info:
+  title: 'OAuth API'
+  version: '1.0'
+paths:
+  /scopes:
+    get:
+      operationId: 'GetScopes'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthScopes'
+components:
+  schemas:
+    OAuthScope:
+      type: object
+      properties:
+        name:
+          type: string
+    OAuthScopes:
+      type: array
+      description: 'Array of OAuth scopes'
+      items:
+        $ref: '#/components/schemas/OAuthScope'
+";
+
+    [TestMethod]
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    public async Task Array_Schema_Is_Generated_As_Class(bool generateNativeRecords, bool immutableRecords)
+    {
+        string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
+        generatedCode.Should().Contain(
+            "partial class OAuthScopes : System.Collections.ObjectModel.Collection<OAuthScope>");
+    }
+
+    [TestMethod]
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    public async Task Object_Schema_Is_Still_Generated_As_Record(bool generateNativeRecords, bool immutableRecords)
+    {
+        string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
+        generatedCode.Should().Contain("partial record OAuthScope");
+    }
+
+    [TestCategory("Integration")]
+    [TestMethod]
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    public async Task Can_Build_Generated_Code(bool generateNativeRecords, bool immutableRecords)
+    {
+        string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    private static async Task<string> GenerateCode(bool generateNativeRecords, bool immutableRecords)
+    {
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerFile(OpenApiSpec);
+        try
+        {
+            var settings = new RefitGeneratorSettings
+            {
+                OpenApiPath = swaggerFile,
+                ImmutableRecords = immutableRecords,
+                CodeGeneratorSettings = new CodeGeneratorSettings
+                {
+                    GenerateNativeRecords = generateNativeRecords,
+                },
+            };
+            var generator = await RefitGenerator.CreateAsync(settings);
+            return generator.Generate();
+        }
+        finally
+        {
+            if (File.Exists(swaggerFile)) File.Delete(swaggerFile);
+            var directory = Path.GetDirectoryName(swaggerFile);
+            if (directory != null && Directory.Exists(directory))
+                Directory.Delete(directory, true);
+        }
+    }
+}
