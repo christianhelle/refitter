@@ -34,6 +34,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OAuthScopeMap'
+  /scopes/audited:
+    get:
+      operationId: 'GetAuditedScopes'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditedScopeMap'
 components:
   schemas:
     OAuthScope:
@@ -51,6 +61,20 @@ components:
       description: 'OAuth scopes by name'
       additionalProperties:
         $ref: '#/components/schemas/OAuthScope'
+    DetailedScopeMap:
+      allOf:
+        - $ref: '#/components/schemas/OAuthScopeMap'
+        - type: object
+          properties:
+            owner:
+              type: string
+    AuditedScopeMap:
+      allOf:
+        - $ref: '#/components/schemas/DetailedScopeMap'
+        - type: object
+          properties:
+            auditor:
+              type: string
 ";
 
     [TestMethod]
@@ -71,6 +95,18 @@ components:
         string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
         generatedCode.Should().Contain(
             "partial class OAuthScopeMap : Dictionary<string, OAuthScope>");
+    }
+
+    [TestMethod]
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    public async Task Descendants_Of_Collection_Schemas_Are_Generated_As_Class(
+        bool generateNativeRecords,
+        bool immutableRecords)
+    {
+        string generatedCode = await GenerateCode(generateNativeRecords, immutableRecords);
+        generatedCode.Should().Contain("partial class DetailedScopeMap : ");
+        generatedCode.Should().Contain("partial class AuditedScopeMap : DetailedScopeMap");
     }
 
     [TestMethod]
