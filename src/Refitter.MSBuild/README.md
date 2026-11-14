@@ -360,13 +360,13 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `jsonSerializerSettingsTransformationMethod` - Default is null,
   - `generateJsonMethods` - Default is false,
   - `enforceFlagEnums` - Default is false,
-  - `inlineNamedDictionaries` - Default is false,
+  - `inlineNamedDictionaries` - Default is false. When enabled, usages of named dictionary schemas use the dictionary type directly (e.g. `IDictionary<string, T>`) and the named types are not generated
   - `inlineNamedTuples` - Default is true,
-  - `inlineNamedArrays` - Default is false,
+  - `inlineNamedArrays` - Default is false. When enabled, usages of named array schemas use the collection type directly (e.g. `ICollection<T>`) and the named types are not generated
   - `generateOptionalPropertiesAsNullable` - Default is false,
   - `generateNullableReferenceTypes` - Default is false,
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
-  - `excludedTypeNames` - Default is empty
+  - `excludedTypeNames` - Default is empty. Excluded types must be provided by an import or another namespace. When `generateNativeRecords` or `immutableRecords` is enabled, an excluded type that a generated contract derives from must itself be a record, since C# records cannot inherit from classes
   - `customTemplateDirectory` - Custom directory with NSwag fluid templates for code generation. Default is null which uses the default NSwag templates. See <https://github.com/RicoSuter/NSwag/wiki/Templates>

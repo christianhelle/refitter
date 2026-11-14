@@ -240,16 +240,16 @@ When using `openApiPaths`, the documents are merged into a single generated clie
   - `jsonSerializerSettingsTransformationMethod` - Default is null,
   - `generateJsonMethods` - Default is false,
   - `enforceFlagEnums` - Default is false,
-  - `inlineNamedDictionaries` - Default is false,
+  - `inlineNamedDictionaries` - Default is false. When enabled, usages of named dictionary schemas use the dictionary type directly (e.g. `IDictionary<string, T>`) and the named types are not generated
   - `inlineNamedTuples` - Default is true,
-  - `inlineNamedArrays` - Default is false,
+  - `inlineNamedArrays` - Default is false. When enabled, usages of named array schemas use the collection type directly (e.g. `ICollection<T>`) and the named types are not generated
   - `generateOptionalPropertiesAsNullable` - Default is false,
   - `generateNullableReferenceTypes` - Default is false,
   - `generateNativeRecords` - Default is false
   - `generateDefaultValues` - Default is true
   - `inlineNamedAny` - Default is false
   - `inlineJsonConverters` - Default is true. When set to false, enum properties will not have `[JsonConverter(typeof(JsonStringEnumConverter))]` attributes
-  - `excludedTypeNames` - Default is empty
+  - `excludedTypeNames` - Default is empty. Excluded types must be provided by an import or another namespace. When `generateNativeRecords` or `immutableRecords` is enabled, an excluded type that a generated contract derives from must itself be a record, since C# records cannot inherit from classes
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
   - `jsonLibraryVersion` - Default is `8.0`. JSON library version for System.Text.Json. When set to `9.0` or higher, enables .NET 9+ `JsonStringEnumMemberName` support for custom enum value names

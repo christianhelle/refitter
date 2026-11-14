@@ -116,6 +116,7 @@ public class RefitGenerator(
             [
                 new Swagger2OptionalReferenceNullabilityNormalizer(),
                 new EnumStringConverterInjector(),
+                new ClassBaseRecordConverter(),
             ]);
 
         return pipeline.Run(document, settings, generator);

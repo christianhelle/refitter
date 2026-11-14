@@ -469,9 +469,9 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `jsonSerializerSettingsTransformationMethod` - Default is null,
   - `generateJsonMethods` - Default is false,
   - `enforceFlagEnums` - Default is false,
-  - `inlineNamedDictionaries` - Default is false,
+  - `inlineNamedDictionaries` - Default is false. When enabled, usages of named dictionary schemas use the dictionary type directly (e.g. `IDictionary<string, T>`) and the named types are not generated
   - `inlineNamedTuples` - Default is true,
-  - `inlineNamedArrays` - Default is false,
+  - `inlineNamedArrays` - Default is false. When enabled, usages of named array schemas use the collection type directly (e.g. `ICollection<T>`) and the named types are not generated
   - `generateOptionalPropertiesAsNullable` - Default is false. Set this explicitly when you want optional contract properties to become nullable
   - `generateNullableReferenceTypes` - Default is false. This does not implicitly enable `generateOptionalPropertiesAsNullable`
   - `generateNativeRecords` - Default is false
@@ -480,7 +480,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `inlineJsonConverters` - Default is true. When set to false, enum properties will not have `[JsonConverter(typeof(JsonStringEnumConverter))]` attributes
   - `dateFormat` - Default is null
   - `dateTimeFormat` - Default is null
-  - `excludedTypeNames` - Default is empty
+  - `excludedTypeNames` - Default is empty. Excluded types must be provided by an import or another namespace. When `generateNativeRecords` or `immutableRecords` is enabled, an excluded type that a generated contract derives from must itself be a record, since C# records cannot inherit from classes
   - `jsonLibraryVersion` - Default is `8.0`. JSON library version for System.Text.Json. When set to `9.0` or higher, enables .NET 9+ `JsonStringEnumMemberName` support for custom enum value names
 
 ## MSBuild
