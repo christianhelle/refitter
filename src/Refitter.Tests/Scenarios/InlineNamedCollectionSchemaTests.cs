@@ -102,6 +102,12 @@ components:
         string generatedCode = await GenerateCode(generateNativeRecords, inlineNamedArrays: true, inlineNamedDictionaries: true);
         generatedCode.Should().NotContain(": OAuthScopeMap");
         generatedCode.Should().NotContain(": OAuthScopes");
+        generatedCode.Should().Contain("public OwnedScopeMap OwnedScopes {");
+        generatedCode.Should().Contain("public OwnedScopes OwnedScopeList {");
+        generatedCode.Should().Contain(
+            "partial class OwnedScopeMap : Dictionary<string, System.Collections.ObjectModel.Collection<string>>");
+        generatedCode.Should().Contain(
+            "partial class OwnedScopes : System.Collections.ObjectModel.Collection<string>");
     }
 
     [TestMethod]
