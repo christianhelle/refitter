@@ -111,7 +111,7 @@ invoke_child_process() {
     fi
 
     local stdout_log stderr_log exit_code
-    stdout_log="$(mktemp "$CHILD_LOG_DIR/XXXXXX.log")"
+    stdout_log="$(mktemp "$CHILD_LOG_DIR/child.XXXXXX")"
     stderr_log="$stdout_log.err"
 
     "$file_path" "$@" >"$stdout_log" 2>"$stderr_log"
