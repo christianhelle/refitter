@@ -28,7 +28,7 @@
         <PackageReference Include="Refit" Version="16.4.0" GeneratePathProperty="true" />
         <PackageReference Include="Refit.Reflection" Version="16.4.0" />
         <PackageReference Include="MSTest" Version="4.5.2" />
-        <PackageReference Include="coverlet.collector" Version="10.1.0">
+        <PackageReference Include="coverlet.collector" Version="10.1.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
