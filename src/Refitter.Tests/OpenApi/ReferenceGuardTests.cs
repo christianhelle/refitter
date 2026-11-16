@@ -219,6 +219,26 @@ components:
     }
 
     [TestMethod]
+    public async Task Remote_Validation_Blocks_Absolute_Http_Reference_By_Default()
+    {
+        var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+    }
+
+    [TestMethod]
+    public async Task Remote_Validation_Allows_Absolute_Http_Reference_When_Enabled()
+    {
+        var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
+
+        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [TestMethod]
     public async Task Remote_Validation_Blocks_Non_Http_Scheme()
     {
         var content = MainTemplate.Replace("__REF__", "file:///etc/passwd");

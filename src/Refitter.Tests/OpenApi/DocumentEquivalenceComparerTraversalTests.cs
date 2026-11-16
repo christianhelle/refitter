@@ -7,8 +7,6 @@ namespace Refitter.Tests.OpenApi;
 [TestClass]
 public class DocumentEquivalenceComparerTraversalTests
 {
-    private static readonly DocumentEquivalenceComparer Comparer = new();
-
     [TestMethod]
     public void AddReferencedSchemas_Traverses_AllOf_SubSchemas()
     {
@@ -16,7 +14,7 @@ public class DocumentEquivalenceComparerTraversalTests
         var root = new JsonSchema { Type = JsonObjectType.Object };
         root.AllOf.Add(Named("AllOfChild"));
 
-        Comparer.AddReferencedSchemas(definitions, root);
+        DocumentEquivalenceComparer.AddReferencedSchemas(definitions, root);
 
         definitions.Should().ContainKey("AllOfChild");
     }
@@ -28,7 +26,7 @@ public class DocumentEquivalenceComparerTraversalTests
         var root = new JsonSchema { Type = JsonObjectType.Object };
         root.OneOf.Add(Named("OneOfChild"));
 
-        Comparer.AddReferencedSchemas(definitions, root);
+        DocumentEquivalenceComparer.AddReferencedSchemas(definitions, root);
 
         definitions.Should().ContainKey("OneOfChild");
     }
@@ -40,7 +38,7 @@ public class DocumentEquivalenceComparerTraversalTests
         var root = new JsonSchema { Type = JsonObjectType.Object };
         root.AnyOf.Add(Named("AnyOfChild"));
 
-        Comparer.AddReferencedSchemas(definitions, root);
+        DocumentEquivalenceComparer.AddReferencedSchemas(definitions, root);
 
         definitions.Should().ContainKey("AnyOfChild");
     }
@@ -52,7 +50,7 @@ public class DocumentEquivalenceComparerTraversalTests
         var root = new JsonSchema { Type = JsonObjectType.Object };
         root.Definitions["Nested"] = Named("NestedChild");
 
-        Comparer.AddReferencedSchemas(definitions, root);
+        DocumentEquivalenceComparer.AddReferencedSchemas(definitions, root);
 
         definitions.Should().ContainKey("NestedChild");
     }

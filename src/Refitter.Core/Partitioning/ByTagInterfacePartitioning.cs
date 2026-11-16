@@ -34,7 +34,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
         var methodName = baseOperationName.CapitalizeFirstCharacter();
         if (settings.OperationNameTemplate?.Contains("{operationName}") ?? false)
         {
-            methodName = settings.OperationNameTemplate!.Replace("{operationName}", methodName);
+            methodName = settings.OperationNameTemplate.Replace("{operationName}", methodName);
         }
 
         return methodName;
@@ -43,7 +43,7 @@ internal class ByTagInterfacePartitioning : IInterfacePartitioning
     public string GetDynamicQuerystringParameterType(string interfaceName, string methodName)
     {
         var prefix = interfaceName;
-        if (prefix.StartsWith("I"))
+        if (prefix.StartsWith('I'))
         {
             prefix = prefix.Substring(1);
         }

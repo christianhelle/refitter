@@ -190,14 +190,47 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
-        var result = sut.IsFileStreamResponse(operation);
+        var result = ReturnTypeGenerator.IsFileStreamResponse(operation);
 
         result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void IsFileStreamResponse_Returns_True_For_File_Typed_Schema()
+    {
+        var operation = CreateOperationWithContent(
+            "application/octet-stream",
+            new OpenApiMediaType { Schema = new NJsonSchema.JsonSchema { Type = NJsonSchema.JsonObjectType.File } });
+
+        ReturnTypeGenerator.IsFileStreamResponse(operation).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void IsFileStreamResponse_Returns_False_For_File_Content_Without_Schema()
+    {
+        var operation = CreateOperationWithContent("application/octet-stream", new OpenApiMediaType());
+
+        ReturnTypeGenerator.IsFileStreamResponse(operation).Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void IsFileStreamResponse_Returns_False_For_File_Content_Without_Media_Type()
+    {
+        var operation = CreateOperationWithContent("application/pdf", null);
+
+        ReturnTypeGenerator.IsFileStreamResponse(operation).Should().BeFalse();
+    }
+
+    private static OpenApiOperation CreateOperationWithContent(string contentType, OpenApiMediaType? mediaType)
+    {
+        var response = new OpenApiResponse();
+        response.Content[contentType] = mediaType!;
+
+        var operation = new OpenApiOperation();
+        operation.Responses["200"] = response;
+        return operation;
     }
 
     [TestMethod]
@@ -230,12 +263,9 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
         var operation = document.Paths["/test"]["get"];
-        var result = sut.IsFileStreamResponse(operation);
+        var result = ReturnTypeGenerator.IsFileStreamResponse(operation);
 
         result.Should().BeFalse();
     }
@@ -1372,11 +1402,8 @@ public class ReturnTypeGeneratorTests
             """;
 
         var document = await OpenApiDocument.FromJsonAsync(spec);
-        var settings = new RefitGeneratorSettings();
-        var generator = new CSharpClientGeneratorFactory(settings, document).Create();
-        var sut = new ReturnTypeGenerator(settings, generator);
 
-        sut.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
+        ReturnTypeGenerator.IsFileStreamResponse(document.Paths["/download"]["get"]).Should().BeTrue();
     }
 
     [TestMethod]

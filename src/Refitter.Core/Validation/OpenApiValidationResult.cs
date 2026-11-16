@@ -18,7 +18,9 @@ public record OpenApiValidationResult(
     /// <summary>
     /// Gets whether the validation passed with no errors.
     /// </summary>
+#pragma warning disable S2325 // False positive: Diagnostics is a positional record property
     public bool IsValid => Diagnostics.Errors.Count == 0;
+#pragma warning restore S2325
 
     /// <summary>
     /// Throws an <see cref="OpenApiValidationException"/> if validation failed.

@@ -40,7 +40,7 @@ internal static class ParameterTypeResolver
                     parameterModel.Type));
 
         if (settings.OptionalParameters &&
-            !type.EndsWith("?") &&
+            !type.EndsWith('?') &&
             (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired))
             type += "?";
 
@@ -57,7 +57,7 @@ internal static class ParameterTypeResolver
         if (!parameterModel.IsArray)
             return type;
 
-        return type.EndsWith("?") ? "string?" : "string";
+        return type.EndsWith('?') ? "string?" : "string";
     }
 
     public static string GetQueryParameterType(

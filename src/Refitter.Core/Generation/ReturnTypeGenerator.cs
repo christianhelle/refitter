@@ -66,7 +66,7 @@ internal class ReturnTypeGenerator(
                ApiResponseTypeRegex.IsMatch(typeName);
     }
 
-    public bool IsFileStreamResponse(OpenApiOperation operation)
+    public static bool IsFileStreamResponse(OpenApiOperation operation)
     {
         var successCodes = new[] { "200", "201", "202", "203", "206", "2XX" };
 
@@ -80,14 +80,11 @@ internal class ReturnTypeGenerator(
             if (response.Content?.Any() != true)
                 continue;
 
-            foreach (var contentEntry in response.Content)
+            foreach (var contentEntry in response.Content.Where(entry => IsFileContentType(entry.Key)))
             {
-                if (IsFileContentType(contentEntry.Key))
-                {
-                    var schema = contentEntry.Value?.Schema;
-                    if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
-                        return true;
-                }
+                var schema = contentEntry.Value?.Schema;
+                if (schema?.Format == "binary" || schema?.Type == NJsonSchema.JsonObjectType.File)
+                    return true;
             }
         }
 
@@ -123,39 +120,36 @@ internal class ReturnTypeGenerator(
 
         foreach (var code in successCodes)
         {
-            if (!operation.Responses.TryGetValue(code, out var apiResponse))
-                continue;
-
-            var response = apiResponse.ActualResponse;
-
-            if (response.Content.Any())
+            if (operation.Responses.TryGetValue(code, out var apiResponse) &&
+                TryGetStreamingResponseSchema(apiResponse.ActualResponse, operation.ActualProduces, out schema))
             {
-                foreach (var contentEntry in response.Content)
-                {
-                    if (!IsStreamingContentType(contentEntry.Key))
-                        continue;
-
-                    schema = contentEntry.Value?.Schema;
-                    if (IsPrimitiveSchema(schema))
-                        continue;
-
-                    return true;
-                }
-            }
-
-            // Swagger 2.0 has no per-media-type schema, so the produces list is the only
-            // signal. A document-level produces list applies to every operation, so require
-            // all of them to be streaming - otherwise a single streaming entry alongside
-            // application/json would turn every operation in the document into a stream.
-            if (IsStreamingOnly(operation.ActualProduces))
-            {
-                schema = response.Schema;
-                if (IsPrimitiveSchema(schema))
-                    continue;
-
                 return true;
             }
         }
+
+        schema = null;
+        return false;
+    }
+
+    private static bool TryGetStreamingResponseSchema(
+        OpenApiResponse response,
+        IEnumerable<string> produces,
+        out JsonSchema? schema)
+    {
+        foreach (var contentEntry in response.Content.Where(entry => IsStreamingContentType(entry.Key)))
+        {
+            schema = contentEntry.Value?.Schema;
+            if (!IsPrimitiveSchema(schema))
+                return true;
+        }
+
+        // Swagger 2.0 has no per-media-type schema, so the produces list is the only
+        // signal. A document-level produces list applies to every operation, so require
+        // all of them to be streaming - otherwise a single streaming entry alongside
+        // application/json would turn every operation in the document into a stream.
+        schema = response.Schema;
+        if (IsStreamingOnly(produces) && !IsPrimitiveSchema(schema))
+            return true;
 
         schema = null;
         return false;
@@ -237,8 +231,10 @@ internal class ReturnTypeGenerator(
             schema?.Type == NJsonSchema.JsonObjectType.Array)
         {
             typeName = typeName
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
                 .Replace("ICollection", codeGeneration.CodeGeneratorSettings!.ArrayType)
-                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings!.ArrayType);
+#pragma warning restore S8969
+                .Replace("IEnumerable", codeGeneration.CodeGeneratorSettings.ArrayType);
         }
 
         return typeName;
