@@ -19,7 +19,7 @@ app.MapGet(
             {
                 var response = await petstore.GetPetById(id);
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                    return Results.StatusCode((int)response.StatusCode);
+                    return Results.StatusCode((int?)response.StatusCode ?? StatusCodes.Status502BadGateway);
 
                 return Results.Ok(response.Content);
             }
@@ -38,7 +38,7 @@ app.MapDelete(
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return Results.Ok();
             else
-                return Results.StatusCode((int)response.StatusCode);
+                return Results.StatusCode((int?)response.StatusCode ?? StatusCodes.Status502BadGateway);
         })
     .WithName("DeletePet");
 
