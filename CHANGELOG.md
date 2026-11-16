@@ -22,6 +22,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Update dependencies ([#1404](https://github.com/christianhelle/refitter/pull/1404)) ([@christianhelle](https://github.com/christianhelle/))
 - Keep .NET 10 packages for net8.0 and net9.0 targets ([#1400](https://github.com/christianhelle/refitter/pull/1400)) ([@christianhelle](https://github.com/christianhelle/))
 - Generate collection-derived contracts as classes when using native records ([#1399](https://github.com/christianhelle/refitter/pull/1399)) ([@christianhelle](https://github.com/christianhelle/))
 - Keep Unicode line breaks in descriptions from escaping doc comments ([#1397](https://github.com/christianhelle/refitter/pull/1397)) ([@christianhelle](https://github.com/christianhelle/))
