@@ -8,7 +8,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddLogging(logging => logging.AddDebug());
 builder.Services.AddTransient<TelemetryDelegatingHandler>();
 builder.Services.ConfigureRefitClients(
-    settings: new RefitSettings { });
+    settings: RefitSettings.ForJsonContext(SwaggerPetstoreSerializerContext.Default));
 
 var app = builder.Build();
 app.MapGet(
