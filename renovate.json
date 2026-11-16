@@ -14,6 +14,18 @@
       ],
       "replacementName": "AwesomeAssertions",
       "replacementVersion": "9.6.0"
+    },
+    {
+      "description": ".NET 11 packages don't support net8.0 or net9.0, so keep the references for those target frameworks on 10.x",
+      "matchDatasources": [
+        "nuget"
+      ],
+      "matchPackageNames": [
+        "System.Text.Json",
+        "Microsoft.Extensions.Http.Polly"
+      ],
+      "matchCurrentVersion": "/^10\\./",
+      "allowedVersions": "/^10\\./"
     }
   ]
 }
