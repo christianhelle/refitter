@@ -18,7 +18,7 @@ public class RefitImplementationGeneratorTests
 
     [TestMethod]
     public void Refitter_Interface_Uses_Generated_Refit_Implementation() =>
-        RestService.For<ISwaggerPetstoreInterface>("https://localhost")
+        RestService.ForGenerated<ISwaggerPetstoreInterface>("https://localhost")
             .GetType()
             .FullName
             .Should()
@@ -26,7 +26,7 @@ public class RefitImplementationGeneratorTests
 
     [TestMethod]
     public void Refitter_Interface_Without_Contracts_Uses_Generated_Refit_Implementation() =>
-        RestService.For<IApiInCustomGeneratedFolder>("https://localhost")
+        RestService.ForGenerated<IApiInCustomGeneratedFolder>("https://localhost")
             .GetType()
             .FullName
             .Should()
@@ -34,7 +34,7 @@ public class RefitImplementationGeneratorTests
 
     [TestMethod]
     public void Hand_Written_Interface_Uses_Generated_Refit_Implementation() =>
-        RestService.For<IHandWrittenApi>("https://localhost")
+        RestService.ForGenerated<IHandWrittenApi>("https://localhost")
             .GetType()
             .FullName
             .Should()

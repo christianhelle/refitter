@@ -2,6 +2,8 @@
   "openApiPath": "../OpenAPI/v3.0/petstore.json",
   "namespace": "Petstore",
   "returnIApiResponse": true,
+  "optionalParameters": true,
+  "generateJsonSerializerContext": true,
   "dependencyInjectionSettings": {
     "baseUrl": "https://petstore3.swagger.io/api/v3",
     "httpMessageHandlers": [ "TelemetryDelegatingHandler" ],

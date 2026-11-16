@@ -8,7 +8,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddLogging(logging => logging.AddDebug());
 builder.Services.AddTransient<TelemetryDelegatingHandler>();
 builder.Services.ConfigureRefitClients(
-    settings: new RefitSettings { });
+    settings: RefitSettings.ForJsonContext(SwaggerPetstoreSerializerContext.Default));
 
 var app = builder.Build();
 app.MapGet(
@@ -19,7 +19,7 @@ app.MapGet(
             {
                 var response = await petstore.GetPetById(id);
                 if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                    return Results.StatusCode((int)response.StatusCode);
+                    return Results.StatusCode((int?)response.StatusCode ?? StatusCodes.Status502BadGateway);
 
                 return Results.Ok(response.Content);
             }
@@ -28,21 +28,19 @@ app.MapGet(
                 return Results.StatusCode((int)e.StatusCode);
             }
         })
-    .WithName("GetPetById")
-    .WithOpenApi();
+    .WithName("GetPetById");
 
 app.MapDelete(
         "/pet/{id:long}",
         async (ISwaggerPetstore petstore, long id) =>
         {
-            var response = await petstore.DeletePet(id, null);
+            var response = await petstore.DeletePet(id);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return Results.Ok();
             else
-                return Results.StatusCode((int)response.StatusCode);
+                return Results.StatusCode((int?)response.StatusCode ?? StatusCodes.Status502BadGateway);
         })
-    .WithName("DeletePet")
-    .WithOpenApi();
+    .WithName("DeletePet");
 
 app.UseHttpsRedirection();
 app.UseSwaggerUI();

@@ -47,6 +47,7 @@
       <Compile Include="..\Refitter.SourceGenerator\Telemetry\*.cs" Link="MSBuild\Telemetry\%(Filename)%(Extension)" />
       <Compile Include="..\Refitter.SourceGenerator\HintNames.cs" Link="SourceGenerator\HintNames.cs" />
       <Compile Include="..\Refitter.SourceGenerator\LoadedGeneratorLocator.cs" Link="SourceGenerator\LoadedGeneratorLocator.cs" />
+      <Compile Include="..\Refitter.SourceGenerator\RefitVersion.cs" Link="SourceGenerator\RefitVersion.cs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -26,6 +26,18 @@
       ],
       "matchCurrentVersion": "/^10\\./",
       "allowedVersions": "/^10\\./"
+    },
+    {
+      "description": "Refit 17 doesn't support net8.0, net9.0, net462 or netstandard2.0, so keep the references for those target frameworks on 16.x",
+      "matchDatasources": [
+        "nuget"
+      ],
+      "matchPackageNames": [
+        "Refit",
+        "Refit.HttpClientFactory"
+      ],
+      "matchCurrentVersion": "/^16\\./",
+      "allowedVersions": "/^16\\./"
     }
   ]
 }

@@ -16,7 +16,8 @@
     "transientErrorHandler": "Polly",
     "maxRetryCount": 3,
     "firstBackoffRetryInSeconds": 0.5,
-    "useWindowsAuthentication": true
+    "useWindowsAuthentication": true,
+    "useGeneratedRefitClient": true
   },
   "codeGeneratorSettings": {
     "dateType": "System.DateTime",

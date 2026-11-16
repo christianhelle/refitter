@@ -9,6 +9,8 @@
         <GenerateProgramFile>false</GenerateProgramFile>
         <EnableMSTestRunner>true</EnableMSTestRunner>
         <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
+        <!-- SwaggerPetstoreMultipleInterfaces.refitter reuses contracts from another .refitter file, so it has no JsonSerializerContext of its own -->
+        <NoWarn>$(NoWarn);REFITTER011</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,8 +25,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Refit" Version="16.4.0" />
-        <PackageReference Include="Refit.HttpClientFactory" Version="16.4.0" />
+        <PackageReference Include="Refit" Version="16.4.0" Condition="'$(TargetFramework)' == 'net8.0'" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="16.4.0" Condition="'$(TargetFramework)' == 'net8.0'" />
+        <PackageReference Include="Refit" Version="17.0.0" Condition="'$(TargetFramework)' != 'net8.0'" />
+        <PackageReference Include="Refit.HttpClientFactory" Version="17.0.0" Condition="'$(TargetFramework)' != 'net8.0'" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.15" Condition="'$(TargetFramework)' == 'net8.0'" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="11.0.0" Condition="'$(TargetFramework)' != 'net8.0'" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
