@@ -84,7 +84,7 @@ The following is an example `.refitter` file
     "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5, // Optional. Default=1.0
-    "useGeneratedRefitClient": true // Optional. Use the source-generated AddRefitGeneratedClient instead of AddRefitClient. Requires Refit 12.1.0+ (14.0.0+ if the interfaces have query parameters). Default=false
+    "useGeneratedRefitClient": true // Optional. Use the source-generated AddRefitGeneratedClient instead of AddRefitClient. Requires Refit 12.1.0+ (14.0.0+ if the interfaces have query parameters). Required for Refit 17+ (the source generator enables it automatically for Refit 17+). Default=false
   },
   "apizrSettings": { // Optional
     "withRequestOptions": true, // Optional. Default=true
@@ -208,7 +208,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
   - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See <https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html>
   - `maxRetryCount` - This is the max retry count used in the Polly retry policy. Default is 6
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
-  - `useGeneratedRefitClient` - Set this to `true` to register clients with the source-generated `AddRefitGeneratedClient` instead of the reflection-based `AddRefitClient`. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. This is ignored when Apizr registration is generated. Default is `false`
+  - `useGeneratedRefitClient` - Set this to `true` to register clients with the source-generated `AddRefitGeneratedClient` instead of the reflection-based `AddRefitClient`. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Refit 17 removed `AddRefitClient`, so this must be `true` when the generated code is compiled against Refit 17 or newer. The source generator detects the referenced Refit version and enables this automatically for Refit 17 or newer. This is ignored when Apizr registration is generated. Default is `false`
 - `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See <https://www.apizr.net> for more information
   - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
   - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
@@ -491,7 +491,7 @@ When using `openApiPaths`, the documents are merged into a single generated clie
                 },
                 "useGeneratedRefitClient": {
                     "type": "boolean",
-                    "description": "Uses the source-generated AddRefitGeneratedClient registration instead of AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Ignored when Apizr registration is generated."
+                    "description": "Uses the source-generated AddRefitGeneratedClient registration instead of AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Must be true for Refit 17 or newer, which removed AddRefitClient; the source generator enables it automatically when the project references Refit 17 or newer. Ignored when Apizr registration is generated."
                 }
             },
             "description": "Settings for dependency injection."

@@ -120,8 +120,8 @@ public class DependencyInjectionSettings
     public string ExtensionMethodName { get; set; } = DefaultExtensionMethodName;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the source-generated AddRefitGeneratedClient registration should be used instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Ignored when Apizr registration is generated. Default is false.
+    /// Gets or sets a value indicating whether the source-generated AddRefitGeneratedClient registration should be used instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Must be true for Refit 17 or newer, which removed AddRefitClient; the source generator enables it automatically when the project references Refit 17 or newer. Ignored when Apizr registration is generated. Default is false.
     /// </summary>
-    [Description("Uses the source-generated AddRefitGeneratedClient registration instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Ignored when Apizr registration is generated. Default is false.")]
+    [Description("Uses the source-generated AddRefitGeneratedClient registration instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Must be true for Refit 17 or newer, which removed AddRefitClient; the source generator enables it automatically when the project references Refit 17 or newer. Ignored when Apizr registration is generated. Default is false.")]
     public bool UseGeneratedRefitClient { get; set; }
 }
