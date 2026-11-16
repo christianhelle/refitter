@@ -9,6 +9,8 @@
         <GenerateProgramFile>false</GenerateProgramFile>
         <EnableMSTestRunner>true</EnableMSTestRunner>
         <RootNamespace>Refitter.SourceGenerators.Tests</RootNamespace>
+        <!-- SwaggerPetstoreMultipleInterfaces.refitter reuses contracts from another .refitter file, so it has no JsonSerializerContext of its own -->
+        <NoWarn>$(NoWarn);REFITTER011</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
