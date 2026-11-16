@@ -7,7 +7,7 @@ const string PetstoreBaseUrl = "https://petstore3.swagger.io/api/v3";
 
 try
 {
-    var client = RestService.For<ISwaggerPetstore>(PetstoreBaseUrl);
+    var client = RestService.ForGenerated<ISwaggerPetstore>(PetstoreBaseUrl);
     var pet = await client.GetPetById(1);
 
     Console.WriteLine($"Name: {pet.Name}");

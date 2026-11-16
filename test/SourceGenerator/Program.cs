@@ -16,7 +16,7 @@ internal static class Program
 
     private static async Task TestPetstoreUsingApiResponse()
     {
-        var responseClient = RestService.For<Petstore.UsingApiResponse.ISwaggerPetstoreApiResponse>("https://petstore3.swagger.io/api/v3");
+        var responseClient = RestService.ForGenerated<Petstore.UsingApiResponse.ISwaggerPetstoreApiResponse>("https://petstore3.swagger.io/api/v3");
         var response = await responseClient.GetPetById(1);
 
         Console.WriteLine("## Using IApiResponse<T> as return type ##");
@@ -33,7 +33,7 @@ internal static class Program
 
     private static async Task TestPetstoreUsingDirectTypes()
     {
-        var client = RestService.For<Petstore.ISwaggerPetstoreDirect>("https://petstore3.swagger.io/api/v3");
+        var client = RestService.ForGenerated<Petstore.ISwaggerPetstoreDirect>("https://petstore3.swagger.io/api/v3");
         var pet = await client.GetPetById(1);
 
         Console.WriteLine($"Name: {pet.Name}");

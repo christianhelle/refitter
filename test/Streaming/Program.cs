@@ -1,7 +1,7 @@
 using Refit;
 using Test;
 
-var api = RestService.For<ILMStudiov1RESTAPI>("http://localhost:1234");
+var api = RestService.ForGenerated<ILMStudiov1RESTAPI>("http://localhost:1234");
 var modelsResponse = await api.ListModels();
 
 foreach (var model in modelsResponse.Models)
