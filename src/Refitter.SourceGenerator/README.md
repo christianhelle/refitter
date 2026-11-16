@@ -29,6 +29,8 @@ Roslyn runs every source generator against the same input, so the Refit source g
 
 For the same reason, when `generateJsonSerializerContext` is enabled, Refitter also runs the System.Text.Json source generator over the `JsonSerializerContext` it generates.
 
+When the project references Refit 17 or newer, which removed the reflection-based `AddRefitClient<T>()`, Refitter generates dependency injection code that uses `AddRefitGeneratedClient<T>()`, as if `dependencyInjectionSettings.useGeneratedRefitClient` was set to `true`.
+
 If the project sets `DisableRefitSourceGenerator` to `true` itself, for example when using `Refit.Reflection`, Refitter leaves Refit source generation off and only emits its own code.
 
 #### Telemetry
