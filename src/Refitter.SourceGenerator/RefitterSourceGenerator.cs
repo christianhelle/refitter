@@ -52,9 +52,15 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         var refitMajorVersion = context.CompilationProvider
             .Select((compilation, _) => RefitVersion.FindMajorVersion(
                 compilation.ReferencedAssemblyNames.Select(identity => (identity.Name, identity.Version))));
+        var refitGeneratorRuns = context.AnalyzerConfigOptionsProvider
+            .Select((options, _) => RunsRefitGenerator(options));
         var generatedCode = refitterFiles
-            .Combine(refitMajorVersion)
-            .Select((input, cancellationToken) => GenerateCode(input.Left, input.Right, cancellationToken))
+            .Combine(refitMajorVersion.Combine(refitGeneratorRuns))
+            .Select((input, cancellationToken) => GenerateCode(
+                input.Left,
+                input.Right.Left,
+                input.Right.Right,
+                cancellationToken))
             .Collect()
             .Select((results, _) => AssignUniqueHintNames(results));
         context.RegisterSourceOutput(generatedCode, ProcessResults);
@@ -151,8 +157,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         CSharpParseOptions parseOptions,
         AnalyzerConfigOptionsProvider optionsProvider)
     {
-        if (!optionsProvider.GlobalOptions.TryGetValue("build_property.RefitterRunsRefitGenerator", out var value) ||
-            !string.Equals(value, "true", StringComparison.OrdinalIgnoreCase))
+        if (!RunsRefitGenerator(optionsProvider))
         {
             return;
         }
@@ -340,6 +345,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
     internal static GeneratedCode GenerateCode(
         AdditionalText file,
         int? refitMajorVersion = null,
+        bool refitGeneratorRuns = true,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -364,7 +370,11 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
                 return CreateFailedResult(file.Path, diagnostics);
             }
 
-            RefitVersion.Apply(settings, refitMajorVersion);
+            foreach (var warning in RefitVersion.Apply(settings, refitMajorVersion, refitGeneratorRuns))
+            {
+                diagnostics.Add(CreateRefitVersionDiagnostic(warning));
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
             var runner = new RefitterRunner();
@@ -491,6 +501,23 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
             "Warning",
             "'codeGeneratorSettings.dateFormat' will be ignored due to 'useIsoDateFormat' set to true",
             DiagnosticSeverity.Warning);
+
+    private static bool RunsRefitGenerator(AnalyzerConfigOptionsProvider optionsProvider) =>
+        optionsProvider.GlobalOptions.TryGetValue("build_property.RefitterRunsRefitGenerator", out var value) &&
+        string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+
+    private static GeneratedDiagnostic CreateRefitVersionDiagnostic(RefitVersionWarning warning) =>
+        warning == RefitVersionWarning.RefitGeneratorNotRun
+            ? new(
+                "REFITTER009",
+                "Refit 17 clients need the Refit source generator",
+                "Refit 17 removed AddRefitClient, so the generated dependency injection code uses AddRefitGeneratedClient, but Refitter doesn't run the Refit source generator over its output. Resolving the registered clients will fail at runtime. Remove DisableRefitSourceGenerator, or import Refitter.SourceGenerator.targets when referencing the generator as a project.",
+                DiagnosticSeverity.Warning)
+            : new(
+                "REFITTER010",
+                "Multipart form objects need the Refit reflection request builder",
+                "Refit 17 removed AddRefitClient, so the generated dependency injection code uses AddRefitGeneratedClient, but 'useMultipartFormObject' relies on [FormObject] flattening, which only Refit's reflection request builder supports. Create these clients with RestService.For from the Refit.Reflection package instead of the generated registration.",
+                DiagnosticSeverity.Warning);
 
     private static GeneratedDiagnostic CreateRefitGeneratorNotFoundDiagnostic() =>
         new(
