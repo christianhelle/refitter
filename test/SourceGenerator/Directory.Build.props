@@ -18,6 +18,8 @@
         <!-- Refit 17 dropped net8.0, net9.0 and net462 -->
         <PackageReference Include="Refit" Version="16.4.0" Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net9.0' Or '$(TargetFramework)' == 'net462'" />
         <PackageReference Include="Refit" Version="17.0.0" Condition="'$(TargetFramework)' != 'net8.0' And '$(TargetFramework)' != 'net9.0' And '$(TargetFramework)' != 'net462'" />
+        <!-- RestService.For moved to Refit.Reflection in Refit 17 -->
+        <PackageReference Include="Refit.Reflection" Version="17.0.0" Condition="'$(TargetFramework)' != 'net8.0' And '$(TargetFramework)' != 'net9.0' And '$(TargetFramework)' != 'net462'" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
     </ItemGroup>
