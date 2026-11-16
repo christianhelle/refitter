@@ -6,8 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="11.0.0" />
-    <PackageReference Include="Refit" Version="16.4.0" />
-    <PackageReference Include="Refit.HttpClientFactory" Version="16.4.0" />
+    <PackageReference Include="Refit" Version="17.0.0" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="17.0.0" />
   </ItemGroup>
 
   <PropertyGroup>
