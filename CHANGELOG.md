@@ -3,13 +3,11 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Fix SonarCloud quality gate and open issues ([#1359](https://github.com/christianhelle/refitter/pull/1359)) ([@christianhelle](https://github.com/christianhelle/))
 - docs: add superbot-helper as a contributor for bug, and security ([#1406](https://github.com/christianhelle/refitter/pull/1406)) (@allcontributors[bot])
 - Fix smoke tests on macOS by using a portable mktemp template ([#1402](https://github.com/christianhelle/refitter/pull/1402)) ([@christianhelle](https://github.com/christianhelle/))
 - docs: add mvn-dips as a contributor for code, and bug ([#1395](https://github.com/christianhelle/refitter/pull/1395)) (@allcontributors[bot])
-- Block escaped remote $ref references in reference guard ([#1392](https://github.com/christianhelle/refitter/pull/1392)) ([@christianhelle](https://github.com/christianhelle/))
-- Fix MSBuild Tasks CI restore after .NET 11 upgrade ([#1393](https://github.com/christianhelle/refitter/pull/1393)) ([@christianhelle](https://github.com/christianhelle/))
 - Update dependency Swashbuckle.AspNetCore to v11 ([#1385](https://github.com/christianhelle/refitter/pull/1385)) (@renovate[bot])
-- Add .NET 11 support ([#1384](https://github.com/christianhelle/refitter/pull/1384)) ([@christianhelle](https://github.com/christianhelle/))
 - Update dotnet monorepo to v11 ([#1383](https://github.com/christianhelle/refitter/pull/1383)) (@renovate[bot])
 - Add technical documentation to the docfx site ([#1382](https://github.com/christianhelle/refitter/pull/1382)) ([@christianhelle](https://github.com/christianhelle/))
 - docs: add AkazaRenn as a contributor for bug ([#1381](https://github.com/christianhelle/refitter/pull/1381)) (@allcontributors[bot])
@@ -23,6 +21,9 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Fix MSBuild Tasks CI restore after .NET 11 upgrade ([#1393](https://github.com/christianhelle/refitter/pull/1393)) ([@christianhelle](https://github.com/christianhelle/))
+- Block escaped remote $ref references in reference guard ([#1392](https://github.com/christianhelle/refitter/pull/1392)) ([@christianhelle](https://github.com/christianhelle/))
+- Add .NET 11 support ([#1384](https://github.com/christianhelle/refitter/pull/1384)) ([@christianhelle](https://github.com/christianhelle/))
 - Add Refit 17 support ([#1405](https://github.com/christianhelle/refitter/pull/1405)) ([@christianhelle](https://github.com/christianhelle/))
 - Update dependencies ([#1404](https://github.com/christianhelle/refitter/pull/1404)) ([@christianhelle](https://github.com/christianhelle/))
 - Keep .NET 10 packages for net8.0 and net9.0 targets ([#1400](https://github.com/christianhelle/refitter/pull/1400)) ([@christianhelle](https://github.com/christianhelle/))
