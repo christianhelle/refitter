@@ -48,8 +48,13 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
 
         // generate code for each .refitter file and add it to the compilation, with hint names
         // made unique across all .refitter files since Roslyn requires that per generator
+        // Refit 17 dropped the reflection-based APIs, so the generated code adapts to the referenced Refit version
+        var refitMajorVersion = context.CompilationProvider
+            .Select((compilation, _) => RefitVersion.FindMajorVersion(
+                compilation.ReferencedAssemblyNames.Select(identity => (identity.Name, identity.Version))));
         var generatedCode = refitterFiles
-            .Select(GenerateCode)
+            .Combine(refitMajorVersion)
+            .Select((input, cancellationToken) => GenerateCode(input.Left, input.Right, cancellationToken))
             .Collect()
             .Select((results, _) => AssignUniqueHintNames(results));
         context.RegisterSourceOutput(generatedCode, ProcessResults);
@@ -334,6 +339,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         Justification = "By design")]
     internal static GeneratedCode GenerateCode(
         AdditionalText file,
+        int? refitMajorVersion = null,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -358,6 +364,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
                 return CreateFailedResult(file.Path, diagnostics);
             }
 
+            RefitVersion.Apply(settings, refitMajorVersion);
             cancellationToken.ThrowIfCancellationRequested();
 
             var runner = new RefitterRunner();
