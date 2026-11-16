@@ -130,6 +130,28 @@ public class RefitVersionTests
             .Equal(RefitVersionWarning.NoJsonSerializerContext);
     }
 
+    [TestMethod]
+    public void Warns_When_Contracts_Are_Not_Generated_For_Refit_17()
+    {
+        var settings = CreateSettings(generateJsonSerializerContext: true);
+        settings.GenerateContracts = false;
+
+        Apply(settings, 17)
+            .Should()
+            .Equal(RefitVersionWarning.NoJsonSerializerContext);
+    }
+
+    [TestMethod]
+    public void Checks_Explicitly_Generated_Clients_When_Reflection_Based_Registration_Is_Referenced()
+    {
+        var settings = CreateSettings();
+        settings.DependencyInjectionSettings!.UseGeneratedRefitClient = true;
+
+        Apply(settings, 17, reflectionRegistration: true, refitGeneratorRuns: false)
+            .Should()
+            .Equal(RefitVersionWarning.RefitGeneratorNotRun, RefitVersionWarning.NoJsonSerializerContext);
+    }
+
     private static IReadOnlyList<RefitVersionWarning> Apply(
         RefitGeneratorSettings settings,
         int? majorVersion,

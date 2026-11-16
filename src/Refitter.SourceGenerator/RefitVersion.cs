@@ -18,7 +18,7 @@ internal enum RefitVersionWarning
     MultipartFormObject,
 
     /// <summary>
-    /// Refit 17 generated clients need JSON type metadata, but no <c>JsonSerializerContext</c> is generated.
+    /// Refit 17 generated clients need JSON type metadata, but Refitter doesn't generate a <c>JsonSerializerContext</c>.
     /// </summary>
     NoJsonSerializerContext,
 }
@@ -70,13 +70,20 @@ internal static class RefitVersion
     {
         if (refitMajorVersion is null ||
             refitMajorVersion < GeneratedClientOnlyMajorVersion ||
-            reflectionRegistration ||
             settings.DependencyInjectionSettings is not { } dependencyInjectionSettings)
         {
             return [];
         }
 
-        dependencyInjectionSettings.UseGeneratedRefitClient = true;
+        if (!reflectionRegistration)
+        {
+            dependencyInjectionSettings.UseGeneratedRefitClient = true;
+        }
+
+        if (!dependencyInjectionSettings.UseGeneratedRefitClient)
+        {
+            return [];
+        }
 
         var warnings = new List<RefitVersionWarning>();
         if (!refitGeneratorRuns)
@@ -89,7 +96,8 @@ internal static class RefitVersion
             warnings.Add(RefitVersionWarning.MultipartFormObject);
         }
 
-        if (!settings.GenerateJsonSerializerContext)
+        // Refitter only generates a JsonSerializerContext together with the contracts
+        if (!settings.GenerateJsonSerializerContext || !settings.GenerateContracts)
         {
             warnings.Add(RefitVersionWarning.NoJsonSerializerContext);
         }
