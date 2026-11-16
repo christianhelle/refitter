@@ -516,7 +516,10 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
 
     private const string GeneratedRegistrationReason =
-        "Refit 17 moved AddRefitClient to the Refit.HttpClientFactory.Reflection package, which the project doesn't reference, so the generated dependency injection code uses AddRefitGeneratedClient.";
+        "With Refit 17 or newer, the generated dependency injection code registers the clients with AddRefitGeneratedClient.";
+
+    private const string ReflectionRegistrationAlternative =
+        "or reference Refit.HttpClientFactory.Reflection and leave 'dependencyInjectionSettings.useGeneratedRefitClient' false to register them with AddRefitClient";
 
     private static GeneratedDiagnostic CreateRefitVersionDiagnostic(RefitVersionWarning warning) =>
         warning switch
@@ -524,17 +527,17 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
             RefitVersionWarning.RefitGeneratorNotRun => new(
                 "REFITTER009",
                 "Refit 17 generated clients need the Refit source generator",
-                $"{GeneratedRegistrationReason} Refitter doesn't run the Refit source generator over its output, so resolving the registered clients will fail at runtime. Remove DisableRefitSourceGenerator, import Refitter.SourceGenerator.targets when referencing the generator as a project, or reference Refit.HttpClientFactory.Reflection.",
+                $"{GeneratedRegistrationReason} Refitter doesn't run the Refit source generator over its output, so resolving the registered clients will fail at runtime. Remove DisableRefitSourceGenerator, import Refitter.SourceGenerator.targets when referencing the generator as a project, {ReflectionRegistrationAlternative}.",
                 DiagnosticSeverity.Warning),
             RefitVersionWarning.MultipartFormObject => new(
                 "REFITTER010",
                 "Multipart form objects need the Refit reflection request builder",
-                $"{GeneratedRegistrationReason} 'useMultipartFormObject' relies on [FormObject] flattening, which only Refit's reflection request builder supports. Reference Refit.HttpClientFactory.Reflection to register the clients with AddRefitClient.",
+                $"{GeneratedRegistrationReason} 'useMultipartFormObject' relies on [FormObject] flattening, which only Refit's reflection request builder supports. Reference Refit.HttpClientFactory.Reflection and leave 'dependencyInjectionSettings.useGeneratedRefitClient' false to register them with AddRefitClient.",
                 DiagnosticSeverity.Warning),
             _ => new(
                 "REFITTER011",
                 "Refit 17 generated clients need a JsonSerializerContext",
-                $"{GeneratedRegistrationReason} Without JSON type metadata, Refit 17 fails to serialize request and response bodies at runtime. Set 'generateJsonSerializerContext' to true and pass RefitSettings.ForJsonContext(<context>.Default) to the generated registration method, or reference Refit.HttpClientFactory.Reflection.",
+                $"{GeneratedRegistrationReason} Without JSON type metadata, Refit 17 fails to serialize request and response bodies at runtime. Set 'generateJsonSerializerContext' (and 'generateContracts') to true and pass the generated context in the settings argument of the generated registration method: RefitSettings.ForJsonContext(<context>.Default) on .NET 10 or newer, or new RefitSettings {{ ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions {{ TypeInfoResolver = <context>.Default }}) }} on .NET Framework. Suppress this warning if you pass your own JsonSerializerContext, {ReflectionRegistrationAlternative}.",
                 DiagnosticSeverity.Warning),
         };
 
