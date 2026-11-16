@@ -148,6 +148,8 @@ All diagnostics use the category `Refitter`.
 | `REFITTER006` | Warning | Refit's source generator couldn't be found; add a direct `Refit` package reference |
 | `REFITTER007` | Error | A nested generator or the Refit analyzer threw an exception |
 | `REFITTER008` | Warning | The System.Text.Json source generator couldn't be found |
+| `REFITTER009` | Warning | The project references Refit 17, which only registers generated clients, but Refitter doesn't run Refit's source generator (`DisableRefitSourceGenerator` is set, or `Refitter.SourceGenerator.targets` isn't imported) |
+| `REFITTER010` | Warning | The project references Refit 17 and `useMultipartFormObject` is enabled, but `[FormObject]` flattening needs Refit's reflection request builder |
 
 ## Telemetry
 

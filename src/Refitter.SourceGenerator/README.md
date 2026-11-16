@@ -29,7 +29,7 @@ Roslyn runs every source generator against the same input, so the Refit source g
 
 For the same reason, when `generateJsonSerializerContext` is enabled, Refitter also runs the System.Text.Json source generator over the `JsonSerializerContext` it generates.
 
-When the project references Refit 17 or newer, which removed the reflection-based `AddRefitClient<T>()`, Refitter generates dependency injection code that uses `AddRefitGeneratedClient<T>()`, as if `dependencyInjectionSettings.useGeneratedRefitClient` was set to `true`.
+When the project references Refit 17 or newer, which removed the reflection-based `AddRefitClient<T>()`, Refitter generates dependency injection code that uses `AddRefitGeneratedClient<T>()`, as if `dependencyInjectionSettings.useGeneratedRefitClient` was set to `true`. Those clients need the Refit source generator, so Refitter reports `REFITTER009` when it doesn't run it, and `REFITTER010` when `useMultipartFormObject` is enabled, because `[FormObject]` flattening needs Refit's reflection request builder.
 
 If the project sets `DisableRefitSourceGenerator` to `true` itself, for example when using `Refit.Reflection`, Refitter leaves Refit source generation off and only emits its own code.
 
