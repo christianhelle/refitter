@@ -34,7 +34,7 @@ app.MapDelete(
         "/pet/{id:long}",
         async (ISwaggerPetstore petstore, long id) =>
         {
-            var response = await petstore.DeletePet(id, null);
+            var response = await petstore.DeletePet(id);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 return Results.Ok();
             else
