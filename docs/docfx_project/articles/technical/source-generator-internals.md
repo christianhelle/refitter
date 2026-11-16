@@ -150,7 +150,7 @@ All diagnostics use the category `Refitter`.
 | `REFITTER008` | Warning | The System.Text.Json source generator couldn't be found |
 | `REFITTER009` | Warning | The project references Refit 17 without `Refit.HttpClientFactory.Reflection`, so clients are registered with `AddRefitGeneratedClient`, but Refitter doesn't run Refit's source generator (`DisableRefitSourceGenerator` is set, or `Refitter.SourceGenerator.targets` isn't imported) |
 | `REFITTER010` | Warning | The project references Refit 17 without `Refit.HttpClientFactory.Reflection` and `useMultipartFormObject` is enabled, but `[FormObject]` flattening needs Refit's reflection request builder |
-| `REFITTER011` | Warning | The project references Refit 17 without `Refit.HttpClientFactory.Reflection` and `generateJsonSerializerContext` is disabled, so the generated clients have no JSON type metadata |
+| `REFITTER011` | Warning | The project references Refit 17, clients are registered with `AddRefitGeneratedClient`, and `generateJsonSerializerContext` or `generateContracts` is disabled, so Refitter generates no JSON type metadata |
 
 ## Telemetry
 
