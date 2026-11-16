@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Merged Pull Requests
+- Fix smoke tests on macOS by using a portable mktemp template ([#1402](https://github.com/christianhelle/refitter/pull/1402)) ([@christianhelle](https://github.com/christianhelle/))
 - docs: add mvn-dips as a contributor for code, and bug ([#1395](https://github.com/christianhelle/refitter/pull/1395)) (@allcontributors[bot])
 - Block escaped remote $ref references in reference guard ([#1392](https://github.com/christianhelle/refitter/pull/1392)) ([@christianhelle](https://github.com/christianhelle/))
 - Fix MSBuild Tasks CI restore after .NET 11 upgrade ([#1393](https://github.com/christianhelle/refitter/pull/1393)) ([@christianhelle](https://github.com/christianhelle/))
@@ -21,6 +22,7 @@
 - Document per target framework .refitter files for multi-targeted projects ([#1351](https://github.com/christianhelle/refitter/pull/1351)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Features
+- Keep .NET 10 packages for net8.0 and net9.0 targets ([#1400](https://github.com/christianhelle/refitter/pull/1400)) ([@christianhelle](https://github.com/christianhelle/))
 - Generate collection-derived contracts as classes when using native records ([#1399](https://github.com/christianhelle/refitter/pull/1399)) ([@christianhelle](https://github.com/christianhelle/))
 - Keep Unicode line breaks in descriptions from escaping doc comments ([#1397](https://github.com/christianhelle/refitter/pull/1397)) ([@christianhelle](https://github.com/christianhelle/))
 - Follow-ups for HTTP QUERY operation support ([#1396](https://github.com/christianhelle/refitter/pull/1396)) ([@christianhelle](https://github.com/christianhelle/))
