@@ -24,7 +24,8 @@
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer" Version="2.23.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.57.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.100" PrivateAssets="all" />
-    <PackageReference Include="System.Text.Json" Version="11.0.0" />
+    <PackageReference Include="System.Text.Json" Version="10.0.15" Condition="'$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0'" />
+    <PackageReference Include="System.Text.Json" Version="11.0.0" Condition="'$(TargetFramework)' != 'net8.0' and '$(TargetFramework)' != 'net9.0'" />
   </ItemGroup>
 
 </Project>
