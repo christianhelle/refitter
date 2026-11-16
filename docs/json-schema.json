@@ -245,7 +245,7 @@
           "type": "string"
         },
         "useGeneratedRefitClient": {
-          "description": "Uses the source-generated AddRefitGeneratedClient registration instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Must be true for Refit 17 or newer, which removed AddRefitClient; the source generator enables it automatically when the project references Refit 17 or newer. Ignored when Apizr registration is generated. Default is false.",
+          "description": "Uses the source-generated AddRefitGeneratedClient registration instead of the reflection-based AddRefitClient. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. With Refit 17 or newer, AddRefitClient needs the Refit.HttpClientFactory.Reflection package, and AddRefitGeneratedClient needs a JsonSerializerContext passed through RefitSettings. The source generator enables this automatically for Refit 17 or newer unless the project references Refit.HttpClientFactory.Reflection. Ignored when Apizr registration is generated. Default is false.",
           "type": "boolean"
         }
       }
