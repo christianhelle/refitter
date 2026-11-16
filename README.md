@@ -316,7 +316,7 @@ The following is an example `.refitter` file using a single OpenAPI specificatio
     "transientErrorHandler": "HttpResilience", // Optional. Set this to configure transient error handling with a retry policy that uses a jittered backoff. May be one of None, Polly, HttpResilience
     "maxRetryCount": 3, // Optional. Default=6
     "firstBackoffRetryInSeconds": 0.5, // Optional. Default=1.0
-    "useGeneratedRefitClient": true // Optional. Use the source-generated AddRefitGeneratedClient instead of AddRefitClient. Requires Refit 12.1.0+ (14.0.0+ if the interfaces have query parameters). Required for Refit 17+ (the source generator enables it automatically for Refit 17+). Default=false
+    "useGeneratedRefitClient": true // Optional. Use the source-generated AddRefitGeneratedClient instead of AddRefitClient. Requires Refit 12.1.0+ (14.0.0+ if the interfaces have query parameters). With Refit 17+, use this or reference Refit.HttpClientFactory.Reflection (the source generator enables it automatically for Refit 17+ without that package). Default=false
   },
   "apizrSettings": { // Optional
     "withRequestOptions": true, // Optional. Default=true
@@ -437,7 +437,7 @@ The following is an example `.refitter` file using multiple OpenAPI specificatio
   - `usePolly` - Set this to `true` to configure the HttpClient to use Polly using a retry policy with a jittered backoff.  This is **DEPRECATED**, use `transientErrorHandler` instead
   - `transientErrorHandler`: Set this to configure transient error handling with a retry policy that uses a jittered backoff. See <https://refitter.github.io/api/Refitter.Core.TransientErrorHandler.html>
   - `firstBackoffRetryInSeconds` - This is the duration of the initial retry backoff. Default is 1 second
-  - `useGeneratedRefitClient` - Set this to `true` to register clients with the source-generated `AddRefitGeneratedClient` instead of the reflection-based `AddRefitClient`. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Refit 17 removed `AddRefitClient`, so this must be `true` when the generated code is compiled against Refit 17 or newer. The source generator detects the referenced Refit version and enables this automatically for Refit 17 or newer. This is ignored when Apizr registration is generated. Default is `false`
+  - `useGeneratedRefitClient` - Set this to `true` to register clients with the source-generated `AddRefitGeneratedClient` instead of the reflection-based `AddRefitClient`. Requires Refit 12.1.0 or newer, and Refit 14.0.0 or newer if the interfaces have query parameters. Refit 17 moved `AddRefitClient` to the `Refit.HttpClientFactory.Reflection` package. With Refit 17 or newer, either reference that package and leave this `false`, or set this to `true` and pass a `JsonSerializerContext` to the generated registration method, for example `RefitSettings.ForJsonContext(MySerializerContext.Default)` with `generateJsonSerializerContext` enabled. The source generator sets this to `true` for Refit 17 or newer unless the project references `Refit.HttpClientFactory.Reflection`. This is ignored when Apizr registration is generated. Default is `false`
 - `apizrSettings` - Setting this will format Refit interface to be managed by Apizr. See <https://www.apizr.net> for more information
   - `withRequestOptions` - Tells if the Refit interface methods should have a final IApizrRequestOptions options parameter
   - `withRegistrationHelper` - Tells if Refitter should generate Apizr registration helpers (extended with dependencyInjectionSettings set, otherwise static)
@@ -973,7 +973,7 @@ internal class Program
 The `RestService` class generates an implementation of `ISwaggerPetstore` that uses `HttpClient` to make its calls.
 
 > [!NOTE]
-> Refit 17 removed the reflection-based `RestService.For<T>()` (it moved to the `Refit.Reflection` package). With Refit 17 or newer, use `RestService.ForGenerated<T>()` instead, which is also available in Refit 12.1.0 or newer.
+> Refit 17 moved the reflection-based `RestService.For<T>()` to the `Refit.Reflection` package. With Refit 17 or newer, either reference `Refit.Reflection` and keep calling `RestService.For<T>()`, or call `RestService.ForGenerated<T>()` with a `JsonSerializerContext`, for example `RestService.ForGenerated<ISwaggerPetstore>(baseUrl, RefitSettings.ForJsonContext(MySerializerContext.Default))` with `generateJsonSerializerContext` enabled. Without type metadata, `ForGenerated<T>()` fails on the first JSON request.
 
 The code above when run will output something like this:
 
@@ -1086,7 +1086,7 @@ Returns a response that looks something like this:
 Refitter supports generating bootstrapping code that allows the user to conveniently configure all generated Refit interfaces by calling a single extension method to `IServiceCollection`.
 
 > [!NOTE]
-> Refit 17 removed the reflection-based `AddRefitClient<T>()`. When the generated code is compiled against Refit 17 or newer, set `dependencyInjectionSettings.useGeneratedRefitClient` to `true` so that `AddRefitGeneratedClient<T>()` is used instead. The Source Generator detects the Refit version the project references and does this automatically for Refit 17 or newer. Refit 17 only supports .NET 10, .NET 11 and .NET Framework 4.7 or newer, so projects targeting .NET 8, .NET 9, .NET Framework 4.6.2 or .NET Standard 2.0 stay on Refit 16.
+> Refit 17 moved the reflection-based `AddRefitClient<T>()` to the `Refit.HttpClientFactory.Reflection` package. When the generated code is compiled against Refit 17 or newer, either reference that package, or set `dependencyInjectionSettings.useGeneratedRefitClient` to `true` so that `AddRefitGeneratedClient<T>()` is used instead. Generated clients need a `JsonSerializerContext`: enable `generateJsonSerializerContext` and pass `RefitSettings.ForJsonContext(MySerializerContext.Default)` as the `settings` argument of the generated registration method. The Source Generator detects the Refit version the project references and uses `AddRefitGeneratedClient<T>()` for Refit 17 or newer unless the project references `Refit.HttpClientFactory.Reflection`. Refit 17 only supports .NET 10, .NET 11 and .NET Framework 4.7 or newer, so projects targeting .NET 8, .NET 9, .NET Framework 4.6.2 or .NET Standard 2.0 stay on Refit 16.
 
 This is enabled through the `.refitter` settings file like this:
 
