@@ -982,6 +982,16 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "superbot-helper",
+      "name": "Superbot Helper",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5358899?v=4",
+      "profile": "https://superbot.gg",
+      "contributions": [
+        "bug",
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,
