@@ -28,8 +28,7 @@ app.MapGet(
                 return Results.StatusCode((int)e.StatusCode);
             }
         })
-    .WithName("GetPetById")
-    .WithOpenApi();
+    .WithName("GetPetById");
 
 app.MapDelete(
         "/pet/{id:long}",
@@ -41,8 +40,7 @@ app.MapDelete(
             else
                 return Results.StatusCode((int)response.StatusCode);
         })
-    .WithName("DeletePet")
-    .WithOpenApi();
+    .WithName("DeletePet");
 
 app.UseHttpsRedirection();
 app.UseSwaggerUI();
