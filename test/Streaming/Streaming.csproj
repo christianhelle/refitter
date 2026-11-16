@@ -10,6 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Refit" Version="17.0.0" />
     <PackageReference Include="Refit.HttpClientFactory" Version="17.0.0" />
+    <!-- RestService.For moved to Refit.Reflection in Refit 17 -->
+    <PackageReference Include="Refit.Reflection" Version="17.0.0" />
   </ItemGroup>
 
 </Project>
