@@ -6,6 +6,7 @@
   "useCancellationTokens": true,
   "additionalNamespaces": ["Refitter.Tests.AdditionalFiles.SingeInterface"],
   "addAcceptHeaders": false,
+  "generateJsonSerializerContext": true,
   "dependencyInjectionSettings": {
     "httpMessageHandlers": [
       "EmptyMessageHandler",
