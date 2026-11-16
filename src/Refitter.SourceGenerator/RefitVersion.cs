@@ -8,7 +8,7 @@ namespace Refitter.SourceGenerator;
 internal enum RefitVersionWarning
 {
     /// <summary>
-    /// Refit 17 only registers generated clients, but Refitter doesn't run Refit's source generator over its output.
+    /// Refit 17 generated clients need Refit's source generator, but Refitter doesn't run it over its output.
     /// </summary>
     RefitGeneratorNotRun,
 
@@ -16,6 +16,11 @@ internal enum RefitVersionWarning
     /// Refit 17 generated clients don't support <c>[FormObject]</c> flattening, which needs the reflection request builder.
     /// </summary>
     MultipartFormObject,
+
+    /// <summary>
+    /// Refit 17 generated clients need JSON type metadata, but no <c>JsonSerializerContext</c> is generated.
+    /// </summary>
+    NoJsonSerializerContext,
 }
 
 /// <summary>
@@ -24,11 +29,12 @@ internal enum RefitVersionWarning
 internal static class RefitVersion
 {
     /// <summary>
-    /// The first Refit major version without the reflection-based <c>RestService.For</c> and <c>AddRefitClient</c> APIs.
+    /// The first Refit major version that moved <c>AddRefitClient</c> to <c>Refit.HttpClientFactory.Reflection</c>.
     /// </summary>
     internal const int GeneratedClientOnlyMajorVersion = 17;
 
     private const string RefitAssemblyName = "Refit";
+    private const string ReflectionRegistrationAssemblyName = "Refit.HttpClientFactory.Reflection";
 
     internal static int? FindMajorVersion(IEnumerable<(string Name, Version Version)> referencedAssemblies)
     {
@@ -43,20 +49,28 @@ internal static class RefitVersion
         return null;
     }
 
+    internal static bool ReferencesReflectionRegistration(IEnumerable<(string Name, Version Version)> referencedAssemblies) =>
+        referencedAssemblies.Any(assembly =>
+            string.Equals(assembly.Name, ReflectionRegistrationAssemblyName, StringComparison.OrdinalIgnoreCase));
+
     /// <summary>
-    /// Switches dependency injection to <c>AddRefitGeneratedClient</c> for Refit 17 or newer, which removed <c>AddRefitClient</c>.
+    /// Switches dependency injection to <c>AddRefitGeneratedClient</c> for Refit 17 or newer, unless the project
+    /// references <c>Refit.HttpClientFactory.Reflection</c>, which still provides <c>AddRefitClient</c>.
     /// </summary>
     /// <param name="settings">The settings to adapt.</param>
     /// <param name="refitMajorVersion">The referenced Refit major version, or <see langword="null"/> when unknown.</param>
+    /// <param name="reflectionRegistration">Whether the project references <c>Refit.HttpClientFactory.Reflection</c>.</param>
     /// <param name="refitGeneratorRuns">Whether Refitter runs Refit's source generator over its output.</param>
     /// <returns>The problems the generated registration code will have.</returns>
     internal static IReadOnlyList<RefitVersionWarning> Apply(
         RefitGeneratorSettings settings,
         int? refitMajorVersion,
+        bool reflectionRegistration,
         bool refitGeneratorRuns)
     {
-        if (refitMajorVersion < GeneratedClientOnlyMajorVersion ||
-            refitMajorVersion is null ||
+        if (refitMajorVersion is null ||
+            refitMajorVersion < GeneratedClientOnlyMajorVersion ||
+            reflectionRegistration ||
             settings.DependencyInjectionSettings is not { } dependencyInjectionSettings)
         {
             return [];
@@ -73,6 +87,11 @@ internal static class RefitVersion
         if (settings.UseMultipartFormObject)
         {
             warnings.Add(RefitVersionWarning.MultipartFormObject);
+        }
+
+        if (!settings.GenerateJsonSerializerContext)
+        {
+            warnings.Add(RefitVersionWarning.NoJsonSerializerContext);
         }
 
         return warnings;
