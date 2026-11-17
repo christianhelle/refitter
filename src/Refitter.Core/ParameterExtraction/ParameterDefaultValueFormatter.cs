@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using NSwag.CodeGeneration.CSharp.Models;
 
 namespace Refitter.Core;
@@ -9,6 +10,12 @@ namespace Refitter.Core;
 internal static class ParameterDefaultValueFormatter
 {
     private const string DefaultKeyword = "default";
+
+    // The value is written into the generated code as it is, so anything else is replaced by default
+    private static readonly Regex NumberLiteral = new(
+        @"^-?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
 
     public static bool IsNumericType(string type)
     {
@@ -32,6 +39,9 @@ internal static class ParameterDefaultValueFormatter
             ? formattable.ToString(null, CultureInfo.InvariantCulture)
             : (defaultValue.ToString() ?? DefaultKeyword);
 
+        if (defaultValue is bool || !NumberLiteral.IsMatch(numericString))
+            return DefaultKeyword;
+
         return type switch
         {
             "float" or "Single" => $"{numericString}f",
@@ -53,11 +63,17 @@ internal static class ParameterDefaultValueFormatter
 
         return type switch
         {
-            "bool" => defaultValue.ToString()?.ToLowerInvariant() ?? DefaultKeyword,
+            "bool" => FormatBooleanValue(defaultValue),
             "string" => $"\"{ParameterNaming.EscapeString(defaultValue.ToString() ?? string.Empty)}\"",
             _ when IsNumericType(type) => FormatNumericValue(defaultValue, type),
             _ => DefaultKeyword
         };
+    }
+
+    private static string FormatBooleanValue(object defaultValue)
+    {
+        var text = defaultValue.ToString()?.ToLowerInvariant();
+        return text is "true" or "false" ? text : DefaultKeyword;
     }
 
     public static string GetDefaultValueForParameter(

@@ -192,7 +192,7 @@ public class ParameterExtractorPrivateCoverageTests
     public void FormatNumericValue_FallsBack_To_DefaultKeyword_For_NonFormattable_Type()
     {
         var result = ParameterDefaultValueFormatter.FormatNumericValue(new object(), "int");
-        result.Should().Be("System.Object");
+        result.Should().Be("default");
     }
 
 
