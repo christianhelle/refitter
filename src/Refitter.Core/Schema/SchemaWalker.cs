@@ -126,6 +126,11 @@ internal static class SchemaWalker
             yield return property;
         }
 
+        foreach (var patternProperty in schema.PatternProperties.Values)
+        {
+            yield return patternProperty;
+        }
+
         foreach (var subSchema in schema.AllOf)
         {
             yield return subSchema;

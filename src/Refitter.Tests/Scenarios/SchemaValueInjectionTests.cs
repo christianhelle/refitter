@@ -32,6 +32,14 @@ public class SchemaValueInjectionTests
            "Level":{"type":"integer","enum":[1,2,"3"]}}}}
         """;
 
+    private const string PatternPropertiesEnumSpec = """
+        {"openapi":"3.0.0","info":{"title":"inject","version":"1.0.0"},
+         "paths":{"/p":{"get":{"operationId":"GetP","responses":{"200":{"description":"ok","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Dto"}}}}}}}},
+         "components":{"schemas":{
+           "Dto":{"type":"object","additionalProperties":false,"patternProperties":{
+             "^x":{"type":"integer","enum":[1,"0,\n#error INJECTED-PATTERN\n"]}}}}}}
+        """;
+
     [TestMethod]
     public async Task Non_Literal_Property_Defaults_Are_Dropped()
     {
@@ -74,6 +82,22 @@ public class SchemaValueInjectionTests
     public async Task Integer_Enum_Injection_Is_Inert_And_Compiles()
     {
         string generatedCode = await GenerateCode(IntegerEnumSpec);
+        BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Integer_Enum_In_Pattern_Properties_Is_Not_Emitted_As_Member_Value()
+    {
+        string generatedCode = await GenerateCode(PatternPropertiesEnumSpec);
+        generatedCode.Should().Contain("INJECTEDPATTERN");
+        generatedCode.Should().NotMatchRegex(@"= 0,\s*#error");
+    }
+
+    [TestMethod]
+    [TestCategory("Integration")]
+    public async Task Integer_Enum_In_Pattern_Properties_Injection_Is_Inert_And_Compiles()
+    {
+        string generatedCode = await GenerateCode(PatternPropertiesEnumSpec);
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
