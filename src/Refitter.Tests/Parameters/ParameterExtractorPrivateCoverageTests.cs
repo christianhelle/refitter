@@ -195,6 +195,27 @@ public class ParameterExtractorPrivateCoverageTests
         result.Should().Be("default");
     }
 
+    [TestMethod]
+    [DataRow("0); evil", "int", "default")]
+    [DataRow("NaN", "double", "default")]
+    [DataRow("-12", "long", "-12L")]
+    [DataRow("TRUE", "bool", "true")]
+    [DataRow("False", "bool?", "false")]
+    [DataRow("true); evil", "bool", "default")]
+    public void FormatDefaultValue_Only_Emits_Literal_Numeric_And_Boolean_Values(
+        string defaultValue,
+        string type,
+        string expected)
+    {
+        ParameterDefaultValueFormatter.FormatDefaultValue(defaultValue, type).Should().Be(expected);
+    }
+
+    [TestMethod]
+    public void FormatNumericValue_Returns_DefaultKeyword_For_Boolean()
+    {
+        ParameterDefaultValueFormatter.FormatNumericValue(true, "int").Should().Be("default");
+    }
+
 
 
     [TestMethod]
