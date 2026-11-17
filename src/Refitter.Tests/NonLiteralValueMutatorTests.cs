@@ -43,6 +43,7 @@ public class NonLiteralValueMutatorTests
     {
         Mutate(new JsonSchema { Type = JsonObjectType.Boolean, Default = true }).Default.Should().Be(true);
         Mutate(new JsonSchema { Type = JsonObjectType.Integer, Default = true }).Default.Should().BeNull();
+        Mutate(new JsonSchema { Type = JsonObjectType.Boolean, Default = 1L }).Default.Should().BeNull();
     }
 
     [TestMethod]

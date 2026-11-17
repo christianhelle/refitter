@@ -49,12 +49,15 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
         return (isBoolean && IsBoolean(value)) || (isNumeric && IsNumber(value));
     }
 
-    private static bool IsBoolean(object value) =>
-        value is bool ||
-        (value is string text && (text.Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                                  text.Equals("false", StringComparison.OrdinalIgnoreCase)));
+    private static bool IsBoolean(object value) => value switch
+    {
+        bool => true,
+        string text => text.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                       text.Equals("false", StringComparison.OrdinalIgnoreCase),
+        _ => false,
+    };
 
     private static bool IsNumber(object value) =>
         value is not bool &&
-        NumberLiteral.IsMatch(Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty);
+        NumberLiteral.IsMatch(string.Format(CultureInfo.InvariantCulture, "{0}", value));
 }
