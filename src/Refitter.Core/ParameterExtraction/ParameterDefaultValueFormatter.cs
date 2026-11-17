@@ -72,7 +72,7 @@ internal static class ParameterDefaultValueFormatter
 
     private static string FormatBooleanValue(object defaultValue)
     {
-        var text = defaultValue.ToString()?.ToLowerInvariant();
+        var text = string.Format(CultureInfo.InvariantCulture, "{0}", defaultValue).ToLowerInvariant();
         return text is "true" or "false" ? text : DefaultKeyword;
     }
 
