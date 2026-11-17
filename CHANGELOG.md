@@ -2,6 +2,12 @@
 
 ## [Unreleased Changes]
 
+### Features
+- Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
+
+
+## [2.4.0](https://github.com/christianhelle/refitter/releases/tag/2.4.0) (2026-11-16)
+
 ### Merged Pull Requests
 - Fix SonarCloud quality gate and open issues ([#1359](https://github.com/christianhelle/refitter/pull/1359)) ([@christianhelle](https://github.com/christianhelle/))
 - docs: add superbot-helper as a contributor for bug, and security ([#1406](https://github.com/christianhelle/refitter/pull/1406)) (@allcontributors[bot])
@@ -48,6 +54,14 @@
 - Support OpenAPI 3.2 itemSchema for streaming responses ([#1355](https://github.com/christianhelle/refitter/pull/1355)) ([@christianhelle](https://github.com/christianhelle/))
 - Use discriminated base type for inline oneOf of derived types ([#1335](https://github.com/christianhelle/refitter/pull/1335)) ([@christianhelle](https://github.com/christianhelle/))
 - Add option to wrap multipart form fields in a FormObject parameter ([#1347](https://github.com/christianhelle/refitter/pull/1347)) ([@christianhelle](https://github.com/christianhelle/))
+
+### Closed Issues
+- Generates record that inherits a class ([#1398](https://github.com/christianhelle/refitter/issues/1398)) ([@AkazaRenn](https://github.com/AkazaRenn/))
+- ConvertSnakeCaseToPascalCase not used when converting tag to API ([#1379](https://github.com/christianhelle/refitter/issues/1379)) ([@AkazaRenn](https://github.com/AkazaRenn/))
+- Source generator requires committing generated code and building twice ([#1364](https://github.com/christianhelle/refitter/issues/1364)) ([@christianhelle](https://github.com/christianhelle/))
+- Unable to build JsonSerializerContext with an entity named "Options" ([#1357](https://github.com/christianhelle/refitter/issues/1357)) ([@AkazaRenn](https://github.com/AkazaRenn/))
+- net11 openapi 3.2 text/event-stream ([#1348](https://github.com/christianhelle/refitter/issues/1348)) ([@MeikelLP](https://github.com/MeikelLP/))
+- Json model in MultiPart ([#1346](https://github.com/christianhelle/refitter/issues/1346)) ([@MeikelLP](https://github.com/MeikelLP/))
 
 
 ## [2.3.1](https://github.com/christianhelle/refitter/releases/tag/2.3.1) (2026-10-17)
