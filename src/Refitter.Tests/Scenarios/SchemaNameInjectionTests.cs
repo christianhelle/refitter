@@ -37,6 +37,24 @@ public class SchemaNameInjectionTests
         """;
 
     [TestMethod]
+    public async Task Property_Name_Is_Escaped_When_Custom_Template_Delegates_To_Embedded_Template()
+    {
+        // A custom template renders the embedded one with {% template "" %}, which NJsonSchema requests as "Class!"
+        string templateDirectory = Path.Combine(Path.GetTempPath(), "refitter-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(templateDirectory);
+        try
+        {
+            await File.WriteAllTextAsync(Path.Combine(templateDirectory, "Class.liquid"), "{% template \"\" %}");
+            string generatedCode = await GenerateCode(PropertyNameSpec, s => s.CustomTemplateDirectory = templateDirectory);
+            generatedCode.Should().Contain("JsonPropertyName(\"a\\\")]");
+        }
+        finally
+        {
+            Directory.Delete(templateDirectory, true);
+        }
+    }
+
+    [TestMethod]
     public async Task Property_Name_Is_Escaped()
     {
         string generatedCode = await GenerateCode(PropertyNameSpec);

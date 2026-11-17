@@ -45,7 +45,8 @@ internal class CustomTemplateFactory(
     protected override string GetEmbeddedLiquidTemplate(string language, string template)
     {
         var templateText = base.GetEmbeddedLiquidTemplate(language, template);
-        return template switch
+        // A custom template that delegates to the embedded one asks for it with a trailing "!"
+        return template.TrimEnd('!') switch
         {
             "Class" => EscapeStringLiterals(templateText
                 .Replace(
