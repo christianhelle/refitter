@@ -52,6 +52,9 @@ internal class CSharpClientGeneratorFactory
         foreach (var mutator in mutators)
             mutator.Mutate(document);
 
+        // Always on, last, so no other mutator can bring back a value that NJsonSchema emits unescaped
+        new NonLiteralValueMutator().Mutate(document);
+
         // The property name generator needs the contract type names, which the generator resolves
         CustomCSharpClientGenerator? generator = null;
 
