@@ -161,9 +161,12 @@ flowchart LR
     M4 --> M5["InlineOneOfDerivedTypesToBaseType"]
     M5 --> M6["FixMissingIntegerTypes"]
     M6 --> M7["CustomIntegerType"]
+    M7 --> M8["NonLiteralValue<br/>(always on)"]
 ```
 
-It then builds NSwag's `CSharpClientGeneratorSettings`. NSwag is used **only for contracts**: `GenerateClientClasses`, `GenerateClientInterfaces` and `GenerateExceptionClasses` are all `false`, `GenerateDtoTypes` is `true`, and the JSON library is System.Text.Json. Refitter also plugs in its own naming components (`UniquePropertyNameGenerator`, `SafeSchemaTypeNameGenerator`, `UniqueEnumNameGenerator`, optionally `PreserveOriginalPropertyNameGenerator`) and a `CustomTemplateFactory` that patches NSwag's class template, for example for polymorphic serialization attributes. The `codeGeneratorSettings` section of the `.refitter` file is copied onto these settings.
+`NonLiteralValueMutator` runs last, even when a caller supplies its own mutators. NJsonSchema writes numeric and boolean defaults and integer enum values into the contracts as they are, so it drops a numeric or boolean default that is not a number or boolean, and generates an integer enum with a non-numeric value as a string enum.
+
+It then builds NSwag's `CSharpClientGeneratorSettings`. NSwag is used **only for contracts**: `GenerateClientClasses`, `GenerateClientInterfaces` and `GenerateExceptionClasses` are all `false`, `GenerateDtoTypes` is `true`, and the JSON library is System.Text.Json. Refitter also plugs in its own naming components (`UniquePropertyNameGenerator`, `SafeSchemaTypeNameGenerator`, `UniqueEnumNameGenerator`, optionally `PreserveOriginalPropertyNameGenerator`) and a `CustomTemplateFactory` that patches NSwag's class template, for example for polymorphic serialization attributes, and escapes the schema property names, discriminator property name and discriminator mapping keys that the template writes into C# string literals. The `codeGeneratorSettings` section of the `.refitter` file is copied onto these settings.
 
 The result is a [`CustomCSharpClientGenerator`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/CodeGeneration/CustomCSharpClientGenerator.cs), a subclass of NSwag's `CSharpClientGenerator` that exposes NSwag's operation models and type resolver to Refitter.
 
