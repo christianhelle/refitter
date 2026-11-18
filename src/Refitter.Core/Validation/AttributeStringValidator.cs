@@ -77,7 +77,7 @@ internal static class AttributeStringValidator
         {
             diagnostic.Errors.Add(new OpenApiError(
                 path,
-                $"Path '{path}' contains illegal characters (quotes, backslashes, or control characters) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
+                $"Path '{path}' contains illegal characters (quotes, backslashes, control characters, or Unicode line separators) and is rejected to prevent code injection into Refit attributes. Use --skip-validation to bypass."));
         }
     }
 
