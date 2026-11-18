@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Features
+- Escape Unicode line terminators and settings values in generated string literals ([#1409](https://github.com/christianhelle/refitter/pull/1409)) ([@christianhelle](https://github.com/christianhelle/))
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 
 
