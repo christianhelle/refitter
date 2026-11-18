@@ -25,6 +25,14 @@ public class AttributeStringValidatorTests
     }
 
     [TestMethod]
+    [DataRow("X\x2028Api")]
+    [DataRow("X\x2029Api")]
+    public void ContainsUnsafeCharacters_Should_Return_True_For_Unicode_Line_Terminators(string value)
+    {
+        AttributeStringValidator.ContainsUnsafeCharacters(value).Should().BeTrue();
+    }
+
+    [TestMethod]
     public void Validate_Should_Return_When_Document_Is_Null()
     {
         OpenApiDiagnostic diagnostic = new();

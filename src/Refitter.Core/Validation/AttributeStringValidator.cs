@@ -12,7 +12,11 @@ namespace Refitter.Core.Validation;
 internal static class AttributeStringValidator
 {
     internal static bool ContainsUnsafeCharacters(string? value) =>
-        value != null && value.Any(c => c is '"' or '\\' || char.IsControl(c));
+        value != null && value.Any(c => c is '"' or '\\' or LineSeparator or ParagraphSeparator || char.IsControl(c));
+
+    // C# ends a string literal at these Unicode line terminators, which are not control characters
+    private const char LineSeparator = (char)0x2028;
+    private const char ParagraphSeparator = (char)0x2029;
 
     internal static void Validate(OpenApiDocument? document, OpenApiDiagnostic diagnostic)
     {
