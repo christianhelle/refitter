@@ -8,6 +8,9 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ParameterNaming
 {
+    private const char LineSeparator = (char)0x2028;
+    private const char ParagraphSeparator = (char)0x2029;
+
     public static string ReplaceUnsafeCharacters(string unsafeText)
     {
         return IdentifierUtils.ToCompilableIdentifier(unsafeText);
@@ -48,7 +51,8 @@ internal static class ParameterNaming
                     sb.Append("\\0");
                     break;
                 default:
-                    if (char.IsControl(c))
+                    // U+2028 and U+2029 end a C# string literal like CR and LF, but are not control characters
+                    if (char.IsControl(c) || c is LineSeparator or ParagraphSeparator)
                         sb.Append($"\\u{(int)c:X4}");
                     else
                         sb.Append(c);
