@@ -45,9 +45,11 @@ internal static class DependencyInjectionGenerator
             ? $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}({newLine}            this IServiceCollection services, {newLine}            Uri baseUrl, {newLine}            Action<IHttpClientBuilder>? builder = default, {newLine}            RefitSettings? settings = default)"
             : $"{methodDocs}public static IServiceCollection {iocSettings.ExtensionMethodName}({newLine}            this IServiceCollection services, {newLine}            Action<IHttpClientBuilder>? builder = default, {newLine}            RefitSettings? settings = default)";
 
+#pragma warning disable S8969 // netstandard2.0 lacks nullability annotations
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
-            : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
+            : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{ParameterNaming.EscapeString(iocSettings.BaseUrl!)}\"))";
+#pragma warning restore S8969
 
         var usings = NormalizeLineEndings(
             iocSettings.TransientErrorHandler switch

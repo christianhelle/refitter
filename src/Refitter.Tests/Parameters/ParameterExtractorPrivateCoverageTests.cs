@@ -47,6 +47,17 @@ public class ParameterExtractorPrivateCoverageTests
     }
 
     [TestMethod]
+    [DataRow("before\u0085after", "before\\u0085after")]
+    [DataRow("before\x2028after", "before\\u2028after")]
+    [DataRow("before\x2029after", "before\\u2029after")]
+    public void EscapeString_Encodes_Unicode_Line_Terminators_As_Unicode_Escapes(string value, string expected)
+    {
+        var result = ParameterNaming.EscapeString(value);
+
+        result.Should().Be(expected);
+    }
+
+    [TestMethod]
     [DataRow("uint")]
     [DataRow("UInt32")]
     public void FormatNumericValue_Appends_U_Suffix_For_UInt_Types(string numericType)
