@@ -118,13 +118,14 @@ public static class Analytics
 
     private static void ApplyTelemetrySource(Settings settings)
     {
-        if (string.IsNullOrWhiteSpace(settings.TelemetrySource))
+        if (!IsMsbuildInvocation(settings.TelemetrySource))
         {
             return;
         }
 
-        telemetryClient.Context.GlobalProperties["telemetry-source"] = settings.TelemetrySource;
-        ExceptionlessClient.Default.Configuration.DefaultData["telemetry-source"] = settings.TelemetrySource;
+        const string telemetrySource = "msbuild";
+        telemetryClient.Context.GlobalProperties["telemetry-source"] = telemetrySource;
+        ExceptionlessClient.Default.Configuration.DefaultData["telemetry-source"] = telemetrySource;
     }
 
     private static void LogMsbuildInvocation(Settings settings)
@@ -176,21 +177,14 @@ public static class Analytics
 
         ApplyTelemetrySource(settings);
 
-        string json = Serializer.Serialize(settings);
-        var properties = Serializer.Deserialize<Dictionary<string, object>>(json)!;
-        exception
+        Exception telemetryException = new("Generation failed.");
+        telemetryException
             .ToExceptionless(
-                new ContextData(
-                    properties))
+                new ContextData())
             .Submit();
 
         await ExceptionlessClient.Default.ProcessQueueAsync();
 
-        telemetryClient.TrackException(
-            exception,
-            new Dictionary<string, string>
-            {
-                { "settings", json }
-            });
+        telemetryClient.TrackException(telemetryException);
     }
 }
