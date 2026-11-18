@@ -202,16 +202,25 @@ public class AnalyticsTests
                 TelemetrySource = "msbuild",
                 TelemetryFileCount = 3,
                 TelemetryRuntime = "net9.0",
-                OpenApiPath = "https://user:password@example.com/openapi.json?token=secret"
+                OpenApiPath = "https://user:password@example.com/openapi.json?token=secret",
+                GenerateMultipleFiles = true,
+                PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal
             };
             var exception = new Exception("Request failed: https://user:password@example.com/openapi.json?token=secret");
 
             await Analytics.LogError(exception, settings);
 
             var reportedException = captured.OfType<ExceptionTelemetry>().Single();
-            reportedException.Exception.Message.Should().Be("Generation failed.");
+            reportedException.Exception.Message.Should().Be("Generation failed: Exception");
             reportedException.Exception.Message.Should().NotContain("password").And.NotContain("secret");
-            reportedException.Properties.Should().NotContainKey("settings");
+            reportedException.Properties["exception-type"].Should().Be("Exception");
+            reportedException.Properties["settings"]
+                .Should()
+                .Contain("\"openApiPath\":\"<redacted>\"")
+                .And.Contain("\"generateMultipleFiles\":true")
+                .And.Contain("\"propertyNamingPolicy\":\"PreserveOriginal\"")
+                .And.NotContain("password")
+                .And.NotContain("secret");
             client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
         }
         finally

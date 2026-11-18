@@ -177,14 +177,29 @@ public static class Analytics
 
         ApplyTelemetrySource(settings);
 
-        Exception telemetryException = new("Generation failed.");
+        string exceptionType = exception.GetType().Name;
+        var exceptionProperties = new Dictionary<string, object>
+        {
+            { "exception-type", exceptionType }
+        };
+        var telemetryProperties = new Dictionary<string, string>
+        {
+            { "exception-type", exceptionType }
+        };
+        if (SettingsSanitizer.Sanitize(Serializer.Serialize(settings)) is { } sanitizedSettings)
+        {
+            exceptionProperties["settings"] = sanitizedSettings;
+            telemetryProperties["settings"] = sanitizedSettings;
+        }
+
+        Exception telemetryException = new($"Generation failed: {exceptionType}");
         telemetryException
             .ToExceptionless(
-                new ContextData())
+                new ContextData(exceptionProperties))
             .Submit();
 
         await ExceptionlessClient.Default.ProcessQueueAsync();
 
-        telemetryClient.TrackException(telemetryException);
+        telemetryClient.TrackException(telemetryException, telemetryProperties);
     }
 }
