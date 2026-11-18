@@ -80,11 +80,11 @@ internal static class ParameterAttributeFormatter
             { parameter.IsDate: true, settings.UseIsoDateFormat: true }
                 => "Query(Format = \"yyyy-MM-dd\")",
             { parameter.IsDate: true, settings.CodeGeneratorSettings.DateFormat: not null }
-                => $"Query(Format = \"{ParameterNaming.EscapeString(settings.CodeGeneratorSettings!.DateFormat!)}\")",
+                => $"Query(Format = \"{ParameterNaming.EscapeString(settings.CodeGeneratorSettings.DateFormat)}\")",
             {
                 parameter.IsDateOrDateTime: true, parameter.Schema.Format: "date-time",
                 settings.CodeGeneratorSettings.DateTimeFormat: not null
-            } => $"Query(Format = \"{ParameterNaming.EscapeString(settings.CodeGeneratorSettings!.DateTimeFormat!)}\")",
+            } => $"Query(Format = \"{ParameterNaming.EscapeString(settings.CodeGeneratorSettings.DateTimeFormat)}\")",
             _ => "Query",
         };
     }
