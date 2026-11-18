@@ -27,7 +27,7 @@ internal class ApizrOptionsBuilder : IApizrOptionsBuilder
     public void WithBaseAddress(string baseUrl, string duplicateStrategy)
     {
         optionsCode.AppendLine();
-        optionsCode.Append($"                .WithBaseAddress(\"{baseUrl}\", {duplicateStrategy})");
+        optionsCode.Append($"                .WithBaseAddress(\"{ParameterNaming.EscapeString(baseUrl)}\",{duplicateStrategy})");
         hasOptions = true;
     }
 
