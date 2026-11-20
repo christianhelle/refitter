@@ -105,6 +105,8 @@ What does not work well is a pull request that stays incomplete with no reply: i
 
 ### Reporting Issues
 
+Security vulnerabilities must not be reported as public issues. See [SECURITY.md](SECURITY.md) for how to report them privately.
+
 If you encounter a bug or issue, please create a GitHub issue with the following information:
 
 - A clear, descriptive title
