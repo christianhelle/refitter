@@ -317,6 +317,8 @@ internal static class ReferenceGuard
         var visited = new HashSet<object>(ReferenceComparer.Instance);
 
         // Aliased schemas can share one discriminator or mapping node, so each is read only once
+        // in each role. One node can be both, so the two roles are tracked separately
+        var visitedDiscriminators = new HashSet<object>(ReferenceComparer.Instance);
         var visitedMappings = new HashSet<object>(ReferenceComparer.Instance);
         pending.Push(root);
 
@@ -328,7 +330,7 @@ internal static class ReferenceGuard
             if (node is null or string || !visited.Add(node))
                 continue;
 
-            VisitYamlNode(node, pending, references, visitedMappings);
+            VisitYamlNode(node, pending, references, visitedDiscriminators, visitedMappings);
         }
 
         return references;
@@ -338,6 +340,7 @@ internal static class ReferenceGuard
         object node,
         Stack<object?> pending,
         List<string> references,
+        HashSet<object> visitedDiscriminators,
         HashSet<object> visitedMappings)
     {
         if (node is IDictionary<object, object> mapping)
@@ -352,7 +355,7 @@ internal static class ReferenceGuard
                 if (entry.Key is string name &&
                     string.Equals(name, "discriminator", StringComparison.OrdinalIgnoreCase) &&
                     entry.Value is IDictionary<object, object> discriminator &&
-                    visitedMappings.Add(discriminator))
+                    visitedDiscriminators.Add(discriminator))
                 {
                     AddDiscriminatorMappingReferences(discriminator, references, visitedMappings);
                 }
