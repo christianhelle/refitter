@@ -35,10 +35,11 @@ public class CliFileWriter : IFileWriter
             throw new InvalidOperationException($"Refusing to write '{file.Path}': it is a symbolic link.");
 
         // Write to a temporary file and rename it over the target, so that a link created after the
-        // check above is replaced instead of followed.
+        // check above is replaced instead of followed. The temporary name is short and fixed-length so
+        // it cannot exceed filesystem filename limits when the output filename is long.
         var tempPath = Path.Combine(
             string.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir,
-            "." + Path.GetFileName(file.Path) + "." + Guid.NewGuid().ToString("N") + ".tmp");
+            "." + Guid.NewGuid().ToString("N") + ".tmp");
         try
         {
             await File.WriteAllTextAsync(tempPath, file.Content, cancellationToken);
