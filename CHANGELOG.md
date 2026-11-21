@@ -9,6 +9,7 @@
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Bug Fixes
+- Reject deeply nested OpenAPI documents before parsing ([#1422](https://github.com/christianhelle/refitter/pull/1422)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-7q2f-m7jf-3gp6: Refuse symlinked settings files and output directories ([#1421](https://github.com/christianhelle/refitter/pull/1421)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-r4f2-382w-frqc: Reject symbolic links in local reference paths ([#1416](https://github.com/christianhelle/refitter/pull/1416)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-rqpj-f34p-mr22: Validate discriminator mapping targets in the reference guard ([#1415](https://github.com/christianhelle/refitter/pull/1415)) ([@christianhelle](https://github.com/christianhelle/))
