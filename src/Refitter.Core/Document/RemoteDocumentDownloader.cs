@@ -31,7 +31,7 @@ internal static class RemoteDocumentDownloader
             throw TooLarge(url, maxBytes);
 
         using var buffer = new MemoryStream();
-        using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+        using (var stream = await response.Content.ReadAsStreamWithCancellationAsync(cancellationToken).ConfigureAwait(false))
         {
             var chunk = new byte[81920];
             int read;
@@ -40,13 +40,13 @@ internal static class RemoteDocumentDownloader
                 if (buffer.Length + read > maxBytes)
                     throw TooLarge(url, maxBytes);
 
-                buffer.Write(chunk, 0, read);
+                await buffer.WriteAsync(chunk, 0, read, cancellationToken).ConfigureAwait(false);
             }
         }
 
         buffer.Position = 0;
         using var reader = new StreamReader(buffer, GetEncoding(response), detectEncodingFromByteOrderMarks: true);
-        return reader.ReadToEnd();
+        return await reader.ReadToEndWithCancellationAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static ReferenceResolutionException TooLarge(string url, long maxBytes) =>
