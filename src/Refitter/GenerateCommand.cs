@@ -99,13 +99,8 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         CancellationToken cancellationToken = default)
     {
         var settingsFilePath = DetermineSettingsFilePath(settings);
-        var settingsDirectory = Path.GetDirectoryName(settingsFilePath);
-
-        if (!string.IsNullOrWhiteSpace(settingsDirectory) && !Directory.Exists(settingsDirectory))
-            Directory.CreateDirectory(settingsDirectory);
-
         var json = Serializer.Serialize(refitGeneratorSettings);
-        await File.WriteAllTextAsync(settingsFilePath, json, cancellationToken);
+        await CliFileWriter.WriteSafelyAsync(settingsFilePath, json, cancellationToken);
 
         CreateReporter(settings, refitGeneratorSettings).ReportSettingsFileGenerated(settingsFilePath);
     }

@@ -322,4 +322,49 @@ public class WriteRefitterSettingsFileTests
                 Directory.Delete(tempDir, true);
         }
     }
+
+    /// <summary>
+    /// GHSA-7q2f-m7jf-3gp6: a symbolic link at the settings file path must not be written through.
+    /// </summary>
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task WriteRefitterSettingsFile_Refuses_Symbolic_Link_At_Settings_Path()
+    {
+        var workspace = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        var previous = Directory.GetCurrentDirectory();
+        Directory.CreateDirectory(Path.Combine(workspace, "Generated"));
+        try
+        {
+            var canary = Path.Combine(workspace, "canary.txt");
+            await File.WriteAllTextAsync(canary, "original");
+            try
+            {
+                File.CreateSymbolicLink(Path.Combine(workspace, "Generated", ".refitter"), canary);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or PlatformNotSupportedException)
+            {
+                Assert.Inconclusive("Symbolic links cannot be created in this environment: " + ex.Message);
+                return;
+            }
+
+            Directory.SetCurrentDirectory(workspace);
+            var settings = new Refitter.Settings
+            {
+                OutputPath = Path.Combine("Generated", "Client.cs"),
+                SimpleOutput = true
+            };
+
+            Func<Task> act = () => GenerateCommand.WriteRefitterSettingsFile(
+                settings,
+                new RefitGeneratorSettings { OpenApiPath = "test.json" });
+
+            await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*symbolic link*");
+            (await File.ReadAllTextAsync(canary)).Should().Be("original");
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(previous);
+            Directory.Delete(workspace, recursive: true);
+        }
+    }
 }

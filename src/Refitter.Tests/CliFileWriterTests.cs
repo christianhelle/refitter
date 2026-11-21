@@ -201,4 +201,184 @@ public class CliFileWriterTests
                 Directory.Delete(workspace, recursive: true);
         }
     }
+    private static void CreateDirectoryLink(string link, string target)
+    {
+        try
+        {
+            Directory.CreateSymbolicLink(link, target);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or PlatformNotSupportedException)
+        {
+            Assert.Inconclusive("Symbolic links cannot be created in this environment: " + ex.Message);
+        }
+    }
+
+    private static async Task InWorkspaceAsync(Func<string, Task> body)
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "CliFileWriterTests",
+            Guid.NewGuid().ToString("N"));
+        var previous = Directory.GetCurrentDirectory();
+        Directory.CreateDirectory(workspace);
+        try
+        {
+            Directory.SetCurrentDirectory(workspace);
+            await body(workspace);
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(previous);
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
+
+    /// <summary>
+    /// GHSA-7q2f-m7jf-3gp6: a symbolic link to a directory below the working directory must not be followed.
+    /// </summary>
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task WriteAsync_Refuses_Symlinked_Parent_Directory()
+    {
+        await InWorkspaceAsync(async workspace =>
+        {
+            var outside = Path.Combine(workspace, "..", "victim-" + Guid.NewGuid().ToString("N"));
+            outside = Path.GetFullPath(outside);
+            Directory.CreateDirectory(outside);
+            try
+            {
+                CreateDirectoryLink(Path.Combine(workspace, "Generated"), outside);
+                var writer = new CliFileWriter(new SimpleGenerationReporter());
+
+                Func<Task> act = () => writer.WriteAsync(
+                    new PlannedFile(Path.Combine("Generated", "Client.cs"), "// injected"), default);
+
+                await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*Generated*symbolic link*");
+                Directory.GetFileSystemEntries(outside).Should().BeEmpty();
+            }
+            finally
+            {
+                Directory.Delete(outside, recursive: true);
+            }
+        });
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task WriteAsync_Refuses_Symlinked_Ancestor_Of_New_Directories()
+    {
+        await InWorkspaceAsync(async workspace =>
+        {
+            var outside = Path.GetFullPath(Path.Combine(workspace, "..", "victim-" + Guid.NewGuid().ToString("N")));
+            Directory.CreateDirectory(outside);
+            try
+            {
+                CreateDirectoryLink(Path.Combine(workspace, "Generated"), outside);
+                var writer = new CliFileWriter(new SimpleGenerationReporter());
+
+                Func<Task> act = () => writer.WriteAsync(
+                    new PlannedFile(Path.Combine("Generated", "Sub", "Client.cs"), "// injected"), default);
+
+                await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*symbolic link*");
+                Directory.GetFileSystemEntries(outside).Should().BeEmpty();
+            }
+            finally
+            {
+                Directory.Delete(outside, recursive: true);
+            }
+        });
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task WriteAsync_Creates_Nested_New_Directories_Under_Normal_Folder()
+    {
+        await InWorkspaceAsync(async workspace =>
+        {
+            Directory.CreateDirectory(Path.Combine(workspace, "Generated"));
+            var writer = new CliFileWriter(new SimpleGenerationReporter());
+            var relative = Path.Combine("Generated", "A", "B", "Client.cs");
+
+            await writer.WriteAsync(new PlannedFile(relative, "// ok"), default);
+
+            (await File.ReadAllTextAsync(Path.Combine(workspace, relative))).Should().Be("// ok");
+        });
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task WriteAsync_Does_Not_Check_Directories_Above_Working_Directory()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "CliFileWriterTests", Guid.NewGuid().ToString("N"));
+        var real = Path.Combine(root, "real");
+        var previous = Directory.GetCurrentDirectory();
+        Directory.CreateDirectory(Path.Combine(real, "work"));
+        try
+        {
+            var link = Path.Combine(root, "link");
+            CreateDirectoryLink(link, real);
+            Directory.SetCurrentDirectory(Path.Combine(link, "work"));
+            var writer = new CliFileWriter(new SimpleGenerationReporter());
+
+            await writer.WriteAsync(new PlannedFile(Path.Combine("Generated", "Client.cs"), "// ok"), default);
+
+            File.Exists(Path.Combine(real, "work", "Generated", "Client.cs")).Should().BeTrue();
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(previous);
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task WriteAsync_Refuses_Symlinked_Final_Directory_Outside_Working_Directory()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, "CliFileWriterTests", Guid.NewGuid().ToString("N"));
+        var outside = Path.Combine(root, "victim");
+        Directory.CreateDirectory(outside);
+        try
+        {
+            var link = Path.Combine(root, "linked");
+            CreateDirectoryLink(link, outside);
+            var writer = new CliFileWriter(new SimpleGenerationReporter());
+
+            Func<Task> act = () => writer.WriteAsync(new PlannedFile(Path.Combine(link, "Client.cs"), "// injected"), default);
+
+            await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*symbolic link*");
+            Directory.GetFileSystemEntries(outside).Should().BeEmpty();
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void IsUnder_Treats_Filesystem_Root_Descendants_As_Inside()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            CliFileWriter.IsUnder(@"C:\", @"C:\Generated\Sub").Should().BeTrue();
+            CliFileWriter.IsUnder(@"C:\", @"C:\Generated").Should().BeTrue();
+        }
+        else
+        {
+            CliFileWriter.IsUnder("/", "/Generated/Sub").Should().BeTrue();
+            CliFileWriter.IsUnder("/", "/Generated").Should().BeTrue();
+        }
+    }
+
+    [TestMethod]
+    public void IsUnder_Handles_Ordinary_Roots()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "root");
+        var sep = Path.DirectorySeparatorChar;
+        CliFileWriter.IsUnder(root, root + sep + "child").Should().BeTrue();
+        CliFileWriter.IsUnder(root + sep, root + sep + "child" + sep + "grand").Should().BeTrue();
+        CliFileWriter.IsUnder(root, root).Should().BeFalse();
+        CliFileWriter.IsUnder(root, root + "-sibling" + sep + "child").Should().BeFalse();
+    }
 }
