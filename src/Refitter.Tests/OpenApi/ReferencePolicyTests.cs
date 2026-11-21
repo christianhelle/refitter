@@ -1,5 +1,6 @@
 using AwesomeAssertions;
 using Refitter.Core;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
@@ -35,15 +36,20 @@ public class ReferencePolicyTests
     [TestMethod]
     [DataRow(false)]
     [DataRow(true)]
-    public async Task Resolver_Attempts_Url_Reference_When_Remote_References_Are_Allowed(bool isYaml)
+    public async Task Resolver_Fetches_Url_Reference_When_Remote_References_Are_Allowed(bool isYaml)
     {
-        var act = () => OpenApiDocumentParser.ParseAsync(
-            Spec,
+        using var server = new LoopbackHttpServer(
+            "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}");
+        var spec = Spec.Replace("http://127.0.0.1:1/", server.BaseUrl);
+
+        var document = await OpenApiDocumentParser.ParseAsync(
+            spec,
             Path.Combine(Path.GetTempPath(), "spec.json"),
             isYaml,
             new ReferencePolicy(allowRemoteReferences: true));
 
-        var thrown = await act.Should().ThrowAsync<Exception>();
-        thrown.Which.Should().NotBeOfType<ReferenceResolutionException>();
+        server.RequestCount.Should().BeGreaterThan(0);
+        document.Components.Schemas.Should().ContainKey("Pet");
+        document.Components.Schemas["Pet"].ActualSchema.Properties.Should().ContainKey("name");
     }
 }

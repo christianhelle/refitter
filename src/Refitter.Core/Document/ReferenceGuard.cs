@@ -12,13 +12,13 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ReferenceGuard
 {
-    // Filesystem-aware comparison: case-sensitive on Linux/macOS, case-insensitive on Windows. The visited set
-    // must use the same rule as the filesystem, otherwise two distinct files such as "Model.json" and
-    // "model.json" collapse into one entry and the second is never inspected
+    // IsWithin uses a platform-aware comparison (case-insensitive on Windows). The visited set always uses
+    // an ordinal comparison, even on Windows, because individual NTFS directories can be case-sensitive:
+    // folding case there could collapse two distinct files such as "Model.json" and "model.json" into one
+    // entry so the second is never inspected. Redundant validation of case aliases is acceptable
     private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    private static readonly StringComparer PathComparer =
-        IsWindows ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+    private static readonly StringComparer PathComparer = StringComparer.Ordinal;
 
     private static readonly StringComparison PathComparison =
         IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
@@ -177,13 +177,13 @@ internal static class ReferenceGuard
             if (string.IsNullOrWhiteSpace(fileRef))
                 continue;
 
-            // A "file:" URI cannot be combined with a directory as text; UNC hosts are network locations
-            if (Uri.TryCreate(fileRef, UriKind.Absolute, out Uri? fileUri) && fileUri.IsFile)
+            // NJsonSchema joins the raw text of a "file:" URI to the document directory instead of converting it,
+            // so it would open a different file from the one validated here. Reject them outright
+            if (fileRef.StartsWith("file:", StringComparison.OrdinalIgnoreCase))
             {
-                if (!string.IsNullOrEmpty(fileUri.Host))
-                    throw RemoteBlocked(reference, filePath);
-
-                fileRef = fileUri.LocalPath;
+                throw new ReferenceResolutionException(
+                    $"The '$ref' \"{reference}\" in \"{filePath}\" is a file URI. File URIs are not supported in " +
+                    "'$ref'; use a relative path instead.");
             }
 
             var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
