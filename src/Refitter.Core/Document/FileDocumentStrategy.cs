@@ -2,7 +2,7 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
-internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
+internal sealed class FileDocumentStrategy : IFailureReportingStrategy
 {
     private readonly ReferencePolicy policy;
 
@@ -16,18 +16,25 @@ internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
         this.policy = policy;
     }
 
-    public async Task<OpenApiDocument?> TryLoadAsync(
+    public async Task<OpenApiDocument?> LoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
         if (PathUtilities.IsHttp(path))
             return null;
 
+        cancellationToken.ThrowIfCancellationRequested();
+
+        return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<OpenApiDocument?> TryLoadAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken).ConfigureAwait(false);
+            return await LoadAsync(path, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
