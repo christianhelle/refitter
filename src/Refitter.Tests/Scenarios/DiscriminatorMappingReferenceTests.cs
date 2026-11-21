@@ -49,6 +49,24 @@ components:
 ";
 
     [TestMethod]
+    public void Extracts_Aliased_Discriminator_Mapping_References_Once()
+    {
+        const int schemas = 500;
+        const int mappings = 20;
+        var yaml = new System.Text.StringBuilder("openapi: 3.0.0\ninfo:\n  title: t\n  version: '1'\npaths: {}\ncomponents:\n  schemas:\n");
+        yaml.Append("    Base:\n      type: object\n      discriminator: &disc\n        propertyName: kind\n        mapping: &map\n");
+        for (int i = 0; i < mappings; i++)
+            yaml.Append($"          k{i}: './m{i}.json'\n");
+        for (int i = 0; i < schemas; i++)
+            yaml.Append($"    S{i}:\n      type: object\n      discriminator: *disc\n    T{i}:\n      type: object\n      discriminator:\n        propertyName: kind\n        mapping: *map\n");
+
+        var references = ReferenceGuard.ExtractReferences(yaml.ToString(), "spec.yaml");
+
+        // Without identity tracking every aliased schema would repeat the whole mapping
+        references.Should().HaveCount(mappings);
+    }
+
+    [TestMethod]
     [DataRow("../outside.json", false)]
     [DataRow("../outside.json", true)]
     [DataRow(Remote, false)]

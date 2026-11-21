@@ -197,7 +197,7 @@ internal static class ReferenceGuard
         }
     }
 
-    private static List<string> ExtractReferences(string content, string source)
+    internal static List<string> ExtractReferences(string content, string source)
     {
         // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
         // valid JSON without starting with '{' or '['
@@ -305,6 +305,9 @@ internal static class ReferenceGuard
 
         var pending = new Stack<object?>();
         var visited = new HashSet<object>(ReferenceComparer.Instance);
+
+        // Aliased schemas can share one discriminator or mapping node, so each is read only once
+        var visitedMappings = new HashSet<object>(ReferenceComparer.Instance);
         pending.Push(root);
 
         while (pending.Count > 0)
@@ -315,13 +318,17 @@ internal static class ReferenceGuard
             if (node is null or string || !visited.Add(node))
                 continue;
 
-            VisitYamlNode(node, pending, references);
+            VisitYamlNode(node, pending, references, visitedMappings);
         }
 
         return references;
     }
 
-    private static void VisitYamlNode(object node, Stack<object?> pending, List<string> references)
+    private static void VisitYamlNode(
+        object node,
+        Stack<object?> pending,
+        List<string> references,
+        HashSet<object> visitedMappings)
     {
         if (node is IDictionary<object, object> mapping)
         {
@@ -334,9 +341,10 @@ internal static class ReferenceGuard
 
                 if (entry.Key is string name &&
                     string.Equals(name, "discriminator", StringComparison.OrdinalIgnoreCase) &&
-                    entry.Value is IDictionary<object, object> discriminator)
+                    entry.Value is IDictionary<object, object> discriminator &&
+                    visitedMappings.Add(discriminator))
                 {
-                    AddDiscriminatorMappingReferences(discriminator, references);
+                    AddDiscriminatorMappingReferences(discriminator, references, visitedMappings);
                 }
 
                 pending.Push(entry.Key);
@@ -352,13 +360,15 @@ internal static class ReferenceGuard
 
     private static void AddDiscriminatorMappingReferences(
         IDictionary<object, object> discriminator,
-        List<string> references)
+        List<string> references,
+        HashSet<object> visitedMappings)
     {
         foreach (var entry in discriminator)
         {
             if (entry.Key is string key &&
                 string.Equals(key, "mapping", StringComparison.OrdinalIgnoreCase) &&
-                entry.Value is IDictionary<object, object> mapping)
+                entry.Value is IDictionary<object, object> mapping &&
+                visitedMappings.Add(mapping))
             {
                 foreach (var target in mapping.Values)
                 {
