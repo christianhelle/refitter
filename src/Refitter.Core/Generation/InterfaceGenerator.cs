@@ -1,6 +1,7 @@
 using System.Text;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
+using Refitter.Core.Validation;
 
 namespace Refitter.Core;
 
@@ -34,6 +35,11 @@ internal class InterfaceGenerator
 
     public IEnumerable<GeneratedCode> Generate(IInterfacePartitioning partitioning)
     {
+        foreach (var path in document.Paths)
+        {
+            RouteValidator.EnsureRelativeRoute(path.Key);
+        }
+
         var operations = document.Paths
             .SelectMany(
                 path => path.Value,
@@ -308,6 +314,7 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
+        RouteValidator.EnsureRelativeRoute(parameterList.Path);
         code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(parameterList.Path)}\")]")
             .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parameterList.Render()});")
             .AppendLine();
