@@ -49,7 +49,8 @@ public class MixedSeparatorReferenceTests
     [TestMethod]
     [DataRow("http:/\\")]
     [DataRow("HTTP:/\\")]
-    public async Task Does_Not_Block_Mixed_Separator_Reference_When_Remote_Allowed(string schemeSeparator)
+    [DataRow("https:\\\\")]
+    public async Task Blocks_Mixed_Separator_Reference_When_Remote_Allowed(string schemeSeparator)
     {
         using var server = new LoopbackHttpServer(
             "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}");
@@ -58,13 +59,27 @@ public class MixedSeparatorReferenceTests
 
         var act = () => GenerateCode(swaggerFile, allowRemoteReferences: true);
 
-        // The guard classifies the reference as remote and lets it through. What happens next is up to the
-        // downstream resolver: on Linux NJsonSchema reads the mixed spelling as a local file name, so the
-        // document fails to load without any request reaching the server. Either way, it is not a guard rejection
-        var thrown = await act.Should().ThrowAsync<Exception>();
-        thrown.Which.Should().NotBeOfType<ReferenceResolutionException>();
-        if (!OperatingSystem.IsWindows())
-            server.RequestCount.Should().Be(0);
+        // Downstream resolvers read a non-standard spelling as a local file name rather than fetch it, so
+        // it is neither a usable remote reference nor a confined local one
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
+        server.RequestCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public async Task Blocks_Mixed_Separator_Traversal_When_Remote_Allowed()
+    {
+        string parent = TestDirectory.CreateFolder();
+        string root = Path.Combine(parent, "input");
+        Directory.CreateDirectory(root);
+        await File.WriteAllTextAsync(
+            Path.Combine(parent, "outside.json"),
+            "{\"type\":\"object\",\"properties\":{\"OutsideMarker\":{\"type\":\"string\"}}}");
+        string main = Path.Combine(root, "main.json");
+        await File.WriteAllTextAsync(main, JsonSpec("http:/\\host/../../outside.json"));
+
+        var act = () => GenerateCode(main, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
     [TestMethod]
