@@ -282,12 +282,9 @@ internal static class ReferenceGuard
                     continue;
                 case JsonToken.StartObject:
                 case JsonToken.StartArray:
-                    containers.Push(reader.TokenType == JsonToken.StartObject ? propertyName : null);
-                    break;
                 case JsonToken.EndObject:
                 case JsonToken.EndArray:
-                    if (containers.Count > 0)
-                        containers.Pop();
+                    TrackContainer(reader.TokenType, propertyName, containers);
                     break;
                 case JsonToken.String:
                     if (expectReferenceValue || IsDiscriminatorMappingValue(containers))
@@ -304,6 +301,25 @@ internal static class ReferenceGuard
             throw new JsonReaderException("Expected a complete JSON object or array.");
 
         return references;
+    }
+
+    // Records the property name an object was found under when it opens, and forgets it when it closes.
+    // Arrays are recorded without a name, so a mapping nested in an array is not mistaken for a direct one
+    private static void TrackContainer(JsonToken token, string? propertyName, Stack<string?> containers)
+    {
+        switch (token)
+        {
+            case JsonToken.StartObject:
+                containers.Push(propertyName);
+                break;
+            case JsonToken.StartArray:
+                containers.Push(null);
+                break;
+            default:
+                if (containers.Count > 0)
+                    containers.Pop();
+                break;
+        }
     }
 
     private static bool IsDiscriminatorMappingValue(Stack<string?> containers)
