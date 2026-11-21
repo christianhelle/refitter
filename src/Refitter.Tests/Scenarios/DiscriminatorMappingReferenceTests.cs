@@ -67,6 +67,36 @@ components:
     }
 
     [TestMethod]
+    public void Extracts_Mapping_Targets_Of_A_Node_First_Seen_As_A_Discriminator()
+    {
+        // One anchored node serves as A's mapping and as B's discriminator. The walk reaches B first, so the
+        // node is read as a discriminator before its string values are read as A's mapping targets
+        const string yaml = @"openapi: 3.0.0
+info:
+  title: t
+  version: '1'
+paths: {}
+components:
+  schemas:
+    A:
+      type: object
+      discriminator:
+        propertyName: kind
+        mapping: &shared
+          propertyName: kind
+          dog: '../outside.json'
+          mapping: {}
+    B:
+      type: object
+      discriminator: *shared
+";
+
+        var references = ReferenceGuard.ExtractReferences(yaml, "spec.yaml");
+
+        references.Should().Contain("../outside.json");
+    }
+
+    [TestMethod]
     [DataRow("../outside.json", false)]
     [DataRow("../outside.json", true)]
     [DataRow(Remote, false)]

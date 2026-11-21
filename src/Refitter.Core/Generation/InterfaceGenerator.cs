@@ -1,6 +1,7 @@
 using System.Text;
 using NSwag;
 using NSwag.CodeGeneration.CSharp.Models;
+using Refitter.Core.Validation;
 
 namespace Refitter.Core;
 
@@ -34,12 +35,17 @@ internal class InterfaceGenerator
 
     public IEnumerable<GeneratedCode> Generate(IInterfacePartitioning partitioning)
     {
+        foreach (var path in document.Paths)
+        {
+            RouteValidator.EnsureRelativeRoute(path.Key);
+        }
+
         var operations = document.Paths
             .SelectMany(
                 path => path.Value,
                 (path, op)
                     => new OpenApiOperationInfo(path.Key, op.Key, op.Value))
-            .Where(op => IsSupportedByRefit(op.Verb))
+            .Where(op => IsSupportedByRefit(op.Path, op.Verb))
             .ToList();
 
         var groups = operations
@@ -117,9 +123,38 @@ internal class InterfaceGenerator
                 : name + suffix);
     }
 
-    // Refit has no attribute for TRACE, so those operations cannot be expressed.
-    private static bool IsSupportedByRefit(string verb) =>
-        !string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase);
+    // Refit has no attribute for TRACE, so those operations cannot be expressed. Any other key that
+    // is not a known HTTP method would be emitted as an attribute name, so it is rejected outright.
+    private static bool IsSupportedByRefit(string path, string verb)
+    {
+        if (string.Equals(verb, OpenApiOperationMethod.Trace, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (GetVerbAttributeName(verb) is null && !IsQuery(verb))
+        {
+            throw new InvalidOperationException(
+                $"OpenAPI path '{path}' has unsupported operation '{verb}'. " +
+                "Only get, put, post, delete, options, head, patch and query operations are supported.");
+        }
+
+        return true;
+    }
+
+    // Maps the operation key to a fixed Refit attribute name, never echoing the key itself.
+    private static string? GetVerbAttributeName(string verb) =>
+        verb.ToLowerInvariant() switch
+        {
+            "get" => "Get",
+            "put" => "Put",
+            "post" => "Post",
+            "delete" => "Delete",
+            "options" => "Options",
+            "head" => "Head",
+            "patch" => "Patch",
+            _ => null,
+        };
 
     // OpenAPI 3.2 QUERY operations. Refit has no QUERY attribute, and Refit.QueryAttribute
     // is the parameter attribute, so the client gets its own HttpMethodAttribute subclass.
@@ -267,7 +302,7 @@ internal class InterfaceGenerator
 
         var returnType = returnTypeGenerator.Generate(operation);
         // The full attribute name, so the suffix pass cannot match it against a contract named QueryMethod
-        var verb = IsQuery(op.Verb) ? queryMethodAttributeTypeName : op.Verb.CapitalizeFirstCharacter();
+        var verb = IsQuery(op.Verb) ? queryMethodAttributeTypeName : GetVerbAttributeName(op.Verb)!;
         var baseOperationName = GetBaseOperationName(op);
         var rawMethodName = partitioning.GetMethodName(op, interfaceName, baseOperationName);
 
@@ -308,6 +343,7 @@ internal class InterfaceGenerator
             code.AppendLine($"{Separator}{Separator}{attribute}");
         }
 
+        RouteValidator.EnsureRelativeRoute(parameterList.Path);
         code.AppendLine($"{Separator}{Separator}[{verb}(\"{ParameterNaming.EscapeString(parameterList.Path)}\")]")
             .AppendLine($"{Separator}{Separator}{returnType} {methodName}({parameterList.Render()});")
             .AppendLine();

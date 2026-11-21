@@ -7,7 +7,8 @@ namespace Refitter.Core.Validation;
 /// Rejects OpenAPI paths, header names, and content-type keys containing characters that could break
 /// out of the generated Refit attribute string literals (e.g. quotes, backslashes, newlines). Generated
 /// code escapes these characters, but rejecting them gives a clear error unless validation is skipped.
-/// See GHSA-3fhm-p725-h3g3 (path), GHSA-58x9-vjvp-6mx8 (header name), GHSA-p32v-8v8j-j534 (content-type).
+/// See GHSA-3fhm-p725-h3g3 (path), GHSA-58x9-vjvp-6mx8 (header name), GHSA-p32v-8v8j-j534 (content-type)
+/// and GHSA-7hgj-q592-v892 (network-path route).
 /// </summary>
 internal static class AttributeStringValidator
 {
@@ -73,6 +74,13 @@ internal static class AttributeStringValidator
 
     private static void ValidatePath(string path, OpenApiDiagnostic diagnostic)
     {
+        if (!RouteValidator.IsRelativeRoute(path))
+        {
+            diagnostic.Errors.Add(new OpenApiError(
+                path,
+                $"Path '{path}' must start with a single '/' and is rejected because a path starting with two slashes or a backslash would be resolved as a different host. Correct the path in the OpenAPI document."));
+        }
+
         if (ContainsUnsafeCharacters(path))
         {
             diagnostic.Errors.Add(new OpenApiError(
