@@ -199,7 +199,8 @@ internal static class ReferenceGuard
     }
 
     // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
-    // reference resolvers decode them, and duplicate "$ref" keys are all inspected
+    // reference resolvers decode them, and duplicate "$ref" keys are all inspected. The key is matched
+    // case-insensitively because Newtonsoft.Json binds properties case-insensitively, so "$REF" is a reference
     private static List<string> ExtractJsonReferences(string content)
     {
         var references = new List<string>();
@@ -210,7 +211,7 @@ internal static class ReferenceGuard
             if (reader.Depth == 0 && reader.TokenType is (JsonToken.EndObject or JsonToken.EndArray))
                 rootCompleted = true;
 
-            if (reader.TokenType != JsonToken.PropertyName || (string?)reader.Value != "$ref")
+            if (reader.TokenType != JsonToken.PropertyName || !string.Equals((string?)reader.Value, "$ref", StringComparison.OrdinalIgnoreCase))
                 continue;
 
             // Comments may sit between the key and its value
@@ -222,7 +223,7 @@ internal static class ReferenceGuard
             while (hasValue && reader.TokenType == JsonToken.Comment);
 
             if (hasValue && reader.TokenType == JsonToken.String)
-                AddReference(references, (string)reader.Value);
+                AddReference(references, (string)reader.Value!);
         }
 
         // The reader stops quietly at the end of truncated input, so require a complete root object or array
@@ -269,7 +270,9 @@ internal static class ReferenceGuard
         {
             foreach (var entry in mapping)
             {
-                if (Equals(entry.Key, "$ref") && entry.Value is string value)
+                if (entry.Key is string key &&
+                    string.Equals(key, "$ref", StringComparison.OrdinalIgnoreCase) &&
+                    entry.Value is string value)
                     AddReference(references, value);
 
                 pending.Push(entry.Key);
