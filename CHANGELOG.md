@@ -9,6 +9,7 @@
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Bug Fixes
+- GHSA-mgqj-ph59-3r6r: Match $ref keys case-insensitively in the reference guard ([#1411](https://github.com/christianhelle/refitter/pull/1411)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-7q2f-m7jf-3gp6: Refuse to write generated output through a symbolic link ([#1419](https://github.com/christianhelle/refitter/pull/1419)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-7hgj-q592-v892: Reject network-path operation routes ([#1418](https://github.com/christianhelle/refitter/pull/1418)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-2p8r-7mx6-gh86: Map operation keys to fixed Refit attribute names ([#1417](https://github.com/christianhelle/refitter/pull/1417)) ([@christianhelle](https://github.com/christianhelle/))
