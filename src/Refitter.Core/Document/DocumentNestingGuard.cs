@@ -1,10 +1,21 @@
+using Newtonsoft.Json;
+using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
+
 namespace Refitter.Core;
 
 /// <summary>
 /// Rejects documents whose nesting is deep enough to overflow the stack of a recursive parser.
-/// YamlDotNet recurses once per nesting level, and a stack overflow cannot be caught: it ends the process.
-/// The measurement is a single non-recursive pass over the text, so it is safe to run before any parser.
+/// YamlDotNet's deserializer recurses once per nesting level, and a stack overflow cannot be caught: it ends
+/// the process. The nesting is measured with parsers that do not recurse, so it is safe to run before any
+/// recursive parser.
 /// </summary>
+/// <remarks>
+/// YAML is measured from the event stream of <see cref="Parser"/>, which applies the full YAML lexical rules
+/// (comments, multiline quotes, block scalars, compact sequences, anchors, tags) and reports every
+/// collection that opens, however it is written. JSON is measured with the token reader of Newtonsoft.Json.
+/// Both stop as soon as the limit is exceeded, so very deep input costs at most a limit's worth of work.
+/// </remarks>
 internal static class DocumentNestingGuard
 {
     /// <summary>
@@ -15,204 +26,96 @@ internal static class DocumentNestingGuard
 
     /// <summary>
     /// Throws a <see cref="ReferenceResolutionException"/> when <paramref name="content"/> nests deeper than
-    /// <paramref name="maxDepth"/>. That type is treated as fatal by the document loader, so the rejection is
-    /// never retried with another loading strategy.
+    /// <see cref="MaxNestingDepth"/>. That type is treated as fatal by the document loader, so the rejection
+    /// is never retried with another loading strategy. The content is measured as JSON when it is valid
+    /// JSON, and as YAML otherwise. Content that is not valid in either format is not rejected here: the
+    /// parser that follows reports the syntax error.
     /// </summary>
-    internal static void EnsureWithinLimit(string content, string source, int maxDepth = MaxNestingDepth)
+    internal static void EnsureWithinLimit(string content, string source)
     {
-        if (MeasureMaxDepth(content, maxDepth) > maxDepth)
+        if (!TryEnsureJsonWithinLimit(content, source))
+            EnsureYamlWithinLimit(content, source);
+    }
+
+    /// <summary>
+    /// Measures <paramref name="content"/> as YAML, which also covers JSON written in flow style. Use this
+    /// directly before handing content to the YAML deserializer.
+    /// </summary>
+    internal static void EnsureYamlWithinLimit(string content, string source)
+    {
+        var parser = new Parser(new StringReader(content));
+        var depth = 0;
+        try
         {
-            throw new ReferenceResolutionException(
-                $"OpenAPI document \"{source}\" is nested deeper than the supported limit of {maxDepth} " +
-                "levels and is rejected, because parsing it could exhaust the stack.");
+            while (parser.MoveNext())
+            {
+                switch (parser.Current)
+                {
+                    case MappingStart or SequenceStart:
+                        depth++;
+                        EnsureDepth(depth, source);
+                        break;
+                    case MappingEnd or SequenceEnd:
+                        depth--;
+                        break;
+                }
+            }
+        }
+        catch (YamlException)
+        {
+            // The deserializer reads the same events and stops at the same place, so what it parses is no
+            // deeper than what was measured. It reports the syntax error itself
         }
     }
 
     /// <summary>
-    /// Measures the deepest nesting of flow collections (<c>[</c> and <c>{</c>) and of inline block
-    /// indicators such as <c>- - - x</c>, ignoring text inside quoted strings. Counting stops early once
-    /// <paramref name="stopAfter"/> is exceeded.
+    /// Measures <paramref name="content"/> as JSON while reading it. Returns <c>false</c> when the content
+    /// is not valid JSON, so the caller can measure it as YAML instead.
     /// </summary>
-    /// <remarks>
-    /// Block nesting by indentation is not measured. Each level needs more indentation than the one before,
-    /// so reaching a dangerous depth takes a file of hundreds of megabytes, which the file size already limits.
-    /// Inline indicators (<c>- - - x</c>) nest without indentation, so those are counted.
-    ///
-    /// A quote only starts a string where a value may start, because a plain YAML scalar can contain quote
-    /// characters (<c>[a - 'b, [[[</c>), and treating one as a string would hide the nesting after it. A
-    /// quote that is not recognized as a string start only makes the count higher, never lower. Quoted
-    /// strings are also ended at a line break for the same reason.
-    /// </remarks>
-    internal static int MeasureMaxDepth(string content, int stopAfter = int.MaxValue)
+    private static bool TryEnsureJsonWithinLimit(string content, string source)
     {
-        var max = 0;
-        var flowDepth = 0;
-        var inDouble = false;
-        var inSingle = false;
-        var escaped = false;
-
-        // The last significant character outside strings, and whether it closed a quoted string
-        var previous = '\0';
-        var previousClosedString = false;
-
-        // A colon directly after a closing quote (JSON: "a":"b") or followed by whitespace (YAML: a: "b")
-        // introduces a value; a colon glued to plain text (a:"b) does not
-        var colonIntroducesValue = false;
-        var colonFollowedBySpace = false;
-
-        var atLineStart = true;
-
-        for (var i = 0; i < content.Length; i++)
+        try
         {
-            var c = content[i];
+            using var reader = CreateJsonReader(content);
+            while (reader.Read())
+                EnsureJsonDepth(reader, source);
 
-            if (c == '\n' || c == '\r')
-            {
-                inDouble = false;
-                inSingle = false;
-                escaped = false;
-                atLineStart = true;
-                if (flowDepth == 0)
-                {
-                    previous = '\0';
-                    previousClosedString = false;
-                }
-
-                colonFollowedBySpace = previous == ':';
-                continue;
-            }
-
-            if (inDouble)
-            {
-                if (escaped)
-                    escaped = false;
-                else if (c == '\\')
-                    escaped = true;
-                else if (c == '"')
-                {
-                    inDouble = false;
-                    previous = '"';
-                    previousClosedString = true;
-                }
-
-                continue;
-            }
-
-            if (inSingle)
-            {
-                if (c == '\'' && i + 1 < content.Length && content[i + 1] == '\'')
-                {
-                    // A doubled quote is an escaped quote and does not end the string
-                    i++;
-                }
-                else if (c == '\'')
-                {
-                    inSingle = false;
-                    previous = '\'';
-                    previousClosedString = true;
-                }
-
-                continue;
-            }
-
-            if (c == ' ' || c == '\t')
-            {
-                if (previous == ':')
-                    colonFollowedBySpace = true;
-                continue;
-            }
-
-            if (atLineStart)
-            {
-                atLineStart = false;
-                if (flowDepth == 0)
-                {
-                    // Leading block indicators ("- ", "? ", ": ") nest without any indentation
-                    var indicators = 0;
-                    var j = i;
-                    while (j < content.Length && IsBlockIndicator(content, j))
-                    {
-                        indicators++;
-                        j++;
-                        while (j < content.Length && (content[j] == ' ' || content[j] == '\t'))
-                            j++;
-                    }
-
-                    if (indicators > 0)
-                    {
-                        if (indicators > max)
-                            max = indicators;
-                        if (max > stopAfter)
-                            return max;
-
-                        previous = '\0';
-                        previousClosedString = false;
-                        i = j - 1;
-                        continue;
-                    }
-                }
-            }
-
-            switch (c)
-            {
-                case '[':
-                case '{':
-                    flowDepth++;
-                    if (flowDepth > max)
-                    {
-                        max = flowDepth;
-                        if (max > stopAfter)
-                            return max;
-                    }
-
-                    previousClosedString = false;
-                    break;
-                case ']':
-                case '}':
-                    if (flowDepth > 0)
-                        flowDepth--;
-                    previousClosedString = false;
-                    break;
-                case '"':
-                case '\'':
-                    if (StartsValue(previous, colonIntroducesValue, colonFollowedBySpace))
-                    {
-                        if (c == '"')
-                            inDouble = true;
-                        else
-                            inSingle = true;
-                        continue;
-                    }
-
-                    previousClosedString = false;
-                    break;
-                case ':':
-                    colonIntroducesValue = previousClosedString;
-                    colonFollowedBySpace = false;
-                    previousClosedString = false;
-                    break;
-                default:
-                    previousClosedString = false;
-                    break;
-            }
-
-            previous = c;
+            return true;
         }
-
-        return max;
+        catch (JsonReaderException)
+        {
+            return false;
+        }
     }
 
-    private static bool StartsValue(char previous, bool colonIntroducesValue, bool colonFollowedBySpace) =>
-        previous is '\0' or '[' or '{' or ',' ||
-        (previous == ':' && (colonIntroducesValue || colonFollowedBySpace));
+    /// <summary>
+    /// Creates a JSON reader without Newtonsoft's own depth limit, which would throw an error that callers
+    /// take for "not JSON" and then hand the content to the recursive YAML reader. The reader is iterative,
+    /// so callers check the depth themselves with <see cref="EnsureJsonDepth"/>.
+    /// </summary>
+    internal static JsonTextReader CreateJsonReader(string content) =>
+        new(new StringReader(content))
+        {
+            DateParseHandling = DateParseHandling.None,
+            MaxDepth = null
+        };
 
-    private static bool IsBlockIndicator(string content, int index)
+    /// <summary>
+    /// Throws when the token the <paramref name="reader"/> is positioned on opens a collection beyond the limit.
+    /// </summary>
+    internal static void EnsureJsonDepth(JsonReader reader, string source)
     {
-        var c = content[index];
-        if (c is not ('-' or '?' or ':'))
-            return false;
+        if (reader.TokenType is JsonToken.StartObject or JsonToken.StartArray)
+            EnsureDepth(reader.Depth + 1, source);
+    }
 
-        // An indicator is followed by whitespace or the end of the line, which excludes "-1" and "-text"
-        return index + 1 >= content.Length || content[index + 1] is ' ' or '\t' or '\n' or '\r';
+    private static void EnsureDepth(int depth, string source)
+    {
+        if (depth > MaxNestingDepth)
+        {
+            throw new ReferenceResolutionException(
+                $"OpenAPI document \"{source}\" is nested deeper than the supported limit of {MaxNestingDepth} " +
+                "levels and is rejected, because parsing it could exhaust the stack.");
+        }
     }
 }

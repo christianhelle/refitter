@@ -219,20 +219,21 @@ internal static class ReferenceGuard
 
     internal static List<string> ExtractReferences(string content, string source)
     {
-        // Before any parser: the YAML reader recurses per nesting level, and a stack overflow is uncatchable.
-        // Every root and referenced document is read through here, so this covers all load paths
-        DocumentNestingGuard.EnsureWithinLimit(content, source);
-
         // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
         // valid JSON without starting with '{' or '['
         try
         {
-            return ExtractJsonReferences(content);
+            return ExtractJsonReferences(content, source);
         }
         catch (JsonReaderException)
         {
             // Not valid JSON, fall through to the YAML reader
         }
+
+        // The YAML reader recurses per nesting level, and a stack overflow is uncatchable. The JSON reader
+        // above is iterative and checks the depth as it reads, so only the YAML path needs this walk first.
+        // Every root and referenced document is read through here, so this covers all load paths
+        DocumentNestingGuard.EnsureYamlWithinLimit(content, source);
 
         try
         {
@@ -251,7 +252,7 @@ internal static class ReferenceGuard
     // reference resolvers decode them, and duplicate "$ref" keys are all inspected. The key is matched
     // case-insensitively because Newtonsoft.Json binds properties case-insensitively, so "$REF" is a reference.
     // The values of "discriminator.mapping" are references too: the schema loader resolves them as files
-    private static List<string> ExtractJsonReferences(string content)
+    private static List<string> ExtractJsonReferences(string content, string source)
     {
         var references = new List<string>();
         var rootCompleted = false;
@@ -261,9 +262,12 @@ internal static class ReferenceGuard
         string? propertyName = null;
         var expectReferenceValue = false;
 
-        using var reader = new JsonTextReader(new StringReader(content)) { DateParseHandling = DateParseHandling.None };
+        using var reader = DocumentNestingGuard.CreateJsonReader(content);
         while (reader.Read())
         {
+            // Not caught below: a document nested too deeply is rejected, never handed to the YAML reader
+            DocumentNestingGuard.EnsureJsonDepth(reader, source);
+
             if (reader.Depth == 0 && reader.TokenType is (JsonToken.EndObject or JsonToken.EndArray))
                 rootCompleted = true;
 

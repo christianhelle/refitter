@@ -116,4 +116,30 @@ public class DeeplyNestedDocumentTests
 
         act.Should().NotThrow();
     }
+
+    [TestMethod]
+    public void Extracts_References_From_Json_Nested_Beyond_The_Default_Reader_Depth()
+    {
+        // Newtonsoft's own limit of 64 would report invalid JSON and hand the document to the YAML reader
+        var act = () => ReferenceGuard.ExtractReferences(JsonSpec(150), "spec.json");
+
+        act.Should().NotThrow();
+    }
+
+    [TestMethod]
+    public void Rejects_Very_Deep_Json_Without_Falling_Back_To_The_Yaml_Reader()
+    {
+        // 20,000 levels overflow the YAML reader, so this passes only if the JSON path rejects it itself
+        var act = () => ReferenceGuard.ExtractReferences(JsonSpec(20_000), "spec.json");
+
+        act.Should().Throw<ReferenceResolutionException>();
+    }
+
+    [TestMethod]
+    public void Rejects_Very_Deep_Yaml_When_Extracting_References()
+    {
+        var act = () => ReferenceGuard.ExtractReferences(YamlSpec(20_000), "spec.yaml");
+
+        act.Should().Throw<ReferenceResolutionException>();
+    }
 }
