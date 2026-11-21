@@ -7,7 +7,7 @@ internal sealed class DocumentLoader : IDocumentLoader
     private readonly IReadOnlyList<IDocumentLoadingStrategy> strategies;
 
     public DocumentLoader()
-        : this(CreateDefaultStrategies())
+        : this(CreateDefaultStrategies(ReferencePolicy.Unrestricted))
     {
     }
 
@@ -18,6 +18,9 @@ internal sealed class DocumentLoader : IDocumentLoader
 
         this.strategies = strategies.ToList();
     }
+
+    public static DocumentLoader Create(ReferencePolicy policy) =>
+        new(CreateDefaultStrategies(policy));
 
     public async Task<OpenApiDocument> LoadAsync(
         string path,
@@ -62,13 +65,13 @@ internal sealed class DocumentLoader : IDocumentLoader
                 : ""));
     }
 
-    private static List<IDocumentLoadingStrategy> CreateDefaultStrategies()
+    private static List<IDocumentLoadingStrategy> CreateDefaultStrategies(ReferencePolicy policy)
     {
         return new List<IDocumentLoadingStrategy>
         {
-            new FileDocumentStrategy(),
-            new HttpDocumentStrategy(),
-            new OpenApiReaderDocumentStrategy()
+            new FileDocumentStrategy(policy),
+            new HttpDocumentStrategy(policy),
+            new OpenApiReaderDocumentStrategy(policy)
         };
     }
 }

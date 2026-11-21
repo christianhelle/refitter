@@ -4,6 +4,18 @@ namespace Refitter.Core;
 
 internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
 {
+    private readonly ReferencePolicy policy;
+
+    public FileDocumentStrategy()
+        : this(ReferencePolicy.Unrestricted)
+    {
+    }
+
+    public FileDocumentStrategy(ReferencePolicy policy)
+    {
+        this.policy = policy;
+    }
+
     public async Task<OpenApiDocument?> TryLoadAsync(
         string path,
         CancellationToken cancellationToken = default)
@@ -15,7 +27,7 @@ internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            return await OpenApiDocumentParser.FromFileAsync(path, cancellationToken).ConfigureAwait(false);
+            return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

@@ -10,7 +10,6 @@ namespace Refitter.Core;
 /// </summary>
 public static class OpenApiDocumentFactory
 {
-    private static readonly IDocumentLoader DocumentLoader = new DocumentLoader();
     private static readonly IDocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());
 
     /// <summary>
@@ -97,11 +96,17 @@ public static class OpenApiDocumentFactory
             await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
 
             return await OpenApiDocumentParser
-                .ParseAsync(content, null, PathUtilities.IsYaml(openApiPath), cancellationToken)
+                .ParseAsync(
+                    content,
+                    null,
+                    PathUtilities.IsYaml(openApiPath),
+                    new ReferencePolicy(allowRemoteReferences),
+                    cancellationToken)
                 .ConfigureAwait(false);
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-        return await DocumentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+        IDocumentLoader documentLoader = Refitter.Core.DocumentLoader.Create(new ReferencePolicy(allowRemoteReferences));
+        return await documentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
     }
 }

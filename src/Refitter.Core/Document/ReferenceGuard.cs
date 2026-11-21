@@ -342,7 +342,7 @@ internal static class ReferenceGuard
                path.StartsWith(root + Path.AltDirectorySeparatorChar, comparison);
     }
 
-    private static ReferenceResolutionException RemoteBlocked(string reference, string source) =>
+    internal static ReferenceResolutionException RemoteBlocked(string reference, string source) =>
         new($"Remote '$ref' \"{reference}\" in \"{source}\" was blocked. " +
             "Remote reference resolution is disabled by default; pass --allow-remote-refs " +
             "(or set allowRemoteReferences: true) to enable it.");

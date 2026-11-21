@@ -6,6 +6,18 @@ namespace Refitter.Core;
 
 internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
 {
+    private readonly ReferencePolicy policy;
+
+    public OpenApiReaderDocumentStrategy()
+        : this(ReferencePolicy.Unrestricted)
+    {
+    }
+
+    public OpenApiReaderDocumentStrategy(ReferencePolicy policy)
+    {
+        this.policy = policy;
+    }
+
     public async Task<OpenApiDocument?> TryLoadAsync(
         string path,
         CancellationToken cancellationToken = default)
@@ -35,7 +47,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         }
     }
 
-    private static async Task<OpenApiDocument> SerializeRoundTripAsync(
+    private async Task<OpenApiDocument> SerializeRoundTripAsync(
         Result readResult,
         string path,
         OpenApiSpecVersion specificationVersion,
@@ -54,7 +66,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
                 .ConfigureAwait(false);
 
             return await OpenApiDocumentParser
-                .ParseAsync(yaml, path, isYaml: true, cancellationToken)
+                .ParseAsync(yaml, path, isYaml: true, policy, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -63,11 +75,11 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
             .ConfigureAwait(false);
 
         return await OpenApiDocumentParser
-            .ParseAsync(json, path, isYaml: false, cancellationToken)
+            .ParseAsync(json, path, isYaml: false, policy, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private static async Task<OpenApiDocument?> FallbackToNSwagAsync(
+    private async Task<OpenApiDocument?> FallbackToNSwagAsync(
         string path,
         CancellationToken cancellationToken)
     {
@@ -76,7 +88,7 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
 
         try
         {
-            return await OpenApiDocumentParser.FromFileAsync(path, cancellationToken)
+            return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
