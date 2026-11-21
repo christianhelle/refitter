@@ -48,6 +48,10 @@ public static class OpenApiDocumentFactory
         return DocumentMerger.Merge(documents);
     }
 
+    // Same root the reference guard confines local references to
+    private static ReferencePolicy CreatePolicy(string openApiPath, bool allowRemoteReferences) =>
+        new(allowRemoteReferences, Path.GetDirectoryName(Path.GetFullPath(openApiPath)));
+
     /// <summary>
     /// Creates a new instance of the <see cref="NSwag.OpenApiDocument"/> class asynchronously.
     /// </summary>
@@ -106,7 +110,7 @@ public static class OpenApiDocumentFactory
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-        IDocumentLoader documentLoader = Refitter.Core.DocumentLoader.Create(new ReferencePolicy(allowRemoteReferences));
+        IDocumentLoader documentLoader = Refitter.Core.DocumentLoader.Create(CreatePolicy(openApiPath, allowRemoteReferences));
         return await documentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
     }
 }

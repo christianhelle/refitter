@@ -70,6 +70,10 @@ internal static class OpenApiDocumentParser
     {
         var content = File.ReadAllText(filePath);
         var json = OpenApiJsonNormalizer.NormalizeReferencedFile(isYaml ? ConvertYamlToJson(content) : content);
+
+        // Nested references resolve against the root document, but the guard validated them against this
+        // file, so pin them to this file's directory
+        json = ReferencedFileReferenceRebaser.Rebase(json, filePath);
         return JsonSchema.FromJsonAsync(json, filePath, _ => referenceResolver, cancellationToken);
     }
 
@@ -78,6 +82,18 @@ internal static class OpenApiDocumentParser
     {
         if (!policy.AllowRemoteReferences)
             throw ReferenceGuard.RemoteBlocked(url, "the OpenAPI document");
+    }
+
+    // The resolver is the code that actually reads referenced files, so it confines them itself rather
+    // than trusting that the guard resolved the same path
+    private static void EnsureFileAllowed(string filePath, ReferencePolicy policy)
+    {
+        if (policy.RootDirectory == null)
+            return;
+
+        var full = Path.GetFullPath(filePath);
+        if (!ReferenceGuard.IsWithin(policy.RootDirectory, full))
+            throw ReferenceGuard.OutsideInputDirectory(filePath, full, policy.RootDirectory);
     }
 
     private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
@@ -93,8 +109,11 @@ internal static class OpenApiDocumentParser
 
         public override async Task<IJsonReference> ResolveFileReferenceAsync(
             string filePath,
-            CancellationToken cancellationToken = default) =>
-            await LoadReferencedFileAsync(filePath, isYaml: false, this, cancellationToken).ConfigureAwait(false);
+            CancellationToken cancellationToken = default)
+        {
+            EnsureFileAllowed(filePath, policy);
+            return await LoadReferencedFileAsync(filePath, isYaml: false, this, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     private sealed class SanitizingYamlReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
@@ -111,7 +130,10 @@ internal static class OpenApiDocumentParser
         // JsonAndYamlReferenceResolver reads every referenced file as YAML, which also covers JSON
         public override async Task<IJsonReference> ResolveFileReferenceAsync(
             string filePath,
-            CancellationToken cancellationToken = default) =>
-            await LoadReferencedFileAsync(filePath, isYaml: true, this, cancellationToken).ConfigureAwait(false);
+            CancellationToken cancellationToken = default)
+        {
+            EnsureFileAllowed(filePath, policy);
+            return await LoadReferencedFileAsync(filePath, isYaml: true, this, cancellationToken).ConfigureAwait(false);
+        }
     }
 }
