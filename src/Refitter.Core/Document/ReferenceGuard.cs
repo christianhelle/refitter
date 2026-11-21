@@ -192,6 +192,9 @@ internal static class ReferenceGuard
                 throw OutsideInputDirectory(reference, resolved, rootDirectory);
             }
 
+            if (ContainsLinkBelowRoot(rootDirectory, resolved))
+                throw SymbolicLinkBlocked(reference, resolved);
+
             await ValidateLocalFileAsync(resolved, rootDirectory, allowRemoteReferences, visited, cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -391,6 +394,38 @@ internal static class ReferenceGuard
         string rootDirectory) =>
         new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
             $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
+
+    internal static ReferenceResolutionException SymbolicLinkBlocked(string reference, string resolved) =>
+        new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", which is or passes through a symbolic " +
+            "link. Refitter does not follow links in referenced files, because a link can point outside the " +
+            "input document's directory tree.");
+
+    /// <summary>
+    /// Determines whether <paramref name="fullPath"/> or any directory between it and
+    /// <paramref name="rootDirectory"/> is a symbolic link or other reparse point. The root and the directories
+    /// above it are deliberately not checked, since they are the user's own choice of input location.
+    /// </summary>
+    internal static bool ContainsLinkBelowRoot(string rootDirectory, string fullPath)
+    {
+        var root = Path.GetFullPath(rootDirectory)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        string? current = Path.GetFullPath(fullPath)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        while (!string.IsNullOrEmpty(current) && !current.Equals(root, PathComparison))
+        {
+            if ((File.Exists(current) || Directory.Exists(current)) &&
+                (File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+            {
+                return true;
+            }
+
+            current = Path.GetDirectoryName(current);
+        }
+
+        return false;
+    }
 
     internal static bool IsWithin(string rootDirectory, string candidate)
     {

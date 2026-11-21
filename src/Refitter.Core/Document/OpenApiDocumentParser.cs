@@ -94,6 +94,9 @@ internal static class OpenApiDocumentParser
         var full = Path.GetFullPath(filePath);
         if (!ReferenceGuard.IsWithin(policy.RootDirectory, full))
             throw ReferenceGuard.OutsideInputDirectory(filePath, full, policy.RootDirectory);
+
+        if (ReferenceGuard.ContainsLinkBelowRoot(policy.RootDirectory, full))
+            throw ReferenceGuard.SymbolicLinkBlocked(filePath, full);
     }
 
     private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
