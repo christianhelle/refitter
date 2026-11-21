@@ -41,8 +41,10 @@ internal sealed class DocumentLoader : IDocumentLoader
 
             try
             {
-                var result = await strategy
-                    .TryLoadAsync(path, cancellationToken)
+                // A strategy that reports failures explains why it could not load the document
+                var result = await (strategy is IFailureReportingStrategy reporting
+                        ? reporting.LoadAsync(path, cancellationToken)
+                        : strategy.TryLoadAsync(path, cancellationToken))
                     .ConfigureAwait(false);
 
                 if (result != null)
@@ -57,7 +59,10 @@ internal sealed class DocumentLoader : IDocumentLoader
                 if (ReferenceResolutionException.FindIn(ex) is { } rejection)
                     throw rejection;
 
-                errors.Add($"{strategy.GetType().Name}: {ex.Message}");
+                // Strategies that fall back to the same parser report the same error
+                var error = $"{strategy.GetType().Name}: {ex.Message}";
+                if (!errors.Any(known => known.EndsWith(": " + ex.Message, StringComparison.Ordinal)))
+                    errors.Add(error);
             }
         }
 
