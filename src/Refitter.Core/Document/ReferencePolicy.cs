@@ -9,10 +9,16 @@ internal sealed class ReferencePolicy
 {
     public static readonly ReferencePolicy Unrestricted = new(allowRemoteReferences: true);
 
-    public ReferencePolicy(bool allowRemoteReferences)
+    public ReferencePolicy(bool allowRemoteReferences, string? rootDirectory = null)
     {
         AllowRemoteReferences = allowRemoteReferences;
+        RootDirectory = rootDirectory;
     }
 
     public bool AllowRemoteReferences { get; }
+
+    /// <summary>
+    /// The directory every referenced file must stay within, or <c>null</c> when file access is unconfined.
+    /// </summary>
+    public string? RootDirectory { get; }
 }

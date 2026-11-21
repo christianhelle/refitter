@@ -189,9 +189,7 @@ internal static class ReferenceGuard
             var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
             if (!IsWithin(rootDirectory, resolved))
             {
-                throw new ReferenceResolutionException(
-                    $"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
-                    $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
+                throw OutsideInputDirectory(reference, resolved, rootDirectory);
             }
 
             await ValidateLocalFileAsync(resolved, rootDirectory, allowRemoteReferences, visited, cancellationToken)
@@ -329,7 +327,14 @@ internal static class ReferenceGuard
         public int GetHashCode(object obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 
-    private static bool IsWithin(string rootDirectory, string candidate)
+    internal static ReferenceResolutionException OutsideInputDirectory(
+        string reference,
+        string resolved,
+        string rootDirectory) =>
+        new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
+            $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
+
+    internal static bool IsWithin(string rootDirectory, string candidate)
     {
         var root = Path.GetFullPath(rootDirectory)
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
