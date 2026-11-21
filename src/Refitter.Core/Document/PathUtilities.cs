@@ -8,6 +8,24 @@ internal static class PathUtilities
                path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Determines whether a reference is an absolute URI with a scheme other than <c>file</c>. Unlike
+    /// <see cref="IsHttp"/>, this follows the URI parser, which also reads <c>http:/\host</c> and
+    /// <c>http:\\host</c> as network locations.
+    /// </summary>
+    public static bool TryGetRemoteUri(string reference, out Uri uri)
+    {
+        var withoutFragment = reference.Split('#')[0];
+        if (Uri.TryCreate(withoutFragment, UriKind.Absolute, out Uri? parsed) && !parsed.IsFile)
+        {
+            uri = parsed;
+            return true;
+        }
+
+        uri = null!;
+        return false;
+    }
+
     public static bool IsYaml(string path)
     {
         var queryIndex = path.IndexOf('?');

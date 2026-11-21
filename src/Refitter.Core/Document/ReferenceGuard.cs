@@ -159,9 +159,16 @@ internal static class ReferenceGuard
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
 
-            if (PathUtilities.IsHttp(reference))
+            // Classify by URI scheme rather than by a literal "http://" prefix: the URI parser also reads
+            // forms such as "http:/\\host" as network locations, and resolvers fetch them
+            if (PathUtilities.TryGetRemoteUri(reference, out Uri? remoteUri) || PathUtilities.IsHttp(reference))
             {
-                if (!allowRemoteReferences)
+                var isHttpScheme = remoteUri == null ||
+                                   remoteUri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
+                                   remoteUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
+
+                // Non-HTTP schemes (ftp:, data:, etc.) are always blocked
+                if (!isHttpScheme || !allowRemoteReferences)
                     throw RemoteBlocked(reference, filePath);
                 continue;
             }
@@ -169,6 +176,15 @@ internal static class ReferenceGuard
             var fileRef = reference.Split('#')[0];
             if (string.IsNullOrWhiteSpace(fileRef))
                 continue;
+
+            // A "file:" URI cannot be combined with a directory as text; UNC hosts are network locations
+            if (Uri.TryCreate(fileRef, UriKind.Absolute, out Uri? fileUri) && fileUri.IsFile)
+            {
+                if (!string.IsNullOrEmpty(fileUri.Host))
+                    throw RemoteBlocked(reference, filePath);
+
+                fileRef = fileUri.LocalPath;
+            }
 
             var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
             if (!IsWithin(rootDirectory, resolved))
