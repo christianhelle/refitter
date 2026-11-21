@@ -160,7 +160,7 @@ internal static class ReferenceGuard
                 continue;
 
             // Classify by URI scheme rather than by a literal "http://" prefix: the URI parser also reads
-            // forms such as "http:/\\host" as network locations, and resolvers fetch them
+            // forms such as "http:/\\host" as network locations, so they must not pass as local paths
             if (PathUtilities.TryGetRemoteUri(reference, out Uri? remoteUri) || PathUtilities.IsHttp(reference))
             {
                 var isHttpScheme = remoteUri == null ||
@@ -170,6 +170,16 @@ internal static class ReferenceGuard
                 // Non-HTTP schemes (ftp:, data:, etc.) are always blocked
                 if (!isHttpScheme || !allowRemoteReferences)
                     throw RemoteBlocked(reference, filePath);
+
+                // Resolvers only fetch the standard "http://" and "https://" spellings and read anything else,
+                // such as "http:/\\host/../x", as a local file name that would escape the confinement check
+                if (!PathUtilities.IsHttp(reference))
+                {
+                    throw new ReferenceResolutionException(
+                        $"Remote '$ref' \"{reference}\" in \"{filePath}\" does not use a standard " +
+                        "\"http://\" or \"https://\" prefix and is rejected.");
+                }
+
                 continue;
             }
 
