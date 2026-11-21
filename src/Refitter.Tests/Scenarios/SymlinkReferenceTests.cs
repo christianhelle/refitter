@@ -67,8 +67,47 @@ public class SymlinkReferenceTests
         code.Should().NotBeNullOrWhiteSpace();
     }
 
+    [TestMethod]
+    [DataRow("secret.json")]
+    [DataRow("./secret.json")]
+    public async Task Blocks_Missing_File_That_Resolver_Search_Finds_Through_File_Link(string reference)
+    {
+        (string root, string outside) = CreateDirectories();
+        await File.WriteAllTextAsync(Path.Combine(outside, "secret.json"), Schema);
+        Directory.CreateDirectory(Path.Combine(root, "sub"));
+        CreateFileLink(Path.Combine(root, "sub", "secret.json"), Path.Combine(outside, "secret.json"));
+        string main = await WriteMain(root, reference);
 
+        var act = () => GenerateCode(main);
 
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
+    [TestMethod]
+    public async Task Blocks_Missing_File_That_Resolver_Search_Finds_Through_Directory_Link()
+    {
+        (string root, string outside) = CreateDirectories();
+        await File.WriteAllTextAsync(Path.Combine(outside, "secret.json"), Schema);
+        CreateDirectoryLink(Path.Combine(root, "linked"), outside);
+        string main = await WriteMain(root, "secret.json");
+
+        var act = () => GenerateCode(main);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
+    [TestMethod]
+    public async Task Allows_Missing_File_When_Resolver_Search_Finds_Only_Regular_File()
+    {
+        (string root, _) = CreateDirectories();
+        Directory.CreateDirectory(Path.Combine(root, "sub"));
+        await File.WriteAllTextAsync(Path.Combine(root, "sub", "secret.json"), Schema);
+        string main = await WriteMain(root, "secret.json");
+
+        var act = () => ReferenceGuard.ValidateAsync(main, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
 
     [TestMethod]
     public async Task Allows_Reference_Back_To_Input_Document_That_Is_A_Link()
