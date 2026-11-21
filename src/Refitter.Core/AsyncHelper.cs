@@ -14,6 +14,18 @@ internal static class AsyncHelper
         return result;
     }
 
+    internal static async Task<Stream> ReadAsStreamWithCancellationAsync(
+        this HttpContent content,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+#pragma warning disable S8949
+        Stream result = await content.ReadAsStreamAsync().ConfigureAwait(false);
+#pragma warning restore S8949
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
+    }
+
     internal static async Task<string> ReadToEndWithCancellationAsync(
         this StreamReader reader,
         CancellationToken cancellationToken)
