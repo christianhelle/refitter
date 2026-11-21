@@ -33,6 +33,39 @@ public class AttributeStringValidatorTests
     }
 
     [TestMethod]
+    [DataRow("//127.0.0.1:1/collect")]
+    [DataRow("/\\127.0.0.1:1/collect")]
+    [DataRow("no-leading-slash")]
+    public void Validate_Should_Reject_Network_Path_Routes(string path)
+    {
+        OpenApiDiagnostic diagnostic = new();
+        OpenApiDocument document = new()
+        {
+            Paths = new OpenApiPaths { [path] = new OpenApiPathItem { Operations = null! } }
+        };
+
+        AttributeStringValidator.Validate(document, diagnostic);
+
+        diagnostic.Errors.Should().Contain(e => e.Message.Contains("must start with a single '/'"));
+    }
+
+    [TestMethod]
+    [DataRow("/probe")]
+    [DataRow("/a//b")]
+    public void Validate_Should_Accept_Relative_Routes(string path)
+    {
+        OpenApiDiagnostic diagnostic = new();
+        OpenApiDocument document = new()
+        {
+            Paths = new OpenApiPaths { [path] = new OpenApiPathItem { Operations = null! } }
+        };
+
+        AttributeStringValidator.Validate(document, diagnostic);
+
+        diagnostic.Errors.Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void Validate_Should_Return_When_Document_Is_Null()
     {
         OpenApiDiagnostic diagnostic = new();
@@ -92,7 +125,7 @@ public class AttributeStringValidatorTests
             Paths = new OpenApiPaths
             {
                 ["/nullpath"] = null!,
-                ["unsafe\"path"] = new OpenApiPathItem
+                ["/unsafe\"path"] = new OpenApiPathItem
                 {
                     Operations = null!
                 },
@@ -134,7 +167,7 @@ public class AttributeStringValidatorTests
         AttributeStringValidator.Validate(document, diagnostic);
 
         diagnostic.Errors.Should().HaveCount(2);
-        diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "unsafe\"path", "X\"Bad" });
+        diagnostic.Errors.Select(x => x.Pointer).Should().Contain(new[] { "/unsafe\"path", "X\"Bad" });
     }
 
     [TestMethod]

@@ -27,7 +27,30 @@ public class CliFileWriter : IFileWriter
         if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
 
-        await File.WriteAllTextAsync(file.Path, file.Content, cancellationToken);
+        // Never write through a symbolic link: a pre-existing link at the output path (for example one
+        // that ships in a cloned repository) would redirect the write to an arbitrary file.
+        // See GHSA-7q2f-m7jf-3gp6.
+        var target = new FileInfo(file.Path);
+        if (target.LinkTarget != null)
+            throw new InvalidOperationException($"Refusing to write '{file.Path}': it is a symbolic link.");
+
+        // Write to a temporary file and rename it over the target, so that a link created after the
+        // check above is replaced instead of followed. The temporary name is short and fixed-length so
+        // it cannot exceed filesystem filename limits when the output filename is long.
+        var tempPath = Path.Combine(
+            string.IsNullOrWhiteSpace(dir) ? Directory.GetCurrentDirectory() : dir,
+            "." + Guid.NewGuid().ToString("N") + ".tmp");
+        try
+        {
+            await File.WriteAllTextAsync(tempPath, file.Content, cancellationToken);
+            File.Move(tempPath, file.Path, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+        }
+
         _reporter.ReportFileWritten(file.Path);
     }
 }
