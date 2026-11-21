@@ -219,6 +219,10 @@ internal static class ReferenceGuard
 
     internal static List<string> ExtractReferences(string content, string source)
     {
+        // Before any parser: the YAML reader recurses per nesting level, and a stack overflow is uncatchable.
+        // Every root and referenced document is read through here, so this covers all load paths
+        DocumentNestingGuard.EnsureWithinLimit(content, source);
+
         // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
         // valid JSON without starting with '{' or '['
         try

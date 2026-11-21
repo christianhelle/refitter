@@ -39,6 +39,7 @@ internal static class OpenApiDocumentParser
         ReferencePolicy policy,
         CancellationToken cancellationToken = default)
     {
+        DocumentNestingGuard.EnsureWithinLimit(content, documentPath ?? "the OpenAPI document");
         var json = OpenApiJsonNormalizer.NormalizeDocument(isYaml ? ConvertYamlToJson(content) : content);
         return OpenApiDocument.FromJsonAsync(
             json,
@@ -58,6 +59,8 @@ internal static class OpenApiDocumentParser
     // Same conversion as NSwag's OpenApiYamlDocument and NJsonSchema's JsonSchemaYaml
     internal static string ConvertYamlToJson(string yaml)
     {
+        // The YAML reader and serializer recurse per nesting level
+        DocumentNestingGuard.EnsureWithinLimit(yaml, "the YAML document");
         var yamlObject = new DeserializerBuilder().Build().Deserialize(new StringReader(yaml));
         return new SerializerBuilder().JsonCompatible().Build().Serialize(yamlObject!);
     }
@@ -69,6 +72,7 @@ internal static class OpenApiDocumentParser
         CancellationToken cancellationToken)
     {
         var content = File.ReadAllText(filePath);
+        DocumentNestingGuard.EnsureWithinLimit(content, filePath);
         var json = OpenApiJsonNormalizer.NormalizeReferencedFile(isYaml ? ConvertYamlToJson(content) : content);
 
         // Nested references resolve against the root document, but the guard validated them against this
