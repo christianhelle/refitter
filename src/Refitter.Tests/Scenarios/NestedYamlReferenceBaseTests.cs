@@ -123,6 +123,28 @@ public class NestedYamlReferenceBaseTests
         result.Should().Be(json);
     }
 
+    [TestMethod]
+    public async Task Resolves_Nested_Reference_When_Input_Directory_Contains_Hash()
+    {
+        string root = Path.Combine(TestDirectory.CreateFolder(), "has#hash");
+        string sub = Path.Combine(root, "sub");
+        Directory.CreateDirectory(sub);
+        await File.WriteAllTextAsync(Path.Combine(sub, "owner.json"), ObjectSchema("HashOwnerProperty", false));
+
+        // Without rebasing, a nested reference resolves against the root document, as it did before the rebaser
+        await File.WriteAllTextAsync(Path.Combine(root, "owner.json"), ObjectSchema("HashOwnerProperty", false));
+        await File.WriteAllTextAsync(
+            Path.Combine(sub, "components.json"),
+            "{\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"properties\":{\"owner\":" +
+            "{\"$ref\":\"./owner.json\"}}}}}}");
+        string main = Path.Combine(root, "main.json");
+        await File.WriteAllTextAsync(main, MainJson("./sub/components.json#/components/schemas/Pet"));
+
+        string code = await GenerateCode(main);
+
+        code.Should().Contain("HashOwnerProperty");
+    }
+
     private static string MainJson(string target) =>
         "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{\"/pets\":{\"get\":" +
         "{\"operationId\":\"getPets\",\"responses\":{\"200\":{\"description\":\"ok\",\"content\":" +

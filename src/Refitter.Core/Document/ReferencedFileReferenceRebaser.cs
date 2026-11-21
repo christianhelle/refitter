@@ -39,7 +39,13 @@ internal static class ReferencedFileReferenceRebaser
             if (string.IsNullOrWhiteSpace(fileReference))
                 continue;
 
+            // NJsonSchema reads a '#' in an absolute path as the start of a fragment and does not decode a
+            // percent-encoded one, so such a reference keeps its original text, which is how it was handled
+            // before rebasing. The resolver still confines every file it reads to the input directory
             var absolutePath = Path.GetFullPath(Path.Combine(directory, fileReference));
+            if (absolutePath.IndexOf('#') >= 0)
+                continue;
+
             value.Value = absolutePath + fragment;
             rewritten = true;
         }
