@@ -80,9 +80,8 @@ public class CliFileWriter : IFileWriter
         var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Directory.GetCurrentDirectory()));
         var current = Path.TrimEndingDirectorySeparator(directory);
         var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-        var insideRoot = current.StartsWith(root + Path.DirectorySeparatorChar, comparison);
 
-        if (!insideRoot)
+        if (!IsUnder(root, current))
         {
             ThrowIfLinkedDirectory(current);
             return;
@@ -97,6 +96,20 @@ public class CliFileWriter : IFileWriter
 
             current = parent;
         }
+    }
+
+    /// <summary>
+    /// Returns true when <paramref name="path"/> is a strict descendant of <paramref name="root"/>.
+    /// </summary>
+    internal static bool IsUnder(string root, string path)
+    {
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        // A filesystem root ("/" or "C:\") keeps its separator when trimmed, so append one only if missing.
+        var trimmed = Path.TrimEndingDirectorySeparator(root);
+        var prefix = trimmed.Length > 0 && Path.EndsInDirectorySeparator(trimmed)
+            ? trimmed
+            : trimmed + Path.DirectorySeparatorChar;
+        return path.StartsWith(prefix, comparison);
     }
 
     private static void ThrowIfLinkedDirectory(string directory)

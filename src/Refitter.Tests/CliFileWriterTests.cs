@@ -355,4 +355,30 @@ public class CliFileWriterTests
             Directory.Delete(root, recursive: true);
         }
     }
+
+    [TestMethod]
+    public void IsUnder_Treats_Filesystem_Root_Descendants_As_Inside()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            CliFileWriter.IsUnder(@"C:\", @"C:\Generated\Sub").Should().BeTrue();
+            CliFileWriter.IsUnder(@"C:\", @"C:\Generated").Should().BeTrue();
+        }
+        else
+        {
+            CliFileWriter.IsUnder("/", "/Generated/Sub").Should().BeTrue();
+            CliFileWriter.IsUnder("/", "/Generated").Should().BeTrue();
+        }
+    }
+
+    [TestMethod]
+    public void IsUnder_Handles_Ordinary_Roots()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "root");
+        var sep = Path.DirectorySeparatorChar;
+        CliFileWriter.IsUnder(root, root + sep + "child").Should().BeTrue();
+        CliFileWriter.IsUnder(root + sep, root + sep + "child" + sep + "grand").Should().BeTrue();
+        CliFileWriter.IsUnder(root, root).Should().BeFalse();
+        CliFileWriter.IsUnder(root, root + "-sibling" + sep + "child").Should().BeFalse();
+    }
 }
