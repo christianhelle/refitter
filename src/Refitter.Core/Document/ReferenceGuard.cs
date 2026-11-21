@@ -159,16 +159,42 @@ internal static class ReferenceGuard
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
 
-            if (PathUtilities.IsHttp(reference))
+            // Classify by URI scheme rather than by a literal "http://" prefix: the URI parser also reads
+            // forms such as "http:/\\host" as network locations, so they must not pass as local paths
+            if (PathUtilities.TryGetRemoteUri(reference, out Uri? remoteUri) || PathUtilities.IsHttp(reference))
             {
-                if (!allowRemoteReferences)
+                var isHttpScheme = remoteUri == null ||
+                                   remoteUri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
+                                   remoteUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
+
+                // Non-HTTP schemes (ftp:, data:, etc.) are always blocked
+                if (!isHttpScheme || !allowRemoteReferences)
                     throw RemoteBlocked(reference, filePath);
+
+                // Resolvers only fetch the standard "http://" and "https://" spellings and read anything else,
+                // such as "http:/\\host/../x", as a local file name that would escape the confinement check
+                if (!PathUtilities.IsHttp(reference))
+                {
+                    throw new ReferenceResolutionException(
+                        $"Remote '$ref' \"{reference}\" in \"{filePath}\" does not use a standard " +
+                        "\"http://\" or \"https://\" prefix and is rejected.");
+                }
+
                 continue;
             }
 
             var fileRef = reference.Split('#')[0];
             if (string.IsNullOrWhiteSpace(fileRef))
                 continue;
+
+            // NJsonSchema joins the raw text of a "file:" URI to the document directory instead of converting it,
+            // so it would open a different file from the one validated here. Reject them outright
+            if (fileRef.StartsWith("file:", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ReferenceResolutionException(
+                    $"The '$ref' \"{reference}\" in \"{filePath}\" is a file URI. File URIs are not supported in " +
+                    "'$ref'; use a relative path instead.");
+            }
 
             var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));
             if (!IsWithin(rootDirectory, resolved))
@@ -326,7 +352,7 @@ internal static class ReferenceGuard
                path.StartsWith(root + Path.AltDirectorySeparatorChar, comparison);
     }
 
-    private static ReferenceResolutionException RemoteBlocked(string reference, string source) =>
+    internal static ReferenceResolutionException RemoteBlocked(string reference, string source) =>
         new($"Remote '$ref' \"{reference}\" in \"{source}\" was blocked. " +
             "Remote reference resolution is disabled by default; pass --allow-remote-refs " +
             "(or set allowRemoteReferences: true) to enable it.");

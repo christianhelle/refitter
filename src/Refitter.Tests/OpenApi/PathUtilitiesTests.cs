@@ -52,4 +52,28 @@ public class PathUtilitiesTests
     {
         PathUtilities.IsYaml(path).Should().BeFalse();
     }
+
+    [TestMethod]
+    [DataRow("http://example.com/s.json")]
+    [DataRow("http:/\\example.com/s.json")]
+    [DataRow("http:\\\\example.com/s.json")]
+    [DataRow("HTTP:/\\example.com/s.json#/a")]
+    [DataRow("ftp://example.com/s.json")]
+    [DataRow("data:text/plain,x")]
+    public void TryGetRemoteUri_Detects_Remote_References(string reference)
+    {
+        PathUtilities.TryGetRemoteUri(reference, out Uri uri).Should().BeTrue();
+        uri.IsFile.Should().BeFalse();
+    }
+
+    [TestMethod]
+    [DataRow("./child.json")]
+    [DataRow("../child.json#/a")]
+    [DataRow("child.json")]
+    [DataRow("/abs/child.json")]
+    [DataRow("sub/dir/child.yaml")]
+    public void TryGetRemoteUri_Returns_False_For_Local_References(string reference)
+    {
+        PathUtilities.TryGetRemoteUri(reference, out Uri _).Should().BeFalse();
+    }
 }

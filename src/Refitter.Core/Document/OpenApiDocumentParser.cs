@@ -17,12 +17,26 @@ internal static class OpenApiDocumentParser
     public static Task<OpenApiDocument> FromFileAsync(
         string path,
         CancellationToken cancellationToken = default) =>
-        ParseAsync(File.ReadAllText(path), path, PathUtilities.IsYaml(path), cancellationToken);
+        FromFileAsync(path, ReferencePolicy.Unrestricted, cancellationToken);
+
+    public static Task<OpenApiDocument> FromFileAsync(
+        string path,
+        ReferencePolicy policy,
+        CancellationToken cancellationToken = default) =>
+        ParseAsync(File.ReadAllText(path), path, PathUtilities.IsYaml(path), policy, cancellationToken);
 
     public static Task<OpenApiDocument> ParseAsync(
         string content,
         string? documentPath,
         bool isYaml,
+        CancellationToken cancellationToken = default) =>
+        ParseAsync(content, documentPath, isYaml, ReferencePolicy.Unrestricted, cancellationToken);
+
+    public static Task<OpenApiDocument> ParseAsync(
+        string content,
+        string? documentPath,
+        bool isYaml,
+        ReferencePolicy policy,
         CancellationToken cancellationToken = default)
     {
         var json = OpenApiJsonNormalizer.NormalizeDocument(isYaml ? ConvertYamlToJson(content) : content);
@@ -35,8 +49,8 @@ internal static class OpenApiDocumentParser
                 // Mirror NSwag: YAML documents resolve references as YAML, JSON documents as JSON
                 var schemaResolver = new OpenApiSchemaResolver(document, new SystemTextJsonSchemaGeneratorSettings());
                 return isYaml
-                    ? new SanitizingYamlReferenceResolver(schemaResolver)
-                    : new SanitizingJsonReferenceResolver(schemaResolver);
+                    ? new SanitizingYamlReferenceResolver(schemaResolver, policy)
+                    : new SanitizingJsonReferenceResolver(schemaResolver, policy);
             },
             cancellationToken);
     }
@@ -59,18 +73,41 @@ internal static class OpenApiDocumentParser
         return JsonSchema.FromJsonAsync(json, filePath, _ => referenceResolver, cancellationToken);
     }
 
-    private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender)
+    // Defense in depth behind ReferenceGuard: the resolver is the code that actually fetches the URL
+    private static void EnsureRemoteAllowed(string url, ReferencePolicy policy)
+    {
+        if (!policy.AllowRemoteReferences)
+            throw ReferenceGuard.RemoteBlocked(url, "the OpenAPI document");
+    }
+
+    private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
         : JsonReferenceResolver(schemaAppender)
     {
+        public override Task<IJsonReference> ResolveUrlReferenceAsync(
+            string url,
+            CancellationToken cancellationToken = default)
+        {
+            EnsureRemoteAllowed(url, policy);
+            return base.ResolveUrlReferenceAsync(url, cancellationToken);
+        }
+
         public override async Task<IJsonReference> ResolveFileReferenceAsync(
             string filePath,
             CancellationToken cancellationToken = default) =>
             await LoadReferencedFileAsync(filePath, isYaml: false, this, cancellationToken).ConfigureAwait(false);
     }
 
-    private sealed class SanitizingYamlReferenceResolver(JsonSchemaAppender schemaAppender)
+    private sealed class SanitizingYamlReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
         : JsonAndYamlReferenceResolver(schemaAppender)
     {
+        public override Task<IJsonReference> ResolveUrlReferenceAsync(
+            string url,
+            CancellationToken cancellationToken = default)
+        {
+            EnsureRemoteAllowed(url, policy);
+            return base.ResolveUrlReferenceAsync(url, cancellationToken);
+        }
+
         // JsonAndYamlReferenceResolver reads every referenced file as YAML, which also covers JSON
         public override async Task<IJsonReference> ResolveFileReferenceAsync(
             string filePath,

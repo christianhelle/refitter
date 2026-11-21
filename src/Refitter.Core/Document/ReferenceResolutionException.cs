@@ -25,4 +25,19 @@ public sealed class ReferenceResolutionException : Exception
         : base(message, innerException)
     {
     }
+
+    /// <summary>
+    /// Finds a <see cref="ReferenceResolutionException"/> in the exception or any of its inner exceptions.
+    /// A policy rejection is fatal and must never be retried with another loading strategy.
+    /// </summary>
+    internal static ReferenceResolutionException? FindIn(Exception? exception)
+    {
+        for (var current = exception; current != null; current = current.InnerException)
+        {
+            if (current is ReferenceResolutionException rejection)
+                return rejection;
+        }
+
+        return null;
+    }
 }

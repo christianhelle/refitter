@@ -6,15 +6,27 @@ namespace Refitter.Core;
 internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
 {
     private readonly HttpClient httpClient;
+    private readonly ReferencePolicy policy;
 
     public HttpDocumentStrategy()
         : this(CreateDefaultHttpClient())
     {
     }
 
+    public HttpDocumentStrategy(ReferencePolicy policy)
+        : this(CreateDefaultHttpClient(), policy)
+    {
+    }
+
     public HttpDocumentStrategy(HttpClient httpClient)
+        : this(httpClient, ReferencePolicy.Unrestricted)
+    {
+    }
+
+    public HttpDocumentStrategy(HttpClient httpClient, ReferencePolicy policy)
     {
         this.httpClient = httpClient;
+        this.policy = policy;
     }
 
     public async Task<OpenApiDocument?> TryLoadAsync(
@@ -37,7 +49,7 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
                 .ConfigureAwait(false);
 
             return await OpenApiDocumentParser
-                .ParseAsync(content, null, PathUtilities.IsYaml(path), cancellationToken)
+                .ParseAsync(content, null, PathUtilities.IsYaml(path), policy, cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
