@@ -3,8 +3,12 @@
 ## [Unreleased Changes]
 
 ### Features
+- Add security policy ([#1408](https://github.com/christianhelle/refitter/pull/1408)) ([@christianhelle](https://github.com/christianhelle/))
 - Escape Unicode line terminators and settings values in generated string literals ([#1409](https://github.com/christianhelle/refitter/pull/1409)) ([@christianhelle](https://github.com/christianhelle/))
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
+
+### Bug Fixes
+- GHSA-2p8r-7mx6-gh86: Map operation keys to fixed Refit attribute names ([#1417](https://github.com/christianhelle/refitter/pull/1417)) ([@christianhelle](https://github.com/christianhelle/))
 
 
 ## [2.4.0](https://github.com/christianhelle/refitter/releases/tag/2.4.0) (2026-11-16)
