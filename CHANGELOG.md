@@ -9,6 +9,7 @@
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Bug Fixes
+- GHSA-wp69-6hgq-9cc3: Confine every file the resolver reads to the input directory ([#1414](https://github.com/christianhelle/refitter/pull/1414)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-5w8x-vqhx-3jrh: Classify references by URI scheme and block remote fetches in the resolver ([#1413](https://github.com/christianhelle/refitter/pull/1413)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-25j7-xpj3-7jf9: Use filesystem-aware comparison for visited reference files ([#1412](https://github.com/christianhelle/refitter/pull/1412)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-mgqj-ph59-3r6r: Match $ref keys case-insensitively in the reference guard ([#1411](https://github.com/christianhelle/refitter/pull/1411)) ([@christianhelle](https://github.com/christianhelle/))
