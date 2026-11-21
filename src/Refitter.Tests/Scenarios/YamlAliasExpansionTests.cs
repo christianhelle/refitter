@@ -181,4 +181,57 @@ components:
 
         act.Should().Throw<ReferenceResolutionException>();
     }
+
+    private const long SmallSizeBudget = 10_000;
+
+    // One long scalar referenced many times: few nodes, but a very large serialized size
+    private static string LongScalarAliasedManyTimes(int length, int aliases) =>
+        $"big: &big \"{new string('x', length)}\"\nitems: [{string.Join(",", Enumerable.Repeat("*big", aliases))}]\n";
+
+    [TestMethod]
+    public void Rejects_A_Long_Scalar_Aliased_Many_Times_Even_Below_The_Node_Budget()
+    {
+        // 101 nodes is far below the node budget, but the expansion is about 50,000 characters
+        var yaml = LongScalarAliasedManyTimes(500, 100);
+
+        var act = () => ReferenceGuard.ExtractReferences(
+            yaml, "long.yaml", SmallBudget, SmallAmplification, SmallSizeBudget);
+
+        act.Should().Throw<ReferenceResolutionException>().Which.Message.Should().Contain("long.yaml");
+    }
+
+    [TestMethod]
+    public void Rejects_A_Long_Scalar_Aliased_Many_Times_When_Converting_To_Json()
+    {
+        var act = () => OpenApiDocumentParser.ConvertYamlToJson(
+            LongScalarAliasedManyTimes(500, 100), SmallBudget, SmallAmplification, SmallSizeBudget);
+
+        act.Should().Throw<ReferenceResolutionException>();
+    }
+
+    [TestMethod]
+    public void Allows_A_Large_Document_With_Long_Strings_And_No_Aliases()
+    {
+        var yaml = new StringBuilder();
+        for (var i = 0; i < 100; i++)
+            yaml.Append($"k{i}: \"{new string('y', 500)}\"\n");
+
+        var references = () => ReferenceGuard.ExtractReferences(
+            yaml.ToString(), "strings.yaml", SmallBudget, SmallAmplification, SmallSizeBudget);
+        var json = () => OpenApiDocumentParser.ConvertYamlToJson(
+            yaml.ToString(), SmallBudget, SmallAmplification, SmallSizeBudget);
+
+        references.Should().NotThrow();
+        json.Should().NotThrow();
+    }
+
+    [TestMethod]
+    public void Computes_The_Expanded_Size_Of_Shared_Scalars()
+    {
+        var shared = new string('z', 100);
+        var once = YamlAliasExpansionGuard.MeasureExpandedSize(new List<object> { shared });
+        var thrice = YamlAliasExpansionGuard.MeasureExpandedSize(new List<object> { shared, shared, shared });
+
+        (thrice - once).Should().BeGreaterThanOrEqualTo(2 * 100);
+    }
 }

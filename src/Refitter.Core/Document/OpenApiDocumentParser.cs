@@ -59,12 +59,13 @@ internal static class OpenApiDocumentParser
     internal static string ConvertYamlToJson(
         string yaml,
         long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
-        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification)
+        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification,
+        long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize)
     {
         var yamlObject = new DeserializerBuilder().Build().Deserialize(new StringReader(yaml));
 
         // Serializing writes a node once per alias that refers to it, so measure that size first
-        YamlAliasExpansionGuard.EnsureWithinBudget(yamlObject, "the YAML document", maxExpandedNodes, maxAmplification);
+        YamlAliasExpansionGuard.EnsureWithinBudget(yamlObject, "the YAML document", maxExpandedNodes, maxAmplification, maxExpandedSize);
         return new SerializerBuilder().JsonCompatible().Build().Serialize(yamlObject!);
     }
 

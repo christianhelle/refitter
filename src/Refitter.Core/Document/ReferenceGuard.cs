@@ -221,7 +221,8 @@ internal static class ReferenceGuard
         string content,
         string source,
         long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
-        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification)
+        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification,
+        long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize)
     {
         // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
         // valid JSON without starting with '{' or '['
@@ -236,7 +237,7 @@ internal static class ReferenceGuard
 
         try
         {
-            return ExtractYamlReferences(content, source, maxExpandedNodes, maxAmplification);
+            return ExtractYamlReferences(content, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
         }
         catch (YamlException ex)
         {
@@ -321,7 +322,8 @@ internal static class ReferenceGuard
         string content,
         string source,
         long maxExpandedNodes,
-        int maxAmplification)
+        int maxAmplification,
+        long maxExpandedSize)
     {
         var references = new List<string>();
         var root = new DeserializerBuilder().WithDuplicateKeyChecking().Build().Deserialize(new StringReader(content));
@@ -333,7 +335,7 @@ internal static class ReferenceGuard
 
         // Aliases share nodes, so the walk below is linear, but serializing the document as JSON later
         // writes a shared node once per alias. Reject a document whose expansion is out of proportion
-        YamlAliasExpansionGuard.EnsureWithinBudget(root, source, maxExpandedNodes, maxAmplification);
+        YamlAliasExpansionGuard.EnsureWithinBudget(root, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
 
         var pending = new Stack<object?>();
         var visited = new HashSet<object>(ReferenceComparer.Instance);

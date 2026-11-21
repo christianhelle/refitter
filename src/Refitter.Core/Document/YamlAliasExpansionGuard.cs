@@ -24,6 +24,17 @@ internal static class YamlAliasExpansionGuard
     /// </summary>
     internal const int MaxAmplification = 20;
 
+    /// <summary>
+    /// The expanded size, in characters, up to which a document is always accepted. The node count alone does
+    /// not bound the output, because one long string referenced by many aliases is a single node that is
+    /// written out once per alias. Larger documents are accepted too, as long as they are not amplified
+    /// (see <see cref="MaxAmplification"/>).
+    /// </summary>
+    internal const long MaxExpandedSize = 16 * 1024 * 1024;
+
+    // Approximate serialized overhead of a node besides its text: quotes, separators and indentation
+    private const long NodeOverhead = 4;
+
     // Saturation value: large enough to be far above any budget, small enough that adding two never overflows
     private const long Saturated = long.MaxValue / 4;
 
@@ -36,10 +47,19 @@ internal static class YamlAliasExpansionGuard
         object? root,
         string source,
         long maxExpandedNodes = MaxExpandedNodes,
-        int maxAmplification = MaxAmplification)
+        int maxAmplification = MaxAmplification,
+        long maxExpandedSize = MaxExpandedSize)
     {
         var expanded = Measure(root, out var distinct);
-        if (expanded > maxExpandedNodes && expanded / maxAmplification > distinct)
+        if (expanded.Size > maxExpandedSize && expanded.Size / maxAmplification > distinct.Size)
+        {
+            throw new ReferenceResolutionException(
+                $"OpenAPI document \"{source}\" expands to more than {maxExpandedSize} characters once its YAML " +
+                $"aliases are resolved, more than {maxAmplification} times its own size, and is rejected, " +
+                "because resolving it could exhaust memory.");
+        }
+
+        if (expanded.Nodes > maxExpandedNodes && expanded.Nodes / maxAmplification > distinct.Nodes)
         {
             throw new ReferenceResolutionException(
                 $"OpenAPI document \"{source}\" expands to more than {maxExpandedNodes} nodes once its YAML " +
@@ -51,26 +71,55 @@ internal static class YamlAliasExpansionGuard
     /// <summary>
     /// Counts the nodes of <paramref name="root"/> as if every alias were expanded, saturating at a large value.
     /// </summary>
-    internal static long MeasureExpandedNodes(object? root) => Measure(root, out _);
+    internal static long MeasureExpandedNodes(object? root) => Measure(root, out _).Nodes;
+
+    /// <summary>
+    /// Estimates the serialized size, in characters, of <paramref name="root"/> as if every alias were expanded,
+    /// saturating at a large value. Each scalar costs its length and each node a small constant.
+    /// </summary>
+    internal static long MeasureExpandedSize(object? root) => Measure(root, out _).Size;
+
+    private readonly record struct Cost(long Nodes, long Size)
+    {
+        public static Cost operator +(Cost left, Cost right) =>
+            new(Math.Min(Saturated, left.Nodes + right.Nodes), Math.Min(Saturated, left.Size + right.Size));
+    }
+
+    private static Cost Scalar(object? value) =>
+        new(1, NodeOverhead + ((value as string)?.Length ?? 0));
 
     // Post-order walk with an explicit stack, so a deeply nested document cannot overflow the stack, and a size
     // per shared node, so the walk visits each node once however many aliases refer to it:
     // size(node) = 1 + the sum of the sizes of its children
-    private static long Measure(object? root, out long distinct)
+    private static Cost Measure(object? root, out Cost distinct)
     {
-        distinct = 0;
+        distinct = default;
         var children = GetChildren(root);
         if (children == null)
-            return 1;
+            return Scalar(root);
 
-        var sizes = new Dictionary<object, long>(ReferenceGuard.ReferenceComparer.Instance);
+        // The size of the document itself: a string shared by aliases is stored once however often it is referenced
+        var seenStrings = new HashSet<object>(ReferenceGuard.ReferenceComparer.Instance);
+        Cost Distinct(List<object?> list)
+        {
+            var cost = new Cost(1 + list.Count, NodeOverhead * (1 + list.Count));
+            foreach (var item in list)
+            {
+                if (item is string text && seenStrings.Add(text))
+                    cost += new Cost(0, text.Length);
+            }
+
+            return cost;
+        }
+
+        var sizes = new Dictionary<object, Cost>(ReferenceGuard.ReferenceComparer.Instance);
         var inProgress = new HashSet<object>(ReferenceGuard.ReferenceComparer.Instance);
         var frames = new Stack<Frame>();
         frames.Push(new Frame(root!, children));
         inProgress.Add(root!);
-        distinct += 1 + children.Count;
+        distinct += Distinct(children);
 
-        long result = 1;
+        Cost result = default;
         while (frames.Count > 0)
         {
             var frame = frames.Peek();
@@ -82,15 +131,15 @@ internal static class YamlAliasExpansionGuard
                 List<object?>? grandChildren;
                 if (child is null or string)
                 {
-                    frame.Sum = Add(frame.Sum, 1);
+                    frame.Sum += Scalar(child);
                 }
                 else if (sizes.TryGetValue(child, out var known))
                 {
-                    frame.Sum = Add(frame.Sum, known);
+                    frame.Sum += known;
                 }
                 else if ((grandChildren = GetChildren(child)) == null)
                 {
-                    frame.Sum = Add(frame.Sum, 1);
+                    frame.Sum += Scalar(child);
                 }
                 else if (inProgress.Contains(child!))
                 {
@@ -102,7 +151,7 @@ internal static class YamlAliasExpansionGuard
                 else
                 {
                     inProgress.Add(child!);
-                    distinct += 1 + grandChildren.Count;
+                    distinct += Distinct(grandChildren);
                     frames.Push(new Frame(child!, grandChildren));
                 }
 
@@ -111,10 +160,10 @@ internal static class YamlAliasExpansionGuard
 
             frames.Pop();
             inProgress.Remove(frame.Node);
-            var size = Add(1, frame.Sum);
+            var size = new Cost(1, NodeOverhead) + frame.Sum;
             sizes[frame.Node] = size;
             if (frames.Count > 0)
-                frames.Peek().Sum = Add(frames.Peek().Sum, size);
+                frames.Peek().Sum += size;
             else
                 result = size;
         }
@@ -122,7 +171,6 @@ internal static class YamlAliasExpansionGuard
         return result;
     }
 
-    private static long Add(long left, long right) => Math.Min(Saturated, left + right);
 
     // Keys and values of a mapping are both nodes of the expanded document
     private static List<object?>? GetChildren(object? node)
@@ -158,6 +206,6 @@ internal static class YamlAliasExpansionGuard
 
         public int Next { get; set; }
 
-        public long Sum { get; set; }
+        public Cost Sum { get; set; }
     }
 }
