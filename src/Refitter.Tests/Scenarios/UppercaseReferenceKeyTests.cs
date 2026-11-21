@@ -82,7 +82,7 @@ components:
 
         string code = await GenerateCode(main);
 
-        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("class Pet").And.Contain("Name");
     }
 
     [TestMethod]
@@ -97,7 +97,7 @@ components:
 
         string code = await GenerateCode(main);
 
-        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("class Pet").And.Contain("Name");
     }
 
     private static string CreateTempDirectory()
