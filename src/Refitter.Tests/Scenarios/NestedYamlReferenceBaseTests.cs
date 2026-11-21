@@ -113,6 +113,16 @@ public class NestedYamlReferenceBaseTests
         code.Should().NotContain("DecoyOwnerProperty");
     }
 
+    [TestMethod]
+    public void Rebase_Leaves_File_Uri_Reference_Unchanged()
+    {
+        const string json = "{\"a\":{\"$ref\":\"file:other.json#/x\"}}";
+
+        string result = ReferencedFileReferenceRebaser.Rebase(json, Path.Combine(Path.GetTempPath(), "child.json"));
+
+        result.Should().Be(json);
+    }
+
     private static string MainJson(string target) =>
         "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{\"/pets\":{\"get\":" +
         "{\"operationId\":\"getPets\",\"responses\":{\"200\":{\"description\":\"ok\",\"content\":" +

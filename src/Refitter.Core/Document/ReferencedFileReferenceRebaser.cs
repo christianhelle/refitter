@@ -29,6 +29,7 @@ internal static class ReferencedFileReferenceRebaser
             if (string.IsNullOrEmpty(reference) ||
                 reference!.StartsWith("#", StringComparison.Ordinal) ||
                 PathUtilities.IsHttp(reference) ||
+                reference.StartsWith("file:", StringComparison.OrdinalIgnoreCase) || // rejected by the guard, leave unchanged
                 PathUtilities.TryGetRemoteUri(reference, out _))
                 continue;
 
