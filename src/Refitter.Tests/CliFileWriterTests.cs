@@ -165,4 +165,40 @@ public class CliFileWriterTests
                 Directory.Delete(workspace, recursive: true);
         }
     }
+
+    [TestMethod]
+    public async Task WriteAsync_Succeeds_For_Very_Long_Output_File_Name()
+    {
+        var workspace = Path.Combine(
+            AppContext.BaseDirectory,
+            "CliFileWriterTests",
+            Guid.NewGuid().ToString("N"));
+
+        try
+        {
+            Directory.CreateDirectory(workspace);
+            var filePath = Path.Combine(workspace, new string('a', 236) + ".cs");
+            try
+            {
+                await File.WriteAllTextAsync(filePath, "probe");
+                File.Delete(filePath);
+            }
+            catch (Exception ex) when (ex is IOException or PathTooLongException or UnauthorizedAccessException)
+            {
+                Assert.Inconclusive("The test filesystem does not accept a long file name: " + ex.Message);
+            }
+
+            var writer = new CliFileWriter(new SimpleGenerationReporter());
+
+            await writer.WriteAsync(new PlannedFile(filePath, "// long"), default);
+
+            (await File.ReadAllTextAsync(filePath)).Should().Be("// long");
+            Directory.GetFiles(workspace).Should().ContainSingle();
+        }
+        finally
+        {
+            if (Directory.Exists(workspace))
+                Directory.Delete(workspace, recursive: true);
+        }
+    }
 }
