@@ -12,13 +12,13 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ReferenceGuard
 {
-    // Filesystem-aware comparison: case-sensitive on Linux/macOS, case-insensitive on Windows. The visited set
-    // must use the same rule as the filesystem, otherwise two distinct files such as "Model.json" and
-    // "model.json" collapse into one entry and the second is never inspected
+    // IsWithin uses a platform-aware comparison (case-insensitive on Windows). The visited set always uses
+    // an ordinal comparison, even on Windows, because individual NTFS directories can be case-sensitive:
+    // folding case there could collapse two distinct files such as "Model.json" and "model.json" into one
+    // entry so the second is never inspected. Redundant validation of case aliases is acceptable
     private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    private static readonly StringComparer PathComparer =
-        IsWindows ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+    private static readonly StringComparer PathComparer = StringComparer.Ordinal;
 
     private static readonly StringComparison PathComparison =
         IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
