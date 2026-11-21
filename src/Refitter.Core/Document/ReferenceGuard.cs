@@ -53,7 +53,7 @@ internal static class ReferenceGuard
 
         string rootDirectory = Path.GetDirectoryName(fullPath);
         var visited = new HashSet<string>(PathComparer);
-        await ValidateLocalFileAsync(fullPath, rootDirectory, allowRemoteReferences, visited, cancellationToken)
+        await ValidateLocalFileAsync(fullPath, rootDirectory, fullPath, allowRemoteReferences, visited, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -132,6 +132,7 @@ internal static class ReferenceGuard
     private static async Task ValidateLocalFileAsync(
         string filePath,
         string rootDirectory,
+        string rootDocumentPath,
         bool allowRemoteReferences,
         HashSet<string> visited,
         CancellationToken cancellationToken)
@@ -192,10 +193,10 @@ internal static class ReferenceGuard
                 throw OutsideInputDirectory(reference, resolved, rootDirectory);
             }
 
-            if (ContainsLinkBelowRoot(rootDirectory, resolved))
+            if (ContainsLinkBelowRoot(rootDirectory, resolved, rootDocumentPath))
                 throw SymbolicLinkBlocked(reference, resolved);
 
-            await ValidateLocalFileAsync(resolved, rootDirectory, allowRemoteReferences, visited, cancellationToken)
+            await ValidateLocalFileAsync(resolved, rootDirectory, rootDocumentPath, allowRemoteReferences, visited, cancellationToken)
                 .ConfigureAwait(false);
         }
     }
@@ -415,13 +416,20 @@ internal static class ReferenceGuard
     /// <paramref name="rootDirectory"/> is a symbolic link or other reparse point. The root and the directories
     /// above it are deliberately not checked, since they are the user's own choice of input location.
     /// </summary>
-    internal static bool ContainsLinkBelowRoot(string rootDirectory, string fullPath)
+    internal static bool ContainsLinkBelowRoot(string rootDirectory, string fullPath, string? rootDocumentPath = null)
     {
         var root = Path.GetFullPath(rootDirectory)
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         string? current = Path.GetFullPath(fullPath)
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        // The input document is the user's own choice, so it may be a link; no other path is exempt
+        if (rootDocumentPath != null &&
+            current.Equals(Path.GetFullPath(rootDocumentPath), PathComparison))
+        {
+            return false;
+        }
 
         while (!string.IsNullOrEmpty(current) && !current.Equals(root, PathComparison))
         {

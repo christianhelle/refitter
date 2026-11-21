@@ -67,6 +67,43 @@ public class SymlinkReferenceTests
         code.Should().NotBeNullOrWhiteSpace();
     }
 
+
+
+
+    [TestMethod]
+    public async Task Allows_Reference_Back_To_Input_Document_That_Is_A_Link()
+    {
+        (string root, string outside) = CreateDirectories();
+        string real = Path.Combine(outside, "real.json");
+        await File.WriteAllTextAsync(
+            real,
+            "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{}," +
+            "\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}," +
+            "\"Owner\":{\"type\":\"object\",\"properties\":{\"pet\":{\"$ref\":\"./main.json#/components/schemas/Pet\"}}}}}}");
+        string main = Path.Combine(root, "main.json");
+        CreateFileLink(main, real);
+
+        string code = await GenerateCode(main);
+
+        code.Should().Contain("class Owner");
+    }
+
+    [TestMethod]
+    public async Task Still_Blocks_Other_Links_When_Input_Document_Is_A_Link()
+    {
+        (string root, string outside) = CreateDirectories();
+        string real = Path.Combine(outside, "real.json");
+        await File.WriteAllTextAsync(real, Spec("./other.json"));
+        await File.WriteAllTextAsync(Path.Combine(outside, "secret.json"), Schema);
+        CreateFileLink(Path.Combine(root, "other.json"), Path.Combine(outside, "secret.json"));
+        string main = Path.Combine(root, "main.json");
+        CreateFileLink(main, real);
+
+        var act = () => GenerateCode(main);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
     private static (string Root, string Outside) CreateDirectories()
     {
         string baseDirectory = Path.Combine(Path.GetTempPath(), "refitter-" + Guid.NewGuid().ToString("N"));

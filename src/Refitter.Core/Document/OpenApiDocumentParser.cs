@@ -95,7 +95,7 @@ internal static class OpenApiDocumentParser
         if (!ReferenceGuard.IsWithin(policy.RootDirectory, full))
             throw ReferenceGuard.OutsideInputDirectory(filePath, full, policy.RootDirectory);
 
-        if (ReferenceGuard.ContainsLinkBelowRoot(policy.RootDirectory, full))
+        if (ReferenceGuard.ContainsLinkBelowRoot(policy.RootDirectory, full, policy.RootDocumentPath))
             throw ReferenceGuard.SymbolicLinkBlocked(filePath, full);
     }
 
