@@ -73,16 +73,38 @@ internal static class OpenApiDocumentParser
         JsonReferenceResolver referenceResolver,
         CancellationToken cancellationToken)
     {
-        var content = File.ReadAllText(filePath);
-        if (!isYaml)
-            DocumentNestingGuard.EnsureWithinLimit(content, filePath);
-
-        var json = OpenApiJsonNormalizer.NormalizeReferencedFile(isYaml ? ConvertYamlToJson(content, filePath) : content);
+        var json = ReadReferencedContent(File.ReadAllText(filePath), filePath, isYaml);
 
         // Nested references resolve against the root document, but the guard validated them against this
         // file, so pin them to this file's directory
         json = ReferencedFileReferenceRebaser.Rebase(json, filePath);
         return JsonSchema.FromJsonAsync(json, filePath, _ => referenceResolver, cancellationToken);
+    }
+
+    // The resolver downloads the content itself instead of delegating to NJsonSchema, which would parse it
+    // with the recursive YAML reader before anything could check it. NJsonSchema's caller handles caching and
+    // fragments: it asks for the URL without the fragment and looks into the result.
+    private static async Task<JsonSchema> LoadReferencedUrlAsync(
+        string url,
+        bool isYaml,
+        JsonReferenceResolver referenceResolver,
+        CancellationToken cancellationToken)
+    {
+        var content = await RemoteDocumentDownloader.DownloadAsync(url, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        var json = ReadReferencedContent(content, url, isYaml);
+
+        // Relative references in a remote document resolve against its URL, which is its document path
+        return await JsonSchema.FromJsonAsync(json, url, _ => referenceResolver, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private static string ReadReferencedContent(string content, string source, bool isYaml)
+    {
+        if (!isYaml)
+            DocumentNestingGuard.EnsureWithinLimit(content, source);
+
+        return OpenApiJsonNormalizer.NormalizeReferencedFile(isYaml ? ConvertYamlToJson(content, source) : content);
     }
 
     // Defense in depth behind ReferenceGuard: the resolver is the code that actually fetches the URL
@@ -110,12 +132,12 @@ internal static class OpenApiDocumentParser
     private sealed class SanitizingJsonReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
         : JsonReferenceResolver(schemaAppender)
     {
-        public override Task<IJsonReference> ResolveUrlReferenceAsync(
+        public override async Task<IJsonReference> ResolveUrlReferenceAsync(
             string url,
             CancellationToken cancellationToken = default)
         {
             EnsureRemoteAllowed(url, policy);
-            return base.ResolveUrlReferenceAsync(url, cancellationToken);
+            return await LoadReferencedUrlAsync(url, isYaml: false, this, cancellationToken).ConfigureAwait(false);
         }
 
         public override async Task<IJsonReference> ResolveFileReferenceAsync(
@@ -130,12 +152,12 @@ internal static class OpenApiDocumentParser
     private sealed class SanitizingYamlReferenceResolver(JsonSchemaAppender schemaAppender, ReferencePolicy policy)
         : JsonAndYamlReferenceResolver(schemaAppender)
     {
-        public override Task<IJsonReference> ResolveUrlReferenceAsync(
+        public override async Task<IJsonReference> ResolveUrlReferenceAsync(
             string url,
             CancellationToken cancellationToken = default)
         {
             EnsureRemoteAllowed(url, policy);
-            return base.ResolveUrlReferenceAsync(url, cancellationToken);
+            return await LoadReferencedUrlAsync(url, isYaml: true, this, cancellationToken).ConfigureAwait(false);
         }
 
         // JsonAndYamlReferenceResolver reads every referenced file as YAML, which also covers JSON
