@@ -9,10 +9,11 @@ internal sealed class ReferencePolicy
 {
     public static readonly ReferencePolicy Unrestricted = new(allowRemoteReferences: true);
 
-    public ReferencePolicy(bool allowRemoteReferences, string? rootDirectory = null)
+    public ReferencePolicy(bool allowRemoteReferences, string? rootDirectory = null, string? rootDocumentPath = null)
     {
         AllowRemoteReferences = allowRemoteReferences;
         RootDirectory = rootDirectory;
+        RootDocumentPath = rootDocumentPath;
     }
 
     public bool AllowRemoteReferences { get; }
@@ -21,4 +22,10 @@ internal sealed class ReferencePolicy
     /// The directory every referenced file must stay within, or <c>null</c> when file access is unconfined.
     /// </summary>
     public string? RootDirectory { get; }
+
+    /// <summary>
+    /// The path of the input document itself, as passed to the reference guard, or <c>null</c> when unknown.
+    /// It is the one path that may be a symbolic link, because the user chose it as the input.
+    /// </summary>
+    public string? RootDocumentPath { get; }
 }

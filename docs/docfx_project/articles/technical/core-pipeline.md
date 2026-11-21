@@ -110,7 +110,7 @@ flowchart TD
 Before a specification is parsed, [`ReferenceGuard`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/ReferenceGuard.cs) scans its `$ref` values. It enforces two separate rules:
 
 - Remote `http(s)` references are rejected, to avoid server-side request forgery when Refitter runs on a build server. Setting `allowRemoteReferences` in the `.refitter` file allows them.
-- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths and does not resolve symbolic links, so a link inside the directory that points elsewhere is followed. Treat it as a guard against accidental or crafted `../` references, not as complete filesystem confinement.
+- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths, and any referenced file that is, or sits below, a symbolic link inside the directory is rejected, because a link can point outside it. The input specification itself, and the directories above it, are not checked.
 
 ### Loading strategies
 

@@ -49,8 +49,11 @@ public static class OpenApiDocumentFactory
     }
 
     // Same root the reference guard confines local references to
-    private static ReferencePolicy CreatePolicy(string openApiPath, bool allowRemoteReferences) =>
-        new(allowRemoteReferences, Path.GetDirectoryName(Path.GetFullPath(openApiPath)));
+    private static ReferencePolicy CreatePolicy(string openApiPath, bool allowRemoteReferences)
+    {
+        var fullPath = Path.GetFullPath(openApiPath);
+        return new(allowRemoteReferences, Path.GetDirectoryName(fullPath), fullPath);
+    }
 
     /// <summary>
     /// Creates a new instance of the <see cref="NSwag.OpenApiDocument"/> class asynchronously.

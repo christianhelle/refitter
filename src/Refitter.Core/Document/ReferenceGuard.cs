@@ -53,7 +53,7 @@ internal static class ReferenceGuard
 
         string rootDirectory = Path.GetDirectoryName(fullPath);
         var visited = new HashSet<string>(PathComparer);
-        await ValidateLocalFileAsync(fullPath, rootDirectory, allowRemoteReferences, visited, cancellationToken)
+        await ValidateLocalFileAsync(fullPath, rootDirectory, fullPath, allowRemoteReferences, visited, cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -132,6 +132,7 @@ internal static class ReferenceGuard
     private static async Task ValidateLocalFileAsync(
         string filePath,
         string rootDirectory,
+        string rootDocumentPath,
         bool allowRemoteReferences,
         HashSet<string> visited,
         CancellationToken cancellationToken)
@@ -202,7 +203,16 @@ internal static class ReferenceGuard
                 throw OutsideInputDirectory(reference, resolved, rootDirectory);
             }
 
-            await ValidateLocalFileAsync(resolved, rootDirectory, allowRemoteReferences, visited, cancellationToken)
+            if (ContainsLinkBelowRoot(rootDirectory, resolved, rootDocumentPath))
+                throw SymbolicLinkBlocked(reference, resolved);
+
+            // OasReader resolves a reference whose file is missing at its literal path by searching the
+            // whole tree for a file whose path ends with the reference, so a link elsewhere can be read
+            if (!File.Exists(resolved) &&
+                FindLinkedSearchMatch(rootDirectory, fileRef, rootDocumentPath) is { } linked)
+                throw SymbolicLinkBlocked(reference, linked);
+
+            await ValidateLocalFileAsync(resolved, rootDirectory, rootDocumentPath, allowRemoteReferences, visited, cancellationToken)
                 .ConfigureAwait(false);
         }
     }
@@ -414,6 +424,90 @@ internal static class ReferenceGuard
         string rootDirectory) =>
         new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
             $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
+
+    internal static ReferenceResolutionException SymbolicLinkBlocked(string reference, string resolved) =>
+        new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", which is or passes through a symbolic " +
+            "link. Refitter does not follow links in referenced files, because a link can point outside the " +
+            "input document's directory tree.");
+
+    /// <summary>
+    /// Determines whether <paramref name="fullPath"/> or any directory between it and
+    /// <paramref name="rootDirectory"/> is a symbolic link or other reparse point. The root and the directories
+    /// above it are deliberately not checked, since they are the user's own choice of input location.
+    /// </summary>
+    internal static bool ContainsLinkBelowRoot(string rootDirectory, string fullPath, string? rootDocumentPath = null)
+    {
+        var root = Path.GetFullPath(rootDirectory)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        string? current = Path.GetFullPath(fullPath)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        // The input document is the user's own choice, so it may be a link; no other path is exempt
+        if (rootDocumentPath != null &&
+            current.Equals(Path.GetFullPath(rootDocumentPath), PathComparison))
+        {
+            return false;
+        }
+
+        while (!string.IsNullOrEmpty(current) && !current.Equals(root, PathComparison))
+        {
+            if ((File.Exists(current) || Directory.Exists(current)) &&
+                (File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+            {
+                return true;
+            }
+
+            current = Path.GetDirectoryName(current);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Mirrors the file search of OasReader: a file whose path ends with the reference, anywhere below the root.
+    /// Directories are enumerated by hand so that links are never followed into a cycle; the files of a
+    /// linked directory are still reported, because their path passes through the link.
+    /// </summary>
+    private static string? FindLinkedSearchMatch(string rootDirectory, string fileReference, string? rootDocumentPath)
+    {
+        var separator = Path.DirectorySeparatorChar;
+        var suffix = fileReference.Replace('\\', separator).Replace('/', separator);
+        while (suffix.StartsWith("." + separator, StringComparison.Ordinal))
+            suffix = suffix.Substring(2);
+
+        if (suffix.Length == 0)
+            return null;
+
+        var pending = new Stack<(string Directory, bool ThroughLink)>();
+        pending.Push((Path.GetFullPath(rootDirectory), false));
+        while (pending.Count > 0)
+        {
+            var (directory, throughLink) = pending.Pop();
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(directory))
+                {
+                    if (file.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) &&
+                        ContainsLinkBelowRoot(rootDirectory, file, rootDocumentPath))
+                        return file;
+                }
+
+                foreach (var subdirectory in Directory.EnumerateDirectories(directory))
+                {
+                    var isLink = (File.GetAttributes(subdirectory) & FileAttributes.ReparsePoint) != 0;
+                    if (!(isLink && throughLink))
+                        pending.Push((subdirectory, throughLink || isLink));
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // A directory that cannot be listed cannot be searched by the resolver either
+            }
+        }
+
+        return null;
+    }
 
     internal static bool IsWithin(string rootDirectory, string candidate)
     {
