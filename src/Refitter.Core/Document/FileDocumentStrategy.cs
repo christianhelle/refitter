@@ -34,6 +34,10 @@ internal sealed class FileDocumentStrategy : IDocumentLoadingStrategy
             if (ex is OperationCanceledException or TaskCanceledException)
                 throw;
 
+            // A policy rejection is fatal: do not let another strategy retry what the policy refused
+            if (ReferenceResolutionException.FindIn(ex) is { } rejection)
+                throw rejection;
+
             return null;
         }
     }

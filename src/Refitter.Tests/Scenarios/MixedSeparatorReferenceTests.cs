@@ -34,17 +34,37 @@ public class MixedSeparatorReferenceTests
     }
 
     [TestMethod]
-    [DataRow("http:/\\127.0.0.1:1/s.json")]
-    [DataRow("HTTP:/\\127.0.0.1:1/s.json")]
-    public async Task Does_Not_Block_Mixed_Separator_Reference_When_Remote_Allowed(string reference)
+    public async Task Fetches_Standard_Reference_When_Remote_Allowed()
     {
+        using var server = new LoopbackHttpServer(
+            "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}");
+        var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(JsonSpec(server.BaseUrl + "s.json"));
+
+        string code = await GenerateCode(swaggerFile, allowRemoteReferences: true);
+
+        server.RequestCount.Should().BeGreaterThan(0);
+        code.Should().Contain("class Pet");
+    }
+
+    [TestMethod]
+    [DataRow("http:/\\")]
+    [DataRow("HTTP:/\\")]
+    public async Task Does_Not_Block_Mixed_Separator_Reference_When_Remote_Allowed(string schemeSeparator)
+    {
+        using var server = new LoopbackHttpServer(
+            "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}");
+        var reference = schemeSeparator + server.BaseUrl.Substring("http://".Length) + "s.json";
         var swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(JsonSpec(reference));
 
         var act = () => GenerateCode(swaggerFile, allowRemoteReferences: true);
 
-        // The guard lets it through, so the failure is the refused connection, not a guard rejection
+        // The guard classifies the reference as remote and lets it through. What happens next is up to the
+        // downstream resolver: on Linux NJsonSchema reads the mixed spelling as a local file name, so the
+        // document fails to load without any request reaching the server. Either way, it is not a guard rejection
         var thrown = await act.Should().ThrowAsync<Exception>();
         thrown.Which.Should().NotBeOfType<ReferenceResolutionException>();
+        if (!OperatingSystem.IsWindows())
+            server.RequestCount.Should().Be(0);
     }
 
     [TestMethod]

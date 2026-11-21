@@ -53,6 +53,10 @@ internal sealed class DocumentLoader : IDocumentLoader
                 if (ex is OperationCanceledException or TaskCanceledException)
                     throw;
 
+                // A policy rejection is fatal: do not fall back to a strategy that could fetch what was refused
+                if (ReferenceResolutionException.FindIn(ex) is { } rejection)
+                    throw rejection;
+
                 errors.Add($"{strategy.GetType().Name}: {ex.Message}");
             }
         }

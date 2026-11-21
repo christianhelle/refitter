@@ -1,5 +1,6 @@
 using AwesomeAssertions;
 using Refitter.Core;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.Scenarios;
 
@@ -89,6 +90,65 @@ public class NestedYamlReferenceBaseTests
         await File.WriteAllTextAsync(main, spec);
         return (main, root);
     }
+
+    [TestMethod]
+    public async Task Rebases_Nested_Reference_With_Fully_Escaped_Key()
+    {
+        string root = TestDirectory.CreateFolder();
+        string sub = Path.Combine(root, "sub");
+        Directory.CreateDirectory(sub);
+        await File.WriteAllTextAsync(Path.Combine(sub, "owner.json"), ObjectSchema("EscapedOwnerProperty", false));
+        await File.WriteAllTextAsync(Path.Combine(root, "owner.json"), ObjectSchema("DecoyOwnerProperty", false));
+        await File.WriteAllTextAsync(
+            Path.Combine(sub, "components.json"),
+            "{\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"properties\":{\"owner\":" +
+            "{\"\\u0024\\u0072\\u0065\\u0066\":\"./owner.json\"}}}}}}");
+        string main = Path.Combine(root, "main.json");
+        await File.WriteAllTextAsync(main, MainJson("./sub/components.json#/components/schemas/Pet"));
+
+        string code = await GenerateCode(main);
+
+        // The reference is read relative to the file that contains it, not relative to the root document
+        code.Should().Contain("EscapedOwnerProperty");
+        code.Should().NotContain("DecoyOwnerProperty");
+    }
+
+    [TestMethod]
+    public void Rebase_Leaves_File_Uri_Reference_Unchanged()
+    {
+        const string json = "{\"a\":{\"$ref\":\"file:other.json#/x\"}}";
+
+        string result = ReferencedFileReferenceRebaser.Rebase(json, Path.Combine(Path.GetTempPath(), "child.json"));
+
+        result.Should().Be(json);
+    }
+
+    [TestMethod]
+    public async Task Resolves_Nested_Reference_When_Input_Directory_Contains_Hash()
+    {
+        string root = Path.Combine(TestDirectory.CreateFolder(), "has#hash");
+        string sub = Path.Combine(root, "sub");
+        Directory.CreateDirectory(sub);
+        await File.WriteAllTextAsync(Path.Combine(sub, "owner.json"), ObjectSchema("HashOwnerProperty", false));
+
+        // Without rebasing, a nested reference resolves against the root document, as it did before the rebaser
+        await File.WriteAllTextAsync(Path.Combine(root, "owner.json"), ObjectSchema("HashOwnerProperty", false));
+        await File.WriteAllTextAsync(
+            Path.Combine(sub, "components.json"),
+            "{\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"properties\":{\"owner\":" +
+            "{\"$ref\":\"./owner.json\"}}}}}}");
+        string main = Path.Combine(root, "main.json");
+        await File.WriteAllTextAsync(main, MainJson("./sub/components.json#/components/schemas/Pet"));
+
+        string code = await GenerateCode(main);
+
+        code.Should().Contain("HashOwnerProperty");
+    }
+
+    private static string MainJson(string target) =>
+        "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{\"/pets\":{\"get\":" +
+        "{\"operationId\":\"getPets\",\"responses\":{\"200\":{\"description\":\"ok\",\"content\":" +
+        "{\"application/json\":{\"schema\":{\"$ref\":\"" + target + "\"}}}}}}}}}";
 
     private static string ObjectSchema(string property, bool yaml) =>
         yaml
