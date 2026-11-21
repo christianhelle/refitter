@@ -12,6 +12,17 @@ namespace Refitter.Core;
 /// </summary>
 internal static class ReferenceGuard
 {
+    // IsWithin uses a platform-aware comparison (case-insensitive on Windows). The visited set always uses
+    // an ordinal comparison, even on Windows, because individual NTFS directories can be case-sensitive:
+    // folding case there could collapse two distinct files such as "Model.json" and "model.json" into one
+    // entry so the second is never inspected. Redundant validation of case aliases is acceptable
+    private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+    private static readonly StringComparer PathComparer = StringComparer.Ordinal;
+
+    private static readonly StringComparison PathComparison =
+        IsWindows ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
     public static Task ValidateAsync(
         string openApiPath,
         bool allowRemoteReferences,
@@ -41,7 +52,7 @@ internal static class ReferenceGuard
             return;
 
         string rootDirectory = Path.GetDirectoryName(fullPath);
-        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var visited = new HashSet<string>(PathComparer);
         await ValidateLocalFileAsync(fullPath, rootDirectory, allowRemoteReferences, visited, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -308,10 +319,7 @@ internal static class ReferenceGuard
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var path = Path.GetFullPath(candidate);
 
-        // Use filesystem-aware comparison: case-sensitive on Linux/macOS, case-insensitive on Windows
-        var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
+        var comparison = PathComparison;
 
         return path.Equals(root, comparison) ||
                path.StartsWith(root + Path.DirectorySeparatorChar, comparison) ||
