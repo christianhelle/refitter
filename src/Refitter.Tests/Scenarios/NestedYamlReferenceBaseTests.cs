@@ -27,23 +27,28 @@ public class NestedYamlReferenceBaseTests
         string ext = yaml ? ".yaml" : ".json";
         (string main, _) = await CreateLayout(yaml, NestedReference + ext);
 
-        string? code = null;
-        Exception? failure = null;
-        try
-        {
-            code = await GenerateCode(main);
-        }
-        catch (Exception ex)
-        {
-            failure = ex;
-        }
+        string code = await GenerateCode(main);
 
-        // Either the reference is rejected, or it resolves to the in-tree decoy; the outside file is never used
-        if (failure == null)
-        {
-            code.Should().NotContain(OutsideMarker);
-            code.Should().Contain(DecoyMarker);
-        }
+        // The reference is read relative to the file that contains it, which is the in-tree decoy
+        code.Should().NotContain(OutsideMarker);
+        code.Should().Contain(DecoyMarker);
+    }
+
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task Resolves_Legitimate_Nested_In_Tree_Reference(bool yaml)
+    {
+        string ext = yaml ? ".yaml" : ".json";
+        (string main, string root) = await CreateLayout(yaml, "./owner" + ext);
+        string childDirectory = Path.Combine(root, "sub", "deep", "deeper");
+        await File.WriteAllTextAsync(
+            Path.Combine(childDirectory, "owner" + ext),
+            ObjectSchema("NestedOwnerProperty", yaml));
+
+        string code = await GenerateCode(main);
+
+        code.Should().Contain("NestedOwnerProperty");
     }
 
     private static async Task<(string Main, string Root)> CreateLayout(bool yaml, string nestedReference)

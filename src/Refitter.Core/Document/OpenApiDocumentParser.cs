@@ -70,6 +70,10 @@ internal static class OpenApiDocumentParser
     {
         var content = File.ReadAllText(filePath);
         var json = OpenApiJsonNormalizer.NormalizeReferencedFile(isYaml ? ConvertYamlToJson(content) : content);
+
+        // Nested references resolve against the root document, but the guard validated them against this
+        // file, so pin them to this file's directory
+        json = ReferencedFileReferenceRebaser.Rebase(json, filePath);
         return JsonSchema.FromJsonAsync(json, filePath, _ => referenceResolver, cancellationToken);
     }
 
