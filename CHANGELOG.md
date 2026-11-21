@@ -9,6 +9,7 @@
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Bug Fixes
+- GHSA-7q2f-m7jf-3gp6: Refuse symlinked settings files and output directories ([#1421](https://github.com/christianhelle/refitter/pull/1421)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-r4f2-382w-frqc: Reject symbolic links in local reference paths ([#1416](https://github.com/christianhelle/refitter/pull/1416)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-rqpj-f34p-mr22: Validate discriminator mapping targets in the reference guard ([#1415](https://github.com/christianhelle/refitter/pull/1415)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-wp69-6hgq-9cc3: Confine every file the resolver reads to the input directory ([#1414](https://github.com/christianhelle/refitter/pull/1414)) ([@christianhelle](https://github.com/christianhelle/))
