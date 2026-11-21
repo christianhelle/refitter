@@ -118,13 +118,14 @@ public static class Analytics
 
     private static void ApplyTelemetrySource(Settings settings)
     {
-        if (string.IsNullOrWhiteSpace(settings.TelemetrySource))
+        if (!IsMsbuildInvocation(settings.TelemetrySource))
         {
             return;
         }
 
-        telemetryClient.Context.GlobalProperties["telemetry-source"] = settings.TelemetrySource;
-        ExceptionlessClient.Default.Configuration.DefaultData["telemetry-source"] = settings.TelemetrySource;
+        const string telemetrySource = "msbuild";
+        telemetryClient.Context.GlobalProperties["telemetry-source"] = telemetrySource;
+        ExceptionlessClient.Default.Configuration.DefaultData["telemetry-source"] = telemetrySource;
     }
 
     private static void LogMsbuildInvocation(Settings settings)
@@ -176,21 +177,29 @@ public static class Analytics
 
         ApplyTelemetrySource(settings);
 
-        string json = Serializer.Serialize(settings);
-        var properties = Serializer.Deserialize<Dictionary<string, object>>(json)!;
-        exception
+        string exceptionType = exception.GetType().Name;
+        var exceptionProperties = new Dictionary<string, object>
+        {
+            { "exception-type", exceptionType }
+        };
+        var telemetryProperties = new Dictionary<string, string>
+        {
+            { "exception-type", exceptionType }
+        };
+        if (SettingsSanitizer.Sanitize(Serializer.Serialize(settings)) is { } sanitizedSettings)
+        {
+            exceptionProperties["settings"] = sanitizedSettings;
+            telemetryProperties["settings"] = sanitizedSettings;
+        }
+
+        Exception telemetryException = new($"Generation failed: {exceptionType}");
+        telemetryException
             .ToExceptionless(
-                new ContextData(
-                    properties))
+                new ContextData(exceptionProperties))
             .Submit();
 
         await ExceptionlessClient.Default.ProcessQueueAsync();
 
-        telemetryClient.TrackException(
-            exception,
-            new Dictionary<string, string>
-            {
-                { "settings", json }
-            });
+        telemetryClient.TrackException(telemetryException, telemetryProperties);
     }
 }

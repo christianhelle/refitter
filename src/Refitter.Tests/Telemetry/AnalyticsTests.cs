@@ -201,14 +201,56 @@ public class AnalyticsTests
             {
                 TelemetrySource = "msbuild",
                 TelemetryFileCount = 3,
-                TelemetryRuntime = "net9.0"
+                TelemetryRuntime = "net9.0",
+                OpenApiPath = "https://user:password@example.com/openapi.json?token=secret",
+                GenerateMultipleFiles = true,
+                PropertyNamingPolicy = PropertyNamingPolicy.PreserveOriginal
             };
-            var exception = new Exception("Test exception");
+            var exception = new Exception("Request failed: https://user:password@example.com/openapi.json?token=secret");
 
             await Analytics.LogError(exception, settings);
 
-            captured.OfType<ExceptionTelemetry>().Should().NotBeEmpty();
+            var reportedException = captured.OfType<ExceptionTelemetry>().Single();
+            reportedException.Exception.Message.Should().Be("Generation failed: Exception");
+            reportedException.Exception.Message.Should().NotContain("password").And.NotContain("secret");
+            reportedException.Properties["exception-type"].Should().Be("Exception");
+            reportedException.Properties["settings"]
+                .Should()
+                .Contain("\"openApiPath\":\"<redacted>\"")
+                .And.Contain("\"generateMultipleFiles\":true")
+                .And.Contain("\"propertyNamingPolicy\":\"PreserveOriginal\"")
+                .And.NotContain("password")
+                .And.NotContain("secret");
             client.Context.GlobalProperties["telemetry-source"].Should().Be("msbuild");
+        }
+        finally
+        {
+            ExceptionlessClient.Default.Configuration.Enabled = previousExceptionlessEnabled;
+            Analytics.SetTelemetryClient(previousClient);
+            RestoreTelemetrySource(previousTelemetrySource);
+        }
+    }
+
+    [TestMethod]
+    [DoNotParallelize]
+    public async Task LogError_Should_Ignore_Unrecognized_Telemetry_Source()
+    {
+        var previousClient = Analytics.GetTelemetryClient();
+        var previousTelemetrySource = GetTelemetrySource();
+        bool previousExceptionlessEnabled = ExceptionlessClient.Default.Configuration.Enabled;
+        var captured = new List<ITelemetry>();
+        var client = CreateTelemetryClient(captured);
+        Analytics.SetTelemetryClient(client);
+
+        try
+        {
+            ExceptionlessClient.Default.Configuration.Enabled = false;
+            var settings = new Settings { TelemetrySource = "user:password" };
+
+            await Analytics.LogError(new Exception("Test exception"), settings);
+
+            client.Context.GlobalProperties.Should().NotContainKey("telemetry-source");
+            captured.OfType<ExceptionTelemetry>().Single().Properties.Should().NotContainKey("telemetry-source");
         }
         finally
         {
