@@ -177,13 +177,13 @@ internal static class ReferenceGuard
             if (string.IsNullOrWhiteSpace(fileRef))
                 continue;
 
-            // A "file:" URI cannot be combined with a directory as text; UNC hosts are network locations
-            if (Uri.TryCreate(fileRef, UriKind.Absolute, out Uri? fileUri) && fileUri.IsFile)
+            // NJsonSchema joins the raw text of a "file:" URI to the document directory instead of converting it,
+            // so it would open a different file from the one validated here. Reject them outright
+            if (fileRef.StartsWith("file:", StringComparison.OrdinalIgnoreCase))
             {
-                if (!string.IsNullOrEmpty(fileUri.Host))
-                    throw RemoteBlocked(reference, filePath);
-
-                fileRef = fileUri.LocalPath;
+                throw new ReferenceResolutionException(
+                    $"The '$ref' \"{reference}\" in \"{filePath}\" is a file URI. File URIs are not supported in " +
+                    "'$ref'; use a relative path instead.");
             }
 
             var resolved = Path.GetFullPath(Path.Combine(currentDirectory, fileRef));

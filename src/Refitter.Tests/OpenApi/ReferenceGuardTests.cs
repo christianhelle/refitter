@@ -113,6 +113,36 @@ components:
     }
 
     [TestMethod]
+    [DataRow("file:///etc/passwd")]
+    [DataRow("file:other.json")]
+    [DataRow("FILE:./other.json#/definitions/Pet")]
+    [DataRow("file://server/share/other.json")]
+    public async Task Rejects_File_Uri_Reference(string reference)
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", reference));
+        Write(root, "other.json", Leaf);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*File URIs are not supported*relative path*");
+    }
+
+    [TestMethod]
+    public async Task Rejects_File_Uri_Reference_In_Nested_File()
+    {
+        var root = NewRoot();
+        var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "./child.json"));
+        Write(root, "child.json", @"{ ""$ref"": ""file:./leaf.json"" }");
+        Write(root, "leaf.json", Leaf);
+
+        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*File URIs are not supported*");
+    }
+
+    [TestMethod]
     public async Task Allows_Internal_Fragment_Reference()
     {
         var root = NewRoot();
