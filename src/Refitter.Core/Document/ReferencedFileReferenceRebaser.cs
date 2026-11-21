@@ -13,8 +13,8 @@ internal static class ReferencedFileReferenceRebaser
 {
     public static string Rebase(string json, string filePath)
     {
-        if (json.IndexOf("ref", StringComparison.OrdinalIgnoreCase) < 0 ||
-            SanitizerJson.Parse(json) is not JContainer document)
+        // No text prefilter for "ref": a key can be written entirely with unicode escapes
+        if (SanitizerJson.Parse(json) is not JContainer document)
             return json;
 
         var directory = Path.GetDirectoryName(Path.GetFullPath(filePath));
@@ -38,7 +38,8 @@ internal static class ReferencedFileReferenceRebaser
             if (string.IsNullOrWhiteSpace(fileReference))
                 continue;
 
-            value.Value = Path.GetFullPath(Path.Combine(directory, fileReference)) + fragment;
+            var absolutePath = Path.GetFullPath(Path.Combine(directory, fileReference));
+            value.Value = absolutePath + fragment;
             rewritten = true;
         }
 
