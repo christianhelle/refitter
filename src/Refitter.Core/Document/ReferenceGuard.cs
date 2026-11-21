@@ -225,30 +225,50 @@ internal static class ReferenceGuard
 
     // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
     // reference resolvers decode them, and duplicate "$ref" keys are all inspected. The key is matched
-    // case-insensitively because Newtonsoft.Json binds properties case-insensitively, so "$REF" is a reference
+    // case-insensitively because Newtonsoft.Json binds properties case-insensitively, so "$REF" is a reference.
+    // The values of "discriminator.mapping" are references too: the schema loader resolves them as files
     private static List<string> ExtractJsonReferences(string content)
     {
         var references = new List<string>();
         var rootCompleted = false;
+
+        // The property name each enclosing object or array was found under, innermost first
+        var containers = new Stack<string?>();
+        string? propertyName = null;
+        var expectReferenceValue = false;
+
         using var reader = new JsonTextReader(new StringReader(content)) { DateParseHandling = DateParseHandling.None };
         while (reader.Read())
         {
             if (reader.Depth == 0 && reader.TokenType is (JsonToken.EndObject or JsonToken.EndArray))
                 rootCompleted = true;
 
-            if (reader.TokenType != JsonToken.PropertyName || !string.Equals((string?)reader.Value, "$ref", StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            // Comments may sit between the key and its value
-            bool hasValue;
-            do
+            switch (reader.TokenType)
             {
-                hasValue = reader.Read();
+                // Comments may sit between the key and its value
+                case JsonToken.Comment:
+                    continue;
+                case JsonToken.PropertyName:
+                    propertyName = (string?)reader.Value;
+                    expectReferenceValue = string.Equals(propertyName, "$ref", StringComparison.OrdinalIgnoreCase);
+                    continue;
+                case JsonToken.StartObject:
+                case JsonToken.StartArray:
+                    containers.Push(reader.TokenType == JsonToken.StartObject ? propertyName : null);
+                    break;
+                case JsonToken.EndObject:
+                case JsonToken.EndArray:
+                    if (containers.Count > 0)
+                        containers.Pop();
+                    break;
+                case JsonToken.String:
+                    if (expectReferenceValue || IsDiscriminatorMappingValue(containers))
+                        AddReference(references, (string)reader.Value!);
+                    break;
             }
-            while (hasValue && reader.TokenType == JsonToken.Comment);
 
-            if (hasValue && reader.TokenType == JsonToken.String)
-                AddReference(references, (string)reader.Value!);
+            expectReferenceValue = false;
+            propertyName = null;
         }
 
         // The reader stops quietly at the end of truncated input, so require a complete root object or array
@@ -256,6 +276,18 @@ internal static class ReferenceGuard
             throw new JsonReaderException("Expected a complete JSON object or array.");
 
         return references;
+    }
+
+    private static bool IsDiscriminatorMappingValue(Stack<string?> containers)
+    {
+        if (containers.Count < 2 || !string.Equals(containers.Peek(), "mapping", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        // Stack enumerates innermost first: "mapping", then the object it is a property of
+        using var enumerator = containers.GetEnumerator();
+        enumerator.MoveNext();
+        enumerator.MoveNext();
+        return string.Equals(enumerator.Current, "discriminator", StringComparison.OrdinalIgnoreCase);
     }
 
     // Deserializes the same way NSwag converts YAML, so escapes, anchors and aliases are resolved
@@ -300,6 +332,13 @@ internal static class ReferenceGuard
                     entry.Value is string value)
                     AddReference(references, value);
 
+                if (entry.Key is string name &&
+                    string.Equals(name, "discriminator", StringComparison.OrdinalIgnoreCase) &&
+                    entry.Value is IDictionary<object, object> discriminator)
+                {
+                    AddDiscriminatorMappingReferences(discriminator, references);
+                }
+
                 pending.Push(entry.Key);
                 pending.Push(entry.Value);
             }
@@ -308,6 +347,25 @@ internal static class ReferenceGuard
         {
             foreach (var item in sequence)
                 pending.Push(item);
+        }
+    }
+
+    private static void AddDiscriminatorMappingReferences(
+        IDictionary<object, object> discriminator,
+        List<string> references)
+    {
+        foreach (var entry in discriminator)
+        {
+            if (entry.Key is string key &&
+                string.Equals(key, "mapping", StringComparison.OrdinalIgnoreCase) &&
+                entry.Value is IDictionary<object, object> mapping)
+            {
+                foreach (var target in mapping.Values)
+                {
+                    if (target is string value)
+                        AddReference(references, value);
+                }
+            }
         }
     }
 
