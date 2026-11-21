@@ -217,7 +217,11 @@ internal static class ReferenceGuard
         }
     }
 
-    internal static List<string> ExtractReferences(string content, string source)
+    internal static List<string> ExtractReferences(
+        string content,
+        string source,
+        long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
+        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification)
     {
         // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
         // valid JSON without starting with '{' or '['
@@ -232,7 +236,7 @@ internal static class ReferenceGuard
 
         try
         {
-            return ExtractYamlReferences(content);
+            return ExtractYamlReferences(content, source, maxExpandedNodes, maxAmplification);
         }
         catch (YamlException ex)
         {
@@ -313,7 +317,11 @@ internal static class ReferenceGuard
     // Deserializes the same way NSwag converts YAML, so escapes, anchors and aliases are resolved
     // before the "$ref" keys and values are inspected. Duplicate keys are rejected because parsers
     // disagree on which one wins
-    private static List<string> ExtractYamlReferences(string content)
+    private static List<string> ExtractYamlReferences(
+        string content,
+        string source,
+        long maxExpandedNodes,
+        int maxAmplification)
     {
         var references = new List<string>();
         var root = new DeserializerBuilder().WithDuplicateKeyChecking().Build().Deserialize(new StringReader(content));
@@ -322,6 +330,10 @@ internal static class ReferenceGuard
         // which a different parser might still read as one
         if (root is not (null or IDictionary<object, object> or IList<object>))
             throw new YamlException("Expected a YAML mapping or sequence at the document root.");
+
+        // Aliases share nodes, so the walk below is linear, but serializing the document as JSON later
+        // writes a shared node once per alias. Reject a document whose expansion is out of proportion
+        YamlAliasExpansionGuard.EnsureWithinBudget(root, source, maxExpandedNodes, maxAmplification);
 
         var pending = new Stack<object?>();
         var visited = new HashSet<object>(ReferenceComparer.Instance);
@@ -409,7 +421,7 @@ internal static class ReferenceGuard
             references.Add(trimmed);
     }
 
-    private sealed class ReferenceComparer : IEqualityComparer<object>
+    internal sealed class ReferenceComparer : IEqualityComparer<object>
     {
         public static readonly ReferenceComparer Instance = new();
 

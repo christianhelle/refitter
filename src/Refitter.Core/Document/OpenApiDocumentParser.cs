@@ -56,9 +56,15 @@ internal static class OpenApiDocumentParser
     }
 
     // Same conversion as NSwag's OpenApiYamlDocument and NJsonSchema's JsonSchemaYaml
-    internal static string ConvertYamlToJson(string yaml)
+    internal static string ConvertYamlToJson(
+        string yaml,
+        long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
+        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification)
     {
         var yamlObject = new DeserializerBuilder().Build().Deserialize(new StringReader(yaml));
+
+        // Serializing writes a node once per alias that refers to it, so measure that size first
+        YamlAliasExpansionGuard.EnsureWithinBudget(yamlObject, "the YAML document", maxExpandedNodes, maxAmplification);
         return new SerializerBuilder().JsonCompatible().Build().Serialize(yamlObject!);
     }
 
