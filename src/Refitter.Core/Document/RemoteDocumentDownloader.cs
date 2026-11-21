@@ -15,12 +15,40 @@ internal static class RemoteDocumentDownloader
     /// </summary>
     internal const long MaxResponseBytes = 50L * 1024 * 1024;
 
+    /// <summary>
+    /// The longest a download may take from sending the request to reading the last byte of the body.
+    /// </summary>
+    internal static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+
     private static readonly Lazy<HttpClient> SharedClient = new(CreateHttpClient);
 
     internal static async Task<string> DownloadAsync(
         string url,
         long maxBytes = MaxResponseBytes,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        TimeSpan? timeout = null)
+    {
+        // HttpClient.Timeout stops applying once the headers arrive when reading with ResponseHeadersRead,
+        // so one deadline covers the whole download, including a body that stalls after the headers
+        var deadline = timeout ?? DefaultTimeout;
+        using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutSource.CancelAfter(deadline);
+
+        try
+        {
+            return await DownloadWithinDeadlineAsync(url, maxBytes, timeoutSource.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new ReferenceResolutionException(
+                $"Remote reference \"{url}\" timed out after {deadline.TotalSeconds:0} seconds and is rejected.", ex);
+        }
+    }
+
+    private static async Task<string> DownloadWithinDeadlineAsync(
+        string url,
+        long maxBytes,
+        CancellationToken cancellationToken)
     {
         using var response = await SharedClient.Value
             .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
@@ -76,7 +104,7 @@ internal static class RemoteDocumentDownloader
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             })
         {
-            Timeout = TimeSpan.FromSeconds(30)
+            Timeout = DefaultTimeout
         };
 
         client.DefaultRequestHeaders.Add(

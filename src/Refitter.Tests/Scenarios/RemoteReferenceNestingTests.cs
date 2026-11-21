@@ -104,4 +104,42 @@ public class RemoteReferenceNestingTests
 
         content.Should().HaveLength(1000);
     }
+
+    [TestMethod]
+    public async Task Times_Out_When_The_Response_Body_Stalls()
+    {
+        // Sends complete headers promising a body, then never sends it
+        var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        listener.Start();
+        try
+        {
+            int port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+            var serve = Task.Run(async () =>
+            {
+                using var client = await listener.AcceptTcpClientAsync();
+                var stream = client.GetStream();
+                var request = new byte[4096];
+                _ = await stream.ReadAsync(request);
+                byte[] headers = System.Text.Encoding.ASCII.GetBytes(
+                    "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 100\r\n\r\n{");
+                await stream.WriteAsync(headers);
+                await stream.FlushAsync();
+                await Task.Delay(TimeSpan.FromSeconds(30));
+            });
+
+            var download = RemoteDocumentDownloader.DownloadAsync(
+                $"http://127.0.0.1:{port}/stall.json",
+                timeout: TimeSpan.FromSeconds(1));
+            var finished = await Task.WhenAny(download, Task.Delay(TimeSpan.FromSeconds(15)));
+
+            finished.Should().BeSameAs(download, "a stalled response body must not block the download indefinitely");
+            var act = () => download;
+            var thrown = await act.Should().ThrowAsync<ReferenceResolutionException>();
+            thrown.Which.Message.Should().Contain("timed out");
+        }
+        finally
+        {
+            listener.Stop();
+        }
+    }
 }
