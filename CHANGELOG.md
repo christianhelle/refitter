@@ -3,8 +3,15 @@
 ## [Unreleased Changes]
 
 ### Features
+- Bump version to 2.4.1 ([#1420](https://github.com/christianhelle/refitter/pull/1420)) ([@christianhelle](https://github.com/christianhelle/))
+- Add security policy ([#1408](https://github.com/christianhelle/refitter/pull/1408)) ([@christianhelle](https://github.com/christianhelle/))
 - Escape Unicode line terminators and settings values in generated string literals ([#1409](https://github.com/christianhelle/refitter/pull/1409)) ([@christianhelle](https://github.com/christianhelle/))
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
+
+### Bug Fixes
+- GHSA-7q2f-m7jf-3gp6: Refuse to write generated output through a symbolic link ([#1419](https://github.com/christianhelle/refitter/pull/1419)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-7hgj-q592-v892: Reject network-path operation routes ([#1418](https://github.com/christianhelle/refitter/pull/1418)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-2p8r-7mx6-gh86: Map operation keys to fixed Refit attribute names ([#1417](https://github.com/christianhelle/refitter/pull/1417)) ([@christianhelle](https://github.com/christianhelle/))
 
 
 ## [2.4.0](https://github.com/christianhelle/refitter/releases/tag/2.4.0) (2026-11-16)
