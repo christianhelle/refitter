@@ -13,8 +13,8 @@ internal static class ReferencedFileReferenceRebaser
 {
     public static string Rebase(string json, string filePath)
     {
-        if (json.IndexOf("ref", StringComparison.OrdinalIgnoreCase) < 0 ||
-            SanitizerJson.Parse(json) is not JContainer document)
+        // No text prefilter for "ref": a key can be written entirely with unicode escapes
+        if (SanitizerJson.Parse(json) is not JContainer document)
             return json;
 
         var directory = Path.GetDirectoryName(Path.GetFullPath(filePath));
@@ -29,6 +29,7 @@ internal static class ReferencedFileReferenceRebaser
             if (string.IsNullOrEmpty(reference) ||
                 reference!.StartsWith("#", StringComparison.Ordinal) ||
                 PathUtilities.IsHttp(reference) ||
+                reference.StartsWith("file:", StringComparison.OrdinalIgnoreCase) || // rejected by the guard, leave unchanged
                 PathUtilities.TryGetRemoteUri(reference, out _))
                 continue;
 
@@ -38,7 +39,14 @@ internal static class ReferencedFileReferenceRebaser
             if (string.IsNullOrWhiteSpace(fileReference))
                 continue;
 
-            value.Value = Path.GetFullPath(Path.Combine(directory, fileReference)) + fragment;
+            // NJsonSchema reads a '#' in an absolute path as the start of a fragment and does not decode a
+            // percent-encoded one, so such a reference keeps its original text, which is how it was handled
+            // before rebasing. The resolver still confines every file it reads to the input directory
+            var absolutePath = Path.GetFullPath(Path.Combine(directory, fileReference));
+            if (absolutePath.IndexOf('#') >= 0)
+                continue;
+
+            value.Value = absolutePath + fragment;
             rewritten = true;
         }
 

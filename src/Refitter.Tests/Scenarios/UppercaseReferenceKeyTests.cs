@@ -82,7 +82,7 @@ components:
 
         string code = await GenerateCode(main);
 
-        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("class Pet").And.Contain("Name");
     }
 
     [TestMethod]
@@ -97,14 +97,12 @@ components:
 
         string code = await GenerateCode(main);
 
-        code.Should().NotBeNullOrWhiteSpace();
+        code.Should().Contain("class Pet").And.Contain("Name");
     }
 
     private static string CreateTempDirectory()
     {
-        string path = Path.Combine(Path.GetTempPath(), "refitter-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(path);
-        return path;
+        return TestDirectory.CreateFolder();
     }
 
     private static async Task<string> GenerateCode(string swaggerFile)

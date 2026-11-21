@@ -42,6 +42,9 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         catch (Exception ex) when (ex is not OperationCanceledException
                                        and not TaskCanceledException)
         {
+            if (ReferenceResolutionException.FindIn(ex) is { } rejection)
+                throw rejection;
+
             return await FallbackToNSwagAsync(path, cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -93,6 +96,9 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
+            if (ReferenceResolutionException.FindIn(ex) is { } rejection)
+                throw rejection;
+
             return null;
         }
     }
