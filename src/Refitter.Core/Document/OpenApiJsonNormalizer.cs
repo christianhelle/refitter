@@ -11,7 +11,8 @@ namespace Refitter.Core;
 /// <remarks>
 /// The rewrites, in order: clamp numeric bounds to the decimal range (#1273), convert object-valued enum
 /// extensions to arrays (#1336), turn <c>itemSchema</c> into an array <c>schema</c> (#1348), and, for the root
-/// document only, inline path items referenced from OpenAPI 3.1 <c>components/pathItems</c> (#1274).
+/// document only, inline path items referenced from OpenAPI 3.1 <c>components/pathItems</c> (#1274). Control
+/// characters that XML rejects are stripped from descriptions, summaries and titles before that (#1428).
 /// </remarks>
 internal static class OpenApiJsonNormalizer
 {
@@ -20,6 +21,7 @@ internal static class OpenApiJsonNormalizer
         new(NumericBoundsSanitizer.IsCandidate, NumericBoundsSanitizer.Rewrite, RootDocumentOnly: false),
         new(EnumExtensionsSanitizer.IsCandidate, EnumExtensionsSanitizer.Rewrite, RootDocumentOnly: false),
         new(ItemSchemaSanitizer.IsCandidate, ItemSchemaSanitizer.Rewrite, RootDocumentOnly: false),
+        new(XmlInvalidCharacterSanitizer.IsCandidate, XmlInvalidCharacterSanitizer.Rewrite, RootDocumentOnly: false),
         new(PathItemReferenceInliner.IsCandidate, PathItemReferenceInliner.Rewrite, RootDocumentOnly: true),
     };
 
