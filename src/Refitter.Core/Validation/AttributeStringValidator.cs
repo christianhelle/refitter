@@ -78,7 +78,7 @@ internal static class AttributeStringValidator
         {
             diagnostic.Errors.Add(new OpenApiError(
                 path,
-                $"Path '{path}' must start with a single '/' and is rejected because a path starting with two slashes or a backslash would be resolved as a different host. Use --skip-validation to bypass."));
+                $"Path '{path}' must start with a single '/' and is rejected because a path starting with two slashes or a backslash would be resolved as a different host. Correct the path in the OpenAPI document."));
         }
 
         if (ContainsUnsafeCharacters(path))
