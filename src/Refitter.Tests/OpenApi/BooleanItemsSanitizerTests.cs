@@ -61,4 +61,28 @@ public class BooleanItemsSanitizerTests
 
         OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
     }
+
+    [TestMethod]
+    [DataRow("default")]
+    [DataRow("example")]
+    [DataRow("const")]
+    [DataRow("x-sample")]
+    public void Keeps_Boolean_Items_Inside_Literal_Value(string keyword)
+    {
+        var json = "{ \"components\": { \"schemas\": { \"A\": { \"" + keyword +
+            "\": { \"type\": \"array\", \"items\": false } } } } }";
+
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
+    }
+
+    [TestMethod]
+    public void Drops_Boolean_Items_Next_To_Literal_Value()
+    {
+        var json = """{ "type": "array", "items": false, "default": { "type": "array", "items": false } }""";
+
+        var result = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
+
+        result.ContainsKey("items").Should().BeFalse();
+        result["default"]!["items"].Should().NotBeNull();
+    }
 }
