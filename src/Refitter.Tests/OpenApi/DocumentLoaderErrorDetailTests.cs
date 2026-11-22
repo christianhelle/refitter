@@ -39,4 +39,28 @@ public class DocumentLoaderErrorDetailTests
         exception.Message.Should().Contain("FileDocumentStrategy:");
         exception.Message.Should().Contain("collectionFormat");
     }
+
+    [TestMethod]
+    public async Task Failure_Message_Includes_The_Reader_Error_For_An_Http_Source()
+    {
+        using var server = new LoopbackHttpServer("this is not an OpenAPI document");
+
+        var act = async () => await new DocumentLoader(new IDocumentLoadingStrategy[]
+        {
+            new OpenApiReaderDocumentStrategy(),
+        }).LoadAsync(server.BaseUrl + "openapi.json");
+
+        var exception = (await act.Should().ThrowAsync<InvalidOperationException>()).Which;
+        exception.Message.Should().Contain("OpenApiReaderDocumentStrategy:");
+    }
+
+    [TestMethod]
+    public async Task TryLoad_Returns_Null_For_An_Http_Source_The_Reader_Cannot_Read()
+    {
+        using var server = new LoopbackHttpServer("this is not an OpenAPI document");
+
+        var document = await new OpenApiReaderDocumentStrategy().TryLoadAsync(server.BaseUrl + "openapi.json");
+
+        document.Should().BeNull();
+    }
 }

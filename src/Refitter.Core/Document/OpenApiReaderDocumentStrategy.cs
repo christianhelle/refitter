@@ -63,8 +63,14 @@ internal sealed class OpenApiReaderDocumentStrategy : IFailureReportingStrategy
             if (ReferenceResolutionException.FindIn(ex) is { } rejection)
                 throw rejection;
 
-            return await FallbackToNSwagAsync(path, cancellationToken)
+            // With no fallback, the reader's own failure is the one to report
+            var fallback = await FallbackToNSwagAsync(path, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (fallback is null)
+                throw;
+
+            return fallback;
         }
     }
 
