@@ -39,7 +39,7 @@ flowchart TB
 
     subgraph Libraries["Third-party libraries"]
         NSWAG["NSwag.CodeGeneration.CSharp<br/>NJsonSchema"]
-        MSOAI["Microsoft.OpenApi<br/>(via OasReader)"]
+        MSOAI["Microsoft.OpenApi"]
         YAML["YamlDotNet<br/>(via NSwag.Core.Yaml)"]
         ROSLYN["Microsoft.CodeAnalysis.CSharp"]
         SPECTRE["Spectre.Console"]
@@ -127,7 +127,7 @@ Refitter does not parse OpenAPI documents or generate DTOs on its own. It combin
 |---|---|
 | [NSwag](https://github.com/RicoSuter/NSwag) (`NSwag.Core.Yaml`, `NSwag.CodeGeneration.CSharp`) | The `OpenApiDocument` model, `$ref` resolution, and generation of the contract (DTO) types. Refitter subclasses `CSharpClientGenerator` but turns off NSwag's own client generation |
 | [NJsonSchema](https://github.com/RicoSuter/NJsonSchema) | JSON schema model, type resolution and the Liquid templates for classes, records and enums |
-| [Microsoft.OpenApi](https://github.com/microsoft/OpenAPI.NET) via [OasReader](https://github.com/christianhelle/oasreader) | OpenAPI validation, statistics, and reading specifications whose external references must be merged into one document |
+| [Microsoft.OpenApi](https://github.com/microsoft/OpenAPI.NET) | OpenAPI validation and statistics, reading the referenced files from the document set |
 | [YamlDotNet](https://github.com/aaubry/YamlDotNet) (via `NSwag.Core.Yaml`) | Converting YAML specifications to JSON before NSwag parses them |
 | [Roslyn](https://github.com/dotnet/roslyn) (`Microsoft.CodeAnalysis.CSharp`) | Rewriting generated contracts and building the `JsonSerializerContext`, and in the source generator, running the nested Refit and System.Text.Json generators |
 | [Spectre.Console](https://spectreconsole.net/) | CLI argument parsing and rich console output |
