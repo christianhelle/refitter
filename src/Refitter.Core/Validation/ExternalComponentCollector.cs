@@ -1,4 +1,4 @@
-using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
@@ -18,6 +18,9 @@ internal sealed class ExternalComponentCollector
     private readonly string rootKey;
     private readonly OpenApiSpecVersion version;
     private readonly KeyValuePair<string, JsonNode?> versionField;
+    private static readonly OpenApiReaderSettings Settings = new() { RuleSet = ValidationRuleSet.GetEmptyRuleSet() };
+
+    private readonly Dictionary<string, JsonObject?> nodes = new(StringComparer.Ordinal);
     private readonly Dictionary<string, OpenApiDocument?> documents = new(StringComparer.Ordinal);
     private readonly HashSet<string> reached = new(StringComparer.Ordinal);
     private readonly Queue<(string Host, OpenApiDocument Item)> pending = new();
@@ -48,7 +51,7 @@ internal sealed class ExternalComponentCollector
     /// Collects the components that a local OpenAPI document reaches in other files, directly or through
     /// references inside those files. A component that is reached more than once is collected once.
     /// </summary>
-    public static async Task<OpenApiComponents> CollectAsync(
+    public static OpenApiComponents Collect(
         DocumentSet set,
         OpenApiDocument document,
         OpenApiSpecVersion version,
@@ -65,13 +68,13 @@ internal sealed class ExternalComponentCollector
             new OpenApiWalker(visitor).Walk(item);
 
             foreach (var reference in visitor.References)
-                await collector.ReachAsync(host, reference, cancellationToken).ConfigureAwait(false);
+                collector.Reach(host, reference);
         }
 
         return collector.Components;
     }
 
-    private async Task ReachAsync(string host, BaseOpenApiReference reference, CancellationToken cancellationToken)
+    private void Reach(string host, BaseOpenApiReference reference)
     {
         // The components of the OpenAPI document itself are walked with it
         if (!reference.IsExternal && host == rootKey)
@@ -88,23 +91,45 @@ internal sealed class ExternalComponentCollector
         if (!set.TryGetFile(file, out var json) && !set.TryGetUrl(file, out json))
             return;
 
-        var components = (await ParseAsync(file, json, cancellationToken).ConfigureAwait(false))?.Components;
+        var node = NodeOf(file, json);
+        var components = DocumentOf(file, node)?.Components;
         var id = reference.Id;
+
+        // A reference to a whole file has the file name as its id, and the file is the component itself
+        var whole = reference.IsExternal && id == Path.GetFileName(reference.ExternalResource) ? node : null;
+
         var item = reference.Type switch
         {
-            ReferenceType.Schema => Collect(
-                components?.Schemas, Components.Schemas!, file, id, (c, d) => c.Schemas = d, WholeFileSchema(reference, json)),
-            ReferenceType.Response => Collect(components?.Responses, Components.Responses!, file, id, (c, d) => c.Responses = d),
-            ReferenceType.Parameter => Collect(components?.Parameters, Components.Parameters!, file, id, (c, d) => c.Parameters = d),
-            ReferenceType.Example => Collect(components?.Examples, Components.Examples!, file, id, (c, d) => c.Examples = d),
-            ReferenceType.RequestBody => Collect(
-                components?.RequestBodies, Components.RequestBodies!, file, id, (c, d) => c.RequestBodies = d),
-            ReferenceType.Header => Collect(components?.Headers, Components.Headers!, file, id, (c, d) => c.Headers = d),
-            ReferenceType.SecurityScheme => Collect(
-                components?.SecuritySchemes, Components.SecuritySchemes!, file, id, (c, d) => c.SecuritySchemes = d),
-            ReferenceType.Link => Collect(components?.Links, Components.Links!, file, id, (c, d) => c.Links = d),
-            ReferenceType.Callback => Collect(components?.Callbacks, Components.Callbacks!, file, id, (c, d) => c.Callbacks = d),
-            ReferenceType.PathItem => Collect(components?.PathItems, Components.PathItems!, file, id, (c, d) => c.PathItems = d),
+            ReferenceType.Schema => Add(
+                components?.Schemas, Components.Schemas!, file, id, (c, d) => c.Schemas = d,
+                () => Fragment<OpenApiSchema>(whole)),
+            ReferenceType.Response => Add(
+                components?.Responses, Components.Responses!, file, id, (c, d) => c.Responses = d,
+                () => Fragment<OpenApiResponse>(whole)),
+            ReferenceType.Parameter => Add(
+                components?.Parameters, Components.Parameters!, file, id, (c, d) => c.Parameters = d,
+                () => Fragment<OpenApiParameter>(whole)),
+            ReferenceType.Example => Add(
+                components?.Examples, Components.Examples!, file, id, (c, d) => c.Examples = d,
+                () => Fragment<OpenApiExample>(whole)),
+            ReferenceType.RequestBody => Add(
+                components?.RequestBodies, Components.RequestBodies!, file, id, (c, d) => c.RequestBodies = d,
+                () => Fragment<OpenApiRequestBody>(whole)),
+            ReferenceType.Header => Add(
+                components?.Headers, Components.Headers!, file, id, (c, d) => c.Headers = d,
+                () => Fragment<OpenApiHeader>(whole)),
+            ReferenceType.SecurityScheme => Add(
+                components?.SecuritySchemes, Components.SecuritySchemes!, file, id, (c, d) => c.SecuritySchemes = d,
+                () => Fragment<OpenApiSecurityScheme>(whole)),
+            ReferenceType.Link => Add(
+                components?.Links, Components.Links!, file, id, (c, d) => c.Links = d,
+                () => Fragment<OpenApiLink>(whole)),
+            ReferenceType.Callback => Add(
+                components?.Callbacks, Components.Callbacks!, file, id, (c, d) => c.Callbacks = d,
+                () => Fragment<OpenApiCallback>(whole)),
+            ReferenceType.PathItem => Add(
+                components?.PathItems, Components.PathItems!, file, id, (c, d) => c.PathItems = d,
+                () => Fragment<OpenApiPathItem>(whole)),
             _ => null,
         };
 
@@ -112,18 +137,18 @@ internal sealed class ExternalComponentCollector
             pending.Enqueue((file, item));
     }
 
-    // Adds the component the file defines under the id, and returns a document holding only it, to walk for the
-    // references it holds
-    private static OpenApiDocument? Collect<T>(
+    // Adds the component the file defines under the id, or the whole file, and returns a document holding only
+    // it, to walk for the references it holds
+    private static OpenApiDocument? Add<T>(
         IDictionary<string, T>? defined,
         IDictionary<string, T> collected,
         string file,
         string id,
         Action<OpenApiComponents, IDictionary<string, T>> assign,
-        T? fallback = null)
+        Func<T?> whole)
         where T : class
     {
-        var component = defined is not null && defined.TryGetValue(id, out var found) ? found : fallback;
+        var component = defined is not null && defined.TryGetValue(id, out var found) ? found : whole();
         if (component is null)
             return null;
 
@@ -136,11 +161,10 @@ internal sealed class ExternalComponentCollector
         return new OpenApiDocument { Components = item };
     }
 
-    // A reference to a whole file has the file name as its id, and the file is a schema of its own
-    private IOpenApiSchema? WholeFileSchema(BaseOpenApiReference reference, string json) =>
-        reference.IsExternal && reference.Id == Path.GetFileName(reference.ExternalResource)
-            ? ParseSchema(json)
-            : null;
+    private T? Fragment<T>(JsonObject? node) where T : class, IOpenApiElement =>
+        node is null
+            ? null
+            : new OpenApiJsonReader().ReadFragment<T>(node.DeepClone(), version, new OpenApiDocument(), out _, Settings);
 
     // A reference is resolved against the file it is written in. A remote document is keyed by its URL
     // as written, and a local file by its full path, as the reader keyed them
@@ -165,43 +189,44 @@ internal sealed class ExternalComponentCollector
         }
     }
 
-    private async Task<OpenApiDocument?> ParseAsync(string file, string json, CancellationToken cancellationToken)
+    private JsonObject? NodeOf(string file, string json)
+    {
+        if (!nodes.TryGetValue(file, out var node))
+            nodes[file] = node = JsonObjectOf(json);
+
+        return node;
+    }
+
+    private OpenApiDocument? DocumentOf(string file, JsonObject? node)
     {
         if (documents.TryGetValue(file, out var cached))
             return cached;
 
         OpenApiDocument? document = null;
-        if (JsonObjectOf(json) is { } content)
+        if (node?.DeepClone() is JsonObject content)
         {
             // Microsoft.OpenApi reads no document without a version, and a referenced file often has none
-            if (!content.ContainsKey("openapi") && !content.ContainsKey("swagger") && versionField.Value is not null)
-                content[versionField.Key] = versionField.Value.DeepClone();
+            if (!content.ContainsKey("openapi") && !content.ContainsKey("swagger"))
+                content[versionField.Key] = versionField.Value?.DeepClone();
 
-            var settings = new OpenApiReaderSettings { RuleSet = ValidationRuleSet.GetEmptyRuleSet() };
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content.ToJsonString()));
-            document = (await OpenApiDocument.LoadAsync(stream, "json", settings, cancellationToken).ConfigureAwait(false))
-                .Document;
+            document = new OpenApiJsonReader().Read(content, new Uri(file), Settings).Document;
         }
 
         documents[file] = document;
         return document;
     }
 
-    private IOpenApiSchema? ParseSchema(string json)
-    {
-        if (JsonObjectOf(json) is null)
-            return null;
-
-        return OpenApiModelFactory.Parse<OpenApiSchema>(json, version, new OpenApiDocument(), out _, "json");
-    }
-
+    // Read with the depth the reader accepts, rather than the lower default of System.Text.Json, and handed to
+    // Microsoft.OpenApi as it is, so that a file the reader read is never skipped for its depth
     private static JsonObject? JsonObjectOf(string json)
     {
         try
         {
-            return JsonNode.Parse(json) as JsonObject;
+            return JsonNode.Parse(
+                json,
+                documentOptions: new JsonDocumentOptions { MaxDepth = DocumentNestingGuard.MaxNestingDepth }) as JsonObject;
         }
-        catch (System.Text.Json.JsonException)
+        catch (JsonException)
         {
             return null;
         }

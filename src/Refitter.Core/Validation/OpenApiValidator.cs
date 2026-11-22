@@ -86,9 +86,8 @@ public static class OpenApiValidator
             if (isLocal)
             {
                 // The references to other files are followed through the set, each file parsed on its own
-                externalComponents = await ExternalComponentCollector
-                    .CollectAsync(set, document, diagnostic.SpecificationVersion, cancellationToken)
-                    .ConfigureAwait(false);
+                externalComponents = ExternalComponentCollector
+                    .Collect(set, document, diagnostic.SpecificationVersion, cancellationToken);
                 walker.Walk(new OpenApiDocument { Components = externalComponents });
             }
         }
