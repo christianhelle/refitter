@@ -88,12 +88,12 @@ flowchart TD
     MULTI -- no --> KIND
     EACH -.-> KIND
     KIND{"http(s) URL?"}
-    KIND -- yes --> HTTP["HttpClient GET<br/>gzip/deflate, 30s timeout"] --> RG1["ReferenceGuard.ValidateAsync"] --> PARSE
+    KIND -- yes --> HTTP["RemoteDocumentDownloader<br/>50 MB limit, 30s deadline"] --> RG1["ReferenceGuard.ValidateAsync"] --> PARSE
     KIND -- no --> RG2["ReferenceGuard.ValidateAsync"] --> LOADER
 
-    subgraph LOADER["DocumentLoader strategy chain (first non-null wins)"]
+    subgraph LOADER["DocumentLoader"]
         direction TB
-        S1["FileDocumentStrategy"] --> S2["HttpDocumentStrategy"] --> S3["OpenApiReaderDocumentStrategy<br/>only when the spec has external refs"]
+        S1["NSwag parse"] -- fails --> S2["MultiFileDocumentReader<br/>only when the spec has external refs"]
     end
 
     LOADER --> PARSE
@@ -112,13 +112,11 @@ Before a specification is parsed, [`ReferenceGuard`](https://github.com/christia
 - Remote `http(s)` references are rejected, to avoid server-side request forgery when Refitter runs on a build server. Setting `allowRemoteReferences` in the `.refitter` file allows them.
 - Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths, and any referenced file that is, or sits below, a symbolic link inside the directory is rejected, because a link can point outside it. The input specification itself, and the directories above it, are not checked.
 
-### Loading strategies
+### Loading a local document
 
-[`DocumentLoader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/DocumentLoader.cs) tries a chain of `IDocumentLoadingStrategy` implementations:
+[`DocumentLoader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/DocumentLoader.cs) parses a local file with NSwag. When that fails, [`MultiFileDocumentReader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/MultiFileDocumentReader.cs) tries the document, but only when it contains external references. It uses Microsoft.OpenApi's multi-file reader (via OasReader) to inline them into one document, fills in a missing `info.title` / `info.version`, serializes the result back in its original OpenAPI version and re-parses it with NSwag. If neither reads the document, NSwag's error is reported. A reference rejected by the reference guard rules is never retried by the reader.
 
-1. `FileDocumentStrategy` parses a local file with NSwag.
-2. `HttpDocumentStrategy` downloads the document with a `refitter/<version>` user agent.
-3. `OpenApiReaderDocumentStrategy` only acts when the specification contains external references. It uses Microsoft.OpenApi's multi-file reader (via OasReader) to inline them into one document, fills in a missing `info.title` / `info.version`, serializes the result back in its original OpenAPI version and re-parses it with NSwag.
+Remote documents are downloaded by `RemoteDocumentDownloader`, which rejects responses larger than 50 MB or slower than 30 seconds.
 
 ### Normalizing the JSON
 
