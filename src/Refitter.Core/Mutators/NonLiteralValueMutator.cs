@@ -51,13 +51,11 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
     }
 
     // NJsonSchema looks the default up among the enum values to build its member name, which throws for a default
-    // that is not one of them
+    // that is not one of them. It uses Enumeration.IndexOf, which compares by equality, so membership is decided
+    // the same way: a string "1" prints like the number 1 but is not a member of [1, 2]
     private static bool IsEnumMember(JsonSchema schema, object value) =>
         schema.Enumeration.Count == 0 ||
-        schema.Enumeration.Any(member => member is not null && AsText(member) == AsText(value));
-
-    private static string AsText(object value) =>
-        string.Format(CultureInfo.InvariantCulture, "{0}", value);
+        schema.Enumeration.Contains(value);
 
     private static bool IsBoolean(object value) => value switch
     {

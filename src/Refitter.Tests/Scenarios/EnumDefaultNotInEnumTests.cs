@@ -53,6 +53,49 @@ public class EnumDefaultNotInEnumTests
         generatedCode.Should().Contain("ThingValid.Green");
     }
 
+    // The string "1" prints like the number 1 but is not equal to it, and NJsonSchema looks the default up
+    // with IndexOf, which uses equality. JSON keeps the two types apart, so this cannot be written in YAML
+    private const string MixedTypeJsonSpec = """
+        {
+          "openapi": "3.0.3",
+          "info": { "title": "T", "version": "1.0" },
+          "paths": {
+            "/items": {
+              "get": {
+                "operationId": "getItems",
+                "responses": {
+                  "200": {
+                    "description": "OK",
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Thing" } } }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "Thing": {
+                "type": "object",
+                "properties": {
+                  "level": { "type": "integer", "enum": [1, 2], "default": "1", "x-enumNames": ["One", "Two"] }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+    [TestMethod]
+    public async Task Can_Generate_Code_When_Enum_Default_Only_Prints_Like_An_Enum_Value()
+    {
+        string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(MixedTypeJsonSpec);
+        RefitGenerator generator = await RefitGenerator.CreateAsync(new RefitGeneratorSettings { OpenApiPath = swaggerFile });
+
+        string generatedCode = generator.Generate();
+
+        generatedCode.Should().Contain("class Thing");
+    }
+
     [TestMethod]
     [TestCategory("Integration")]
     public async Task Can_Build_Generated_Code()
