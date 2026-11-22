@@ -59,22 +59,43 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
         return (isBoolean && IsBoolean(value)) || (isNumeric && IsNumber(value));
     }
 
-    // NJsonSchema writes an integer default as it is, so one that does not fit the CLR type of the property
-    // (int, or long for int64) is a compile error
+    // NJsonSchema writes an integer default as it is, so one that does not fit the CLR type of the property is a
+    // compile error (or makes the generator throw). The type is resolved like CSharpTypeResolver.ResolveInteger does:
+    // byte is byte, int64 and long are long, uint64 and ulong are ulong, int32 is int, a schema without a format whose
+    // bounds are outside the int range is long, and anything else (uint32, int16, ...) is the integer type, int
     private static bool FitsInteger(JsonSchema schema, object value)
     {
         string text = string.Format(CultureInfo.InvariantCulture, "{0}", value);
         if (!WholeNumber.IsMatch(text))
             return true;
 
-        return schema.Format switch
+        const NumberStyles signed = NumberStyles.AllowLeadingSign;
+        IFormatProvider culture = CultureInfo.InvariantCulture;
+        switch (schema.Format)
         {
-            "int64" => long.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _),
-            "uint64" => ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out _),
-            "uint32" => uint.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out _),
-            _ => int.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _),
-        };
+            case "byte":
+                return byte.TryParse(text, NumberStyles.None, culture, out _);
+            case "int64":
+            case "long":
+                return long.TryParse(text, signed, culture, out _);
+            case "uint64":
+            case "ulong":
+                return ulong.TryParse(text, NumberStyles.None, culture, out _);
+            case "int32":
+                return int.TryParse(text, signed, culture, out _);
+            default:
+                return IsWidenedToLong(schema)
+                    ? long.TryParse(text, signed, culture, out _)
+                    : int.TryParse(text, signed, culture, out _);
+        }
     }
+
+    private static bool IsWidenedToLong(JsonSchema schema) =>
+        (schema.Minimum.HasValue || schema.Maximum.HasValue) &&
+        string.IsNullOrEmpty(schema.Format) &&
+        schema.Type == JsonObjectType.Integer &&
+        (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
+         schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue);
 
     // NJsonSchema looks the default up among the enum values to build its member name, which throws for a default
     // that is not one of them. It uses Enumeration.IndexOf, which compares by equality, so membership is decided

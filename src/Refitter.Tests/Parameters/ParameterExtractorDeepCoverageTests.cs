@@ -480,12 +480,13 @@ public class ParameterExtractorDeepCoverageTests
     }
 
     [TestMethod]
-    public async Task FormatNumericValue_Uint_Has_U_Suffix()
+    public async Task FormatNumericValue_Uint_Default_Not_Fitting_Int_Is_Dropped()
     {
-        // NSwag maps integer/uint32 to int (not uint), so no U suffix is generated
+        // NSwag maps integer/uint32 to int (not uint), so no U suffix is generated and a default that
+        // does not fit an int is dropped instead of producing code that does not compile
         string generatedCode = await GenerateCode(OpenApiSpecWithUintDefault);
-        generatedCode.Should().Contain("4294967295");
-        generatedCode.Should().Contain("int? uintValue = 4294967295");
+        generatedCode.Should().NotContain("4294967295");
+        generatedCode.Should().Contain("int? uintValue");
     }
 
     [TestMethod]
