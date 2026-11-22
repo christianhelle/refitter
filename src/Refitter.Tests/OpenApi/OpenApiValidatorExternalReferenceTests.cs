@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Refitter.Core;
 using Refitter.Core.Validation;
 using Refitter.Tests.TestUtilities;
 
@@ -75,9 +76,8 @@ public class OpenApiValidatorExternalReferenceTests
     }
 
     [TestMethod]
-    public async Task Validate_Does_Not_Count_Components_Of_A_Dot_Relative_Reference()
+    public async Task Validate_Counts_Components_Of_A_Dot_Relative_Reference()
     {
-        // Baseline of the OasReader based validation, which only merges references without a leading "./"
         var folder = TestDirectory.CreateFolder();
         await Write(folder, "components.json", Components(Pet("") + ",\"Tag\":{\"type\":\"string\"}", withVersion: true));
         var root = await Write(folder, "root.json", Root("./components.json#/components/schemas/Pet"));
@@ -85,7 +85,7 @@ public class OpenApiValidatorExternalReferenceTests
         var result = await OpenApiValidator.Validate(root);
 
         result.Diagnostics.Errors.Should().BeEmpty();
-        result.Statistics.SchemaCount.Should().Be(0);
+        result.Statistics.SchemaCount.Should().Be(2);
     }
 
     [TestMethod]
@@ -105,11 +105,11 @@ public class OpenApiValidatorExternalReferenceTests
         var result = await OpenApiValidator.Validate(root);
 
         result.Diagnostics.Errors.Should().BeEmpty();
-        result.Statistics.SchemaCount.Should().Be(2);
+        result.Statistics.SchemaCount.Should().Be(4);
     }
 
     [TestMethod]
-    public async Task Validate_Does_Not_Resolve_External_Header_Parameter()
+    public async Task Validate_Flags_Unsafe_Header_Parameter_From_External_File()
     {
         var folder = TestDirectory.CreateFolder();
         await Write(
@@ -125,12 +125,11 @@ public class OpenApiValidatorExternalReferenceTests
 
         var result = await OpenApiValidator.Validate(root);
 
-        // Baseline of the OasReader based validation: external parameters stay unresolved, so they are not checked
-        result.Diagnostics.Errors.Should().BeEmpty();
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Header parameter name"));
     }
 
     [TestMethod]
-    public async Task Validate_Does_Not_Resolve_External_ApiKey_Scheme()
+    public async Task Validate_Flags_Unsafe_ApiKey_Header_Scheme_From_External_File()
     {
         var folder = TestDirectory.CreateFolder();
         await Write(
@@ -147,7 +146,51 @@ public class OpenApiValidatorExternalReferenceTests
 
         var result = await OpenApiValidator.Validate(root);
 
-        // Baseline of the OasReader based validation: external security schemes stay unresolved, so they are not checked
-        result.Diagnostics.Errors.Should().BeEmpty();
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Security scheme 'Alias'"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Resolves_External_References_From_The_Set_Only()
+    {
+        // Neither file exists on disk: only the document set can have served the unsafe header
+        var folder = Path.Combine(TestDirectory.Root, "validator-set-only");
+        var paramsPath = Path.Combine(folder, "params.json");
+        var set = new DocumentSet(
+            Path.Combine(folder, "root.json"),
+            "{" + Header + ",\"paths\":{\"/pets\":{\"get\":{\"parameters\":[{\"$ref\":\"" + paramsPath.Replace(Path.DirectorySeparatorChar, '/') +
+            "#/components/parameters/Bad\"}],\"responses\":{\"200\":{\"description\":\"ok\"}}}}}}",
+            new Dictionary<string, string>
+            {
+                [paramsPath] = "{" + Header + ",\"components\":{\"parameters\":{\"Bad\":{\"name\":\"X-Bad\\\"Header\"," +
+                               "\"in\":\"header\",\"schema\":{\"type\":\"string\"}}}}}",
+            },
+            new Dictionary<string, string>());
+
+        var result = await OpenApiValidator.ValidateAsync(set);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Header parameter name"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Terminates_On_Cyclic_External_References()
+    {
+        var folder = Path.Combine(TestDirectory.Root, "validator-cycle");
+        var aPath = Path.Combine(folder, "a.json");
+        var bPath = Path.Combine(folder, "b.json");
+        string Cycle(string name, string other, string otherName) =>
+            Components(
+                "\"" + name + "\":{\"type\":\"object\",\"properties\":{\"next\":{\"$ref\":\"" +
+                other.Replace(Path.DirectorySeparatorChar, '/') + "#/components/schemas/" + otherName + "\"}}}",
+                withVersion: true);
+        var set = new DocumentSet(
+            Path.Combine(folder, "root.json"),
+            Root(aPath.Replace(Path.DirectorySeparatorChar, '/') + "#/components/schemas/A"),
+            new Dictionary<string, string> { [aPath] = Cycle("A", bPath, "B"), [bPath] = Cycle("B", aPath, "A") },
+            new Dictionary<string, string>());
+
+        var validation = OpenApiValidator.ValidateAsync(set);
+
+        (await Task.WhenAny(validation, Task.Delay(TimeSpan.FromSeconds(30)))).Should().BeSameAs(validation);
+        (await validation).Statistics.SchemaCount.Should().BeGreaterThan(0);
     }
 }
