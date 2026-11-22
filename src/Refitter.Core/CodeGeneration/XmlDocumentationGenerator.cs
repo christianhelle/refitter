@@ -305,7 +305,7 @@ public class XmlDocumentationGenerator
             description
                 .AppendLine("<item>")
                 .Append("<term>")
-                .Append(response.StatusCode)
+                .Append(EscapeSymbols(response.StatusCode))
                 .AppendLine("</term>");
 
             if (!string.IsNullOrWhiteSpace(response.ExceptionDescription))
