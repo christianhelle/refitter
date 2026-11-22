@@ -381,9 +381,8 @@ internal static class OpenApiDocumentReader
                 return;
             }
 
+            // References are trimmed and those starting with '#' are skipped, so the file part is never empty
             var fileRef = reference.Split('#')[0];
-            if (string.IsNullOrWhiteSpace(fileRef))
-                return;
 
             // NJsonSchema joins the raw text of a "file:" URI to the document directory instead of converting it,
             // so it would open a different file from the one validated here. Reject them outright
