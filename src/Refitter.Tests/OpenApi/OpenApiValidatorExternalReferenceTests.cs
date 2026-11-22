@@ -308,6 +308,24 @@ public class OpenApiValidatorExternalReferenceTests
     }
 
     [TestMethod]
+    [DataRow("ftp://127.0.0.1/pet.json#/components/schemas/Pet")]
+    [DataRow("./pet.json")]
+    public async Task Validate_Skips_A_Reference_That_Reaches_No_Document(string reference)
+    {
+        // pet.json is not JSON, so a reference to it as a whole schema reaches nothing
+        var folder = Path.Combine(TestDirectory.Root, "validator-no-document");
+        var set = new DocumentSet(
+            Path.Combine(folder, "root.json"),
+            Root(reference),
+            new Dictionary<string, string> { [Path.Combine(folder, "pet.json")] = "{not json" },
+            new Dictionary<string, string>());
+
+        var result = await OpenApiValidator.ValidateAsync(set);
+
+        result.Diagnostics.Errors.Should().BeEmpty();
+    }
+
+    [TestMethod]
     [DataRow("missing.json", null)]
     [DataRow("broken.json", "{not json")]
     [DataRow("array.json", "[]")]

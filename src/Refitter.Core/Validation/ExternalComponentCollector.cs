@@ -146,19 +146,17 @@ internal sealed class ExternalComponentCollector
     // as written, and a local file by its full path, as the reader keyed them
     private static string? Resolve(string host, string? externalResource)
     {
-        if (string.IsNullOrWhiteSpace(externalResource))
-            return null;
-
         try
         {
+            // An external reference always names a resource
             var isAbsolute = Uri.TryCreate(externalResource, UriKind.Absolute, out var absolute);
             if (isAbsolute && absolute!.Scheme is "http" or "https")
                 return externalResource;
 
             if (PathUtilities.IsHttp(host))
-                return new Uri(new Uri(host), externalResource).ToString();
+                return new Uri(new Uri(host), externalResource!).ToString();
 
-            var uri = isAbsolute && absolute!.IsFile ? absolute : new Uri(new Uri(host), externalResource);
+            var uri = isAbsolute ? absolute! : new Uri(new Uri(host), externalResource!);
             return uri.IsFile ? Path.GetFullPath(uri.LocalPath) : null;
         }
         catch (Exception ex) when (ex is UriFormatException or ArgumentException or NotSupportedException or PathTooLongException)
