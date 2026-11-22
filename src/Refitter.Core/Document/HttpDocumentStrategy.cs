@@ -3,7 +3,7 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
-internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
+internal sealed class HttpDocumentStrategy : IFailureReportingStrategy
 {
     private readonly HttpClient httpClient;
     private readonly ReferencePolicy policy;
@@ -29,28 +29,35 @@ internal sealed class HttpDocumentStrategy : IDocumentLoadingStrategy
         this.policy = policy;
     }
 
-    public async Task<OpenApiDocument?> TryLoadAsync(
+    public async Task<OpenApiDocument?> LoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
         if (!PathUtilities.IsHttp(path))
             return null;
 
+        cancellationToken.ThrowIfCancellationRequested();
+
+        using var response = await httpClient
+            .GetAsync(path, cancellationToken)
+            .ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content
+            .ReadAsStringWithCancellationAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return await OpenApiDocumentParser
+            .ParseAsync(content, null, PathUtilities.IsYaml(path), policy, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task<OpenApiDocument?> TryLoadAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            using var response = await httpClient
-                .GetAsync(path, cancellationToken)
-                .ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content
-                .ReadAsStringWithCancellationAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            return await OpenApiDocumentParser
-                .ParseAsync(content, null, PathUtilities.IsYaml(path), policy, cancellationToken)
-                .ConfigureAwait(false);
+            return await LoadAsync(path, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

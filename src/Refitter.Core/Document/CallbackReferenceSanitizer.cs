@@ -31,7 +31,7 @@ internal static class CallbackReferenceSanitizer
         // Only entries of a callbacks map, not a schema property that happens to be called "callbacks"
         if (property.Parent!.Parent is not JProperty { Name: "callbacks" } ||
             !NamedMapEntries.IsEntry(property) ||
-            LiteralValues.IsInside(property) ||
+            NamedMapEntries.IsInsideLiteralValue(property) ||
             property.Value is not JObject callback ||
             callback["$ref"] is not JValue { Type: JTokenType.String } reference ||
             !((string)reference!).StartsWith(ComponentsPrefix, StringComparison.Ordinal))
