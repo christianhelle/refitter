@@ -28,17 +28,13 @@ public static class OpenApiValidator
             string content;
             try
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                using var httpResponse = await client.SendAsync(
-                    new HttpRequestMessage(HttpMethod.Get, openApiFile),
-                    cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content
-                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                content = await RemoteDocumentDownloader
+                    .DownloadAsync(openApiFile, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}'.", ex);
+                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}': {ex.Message}", ex);
             }
 
             await ReferenceGuard.ValidateAsync(openApiFile, content, allowRemoteReferences, cancellationToken)

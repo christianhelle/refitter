@@ -72,12 +72,8 @@ internal static class ReferenceGuard
         {
             try
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-                using var httpResponse = await client.SendAsync(
-                    new HttpRequestMessage(HttpMethod.Get, url),
-                    cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content
-                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                content = await RemoteDocumentDownloader
+                    .DownloadAsync(url, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)

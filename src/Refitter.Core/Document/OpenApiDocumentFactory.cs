@@ -1,4 +1,3 @@
-using System.Net;
 
 using OpenApiDocument = NSwag.OpenApiDocument;
 
@@ -10,7 +9,7 @@ namespace Refitter.Core;
 /// </summary>
 public static class OpenApiDocumentFactory
 {
-    private static readonly IDocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());
+    private static readonly DocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());
 
     /// <summary>
     /// Creates a merged <see cref="NSwag.OpenApiDocument"/> from multiple paths or URLs.
@@ -86,18 +85,13 @@ public static class OpenApiDocumentFactory
             string content;
             try
             {
-                using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
-                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-                using var httpResponse = await client.SendAsync(
-                    new HttpRequestMessage(HttpMethod.Get, openApiPath),
-                    cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content
-                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                content = await RemoteDocumentDownloader
+                    .DownloadAsync(openApiPath, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}'.", ex);
+                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}': {ex.Message}", ex);
             }
 
             await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
@@ -113,7 +107,8 @@ public static class OpenApiDocumentFactory
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-        IDocumentLoader documentLoader = Refitter.Core.DocumentLoader.Create(CreatePolicy(openApiPath, allowRemoteReferences));
-        return await documentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+        return await DocumentLoader
+            .LoadAsync(openApiPath, CreatePolicy(openApiPath, allowRemoteReferences), cancellationToken)
+            .ConfigureAwait(false);
     }
 }

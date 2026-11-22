@@ -4,40 +4,19 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
-internal sealed class OpenApiReaderDocumentStrategy : IFailureReportingStrategy
+/// <summary>
+/// Reads a multi-file document with OasReader, which merges external references that NSwag cannot follow by
+/// itself, and hands the merged document back to NSwag.
+/// </summary>
+internal static class MultiFileDocumentReader
 {
-    private readonly ReferencePolicy policy;
-
-    public OpenApiReaderDocumentStrategy()
-        : this(ReferencePolicy.Unrestricted)
-    {
-    }
-
-    public OpenApiReaderDocumentStrategy(ReferencePolicy policy)
-    {
-        this.policy = policy;
-    }
-
-    public async Task<OpenApiDocument?> TryLoadAsync(
+    /// <summary>
+    /// Returns <c>null</c> when the document has no external references or the reader cannot read it. A policy
+    /// rejection is fatal and is thrown.
+    /// </summary>
+    public static async Task<OpenApiDocument?> TryReadAsync(
         string path,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            return await LoadAsync(path, cancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException
-                                       and not TaskCanceledException)
-        {
-            if (ReferenceResolutionException.FindIn(ex) is { } rejection)
-                throw rejection;
-
-            return null;
-        }
-    }
-
-    public async Task<OpenApiDocument?> LoadAsync(
-        string path,
+        ReferencePolicy policy,
         CancellationToken cancellationToken = default)
     {
         try
@@ -54,30 +33,23 @@ internal sealed class OpenApiReaderDocumentStrategy : IFailureReportingStrategy
             var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
             PopulateMissingRequiredFields(path, readResult);
 
-            return await SerializeRoundTripAsync(readResult, path, specificationVersion, cancellationToken)
+            return await SerializeRoundTripAsync(readResult, path, specificationVersion, policy, cancellationToken)
                 .ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException
-                                       and not TaskCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             if (ReferenceResolutionException.FindIn(ex) is { } rejection)
                 throw rejection;
 
-            // With no fallback, the reader's own failure is the one to report
-            var fallback = await FallbackToNSwagAsync(path, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (fallback is null)
-                throw;
-
-            return fallback;
+            return null;
         }
     }
 
-    private async Task<OpenApiDocument> SerializeRoundTripAsync(
+    private static async Task<OpenApiDocument> SerializeRoundTripAsync(
         Result readResult,
         string path,
         OpenApiSpecVersion specificationVersion,
+        ReferencePolicy policy,
         CancellationToken cancellationToken)
     {
         var document = readResult.OpenApiDocument;
@@ -103,19 +75,6 @@ internal sealed class OpenApiReaderDocumentStrategy : IFailureReportingStrategy
 
         return await OpenApiDocumentParser
             .ParseAsync(json, path, isYaml: false, policy, cancellationToken)
-            .ConfigureAwait(false);
-    }
-
-    // When the reader fails, NSwag reads the document itself. Its error is the one worth reporting, because the
-    // reader's covers only a document with external references.
-    private async Task<OpenApiDocument?> FallbackToNSwagAsync(
-        string path,
-        CancellationToken cancellationToken)
-    {
-        if (PathUtilities.IsHttp(path))
-            return null;
-
-        return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken)
             .ConfigureAwait(false);
     }
 

@@ -2,7 +2,7 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
-internal sealed class DocumentMerger : IDocumentMerger
+internal sealed class DocumentMerger
 {
     private readonly DocumentEquivalenceComparer comparer;
 

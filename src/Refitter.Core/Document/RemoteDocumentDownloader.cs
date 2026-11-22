@@ -101,7 +101,11 @@ internal static class RemoteDocumentDownloader
         var client = new HttpClient(
             new HttpClientHandler
             {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+
+                // The client is shared by every download in the process, so a cookie set by one server
+                // must not reach a later, unrelated download
+                UseCookies = false
             })
         {
             Timeout = DefaultTimeout
