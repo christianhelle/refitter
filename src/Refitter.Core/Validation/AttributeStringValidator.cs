@@ -55,19 +55,20 @@ internal static class AttributeStringValidator
         if (components == null)
             return;
 
+        // The collector fills every kind of component, so none of them is null
         ValidateSecuritySchemes(components.SecuritySchemes, diagnostic);
-        ValidateHeaderParameters(components.Parameters?.Values, diagnostic);
+        ValidateHeaderParameters(components.Parameters!.Values, diagnostic);
 
         if (validateContentTypes)
         {
-            foreach (var requestBody in components.RequestBodies?.Values ?? Enumerable.Empty<IOpenApiRequestBody>())
-                ValidateContentTypeKeys(requestBody?.Content, diagnostic);
+            foreach (var requestBody in components.RequestBodies!.Values)
+                ValidateContentTypeKeys(requestBody.Content, diagnostic);
 
-            foreach (var response in components.Responses?.Values ?? Enumerable.Empty<IOpenApiResponse>())
-                ValidateContentTypeKeys(response?.Content, diagnostic);
+            foreach (var response in components.Responses!.Values)
+                ValidateContentTypeKeys(response.Content, diagnostic);
         }
 
-        foreach (var pathItem in components.PathItems?.Values ?? Enumerable.Empty<IOpenApiPathItem>())
+        foreach (var pathItem in components.PathItems!.Values)
             ValidateOperations(pathItem, diagnostic, validateContentTypes);
     }
 
