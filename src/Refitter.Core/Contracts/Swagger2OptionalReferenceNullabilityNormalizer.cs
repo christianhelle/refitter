@@ -19,11 +19,17 @@ internal sealed class Swagger2OptionalReferenceNullabilityNormalizer : IContract
 
         var tree = CSharpSyntaxTree.ParseText(contracts);
         var root = tree.GetCompilationUnitRoot();
-        var rewrittenRoot = new Swagger2OptionalReferencePropertyNullabilityRewriter().Visit(root);
+        // An enum is a value type, so its nullable type is not a nullable reference type
+        var enumNames = root.DescendantNodes()
+            .OfType<EnumDeclarationSyntax>()
+            .Select(declaration => declaration.Identifier.ValueText);
+        var enumNameSet = new HashSet<string>(enumNames, StringComparer.Ordinal);
+        var rewrittenRoot = new Swagger2OptionalReferencePropertyNullabilityRewriter(enumNameSet).Visit(root);
         return rewrittenRoot!.ToFullString();
     }
 
-    private sealed class Swagger2OptionalReferencePropertyNullabilityRewriter : CSharpSyntaxRewriter
+    private sealed class Swagger2OptionalReferencePropertyNullabilityRewriter(HashSet<string> enumNames)
+        : CSharpSyntaxRewriter
     {
         public override SyntaxNode? VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
@@ -36,7 +42,8 @@ internal sealed class Swagger2OptionalReferenceNullabilityNormalizer : IContract
             return base.VisitPropertyDeclaration(node);
         }
 
-        private static bool IsReferenceType(TypeSyntax typeSyntax) =>
+        private bool IsReferenceType(TypeSyntax typeSyntax) =>
+            !IsEnum(typeSyntax) &&
             typeSyntax switch
             {
                 PredefinedTypeSyntax predefinedType =>
@@ -46,6 +53,14 @@ internal sealed class Swagger2OptionalReferenceNullabilityNormalizer : IContract
                 GenericNameSyntax => true,
                 QualifiedNameSyntax => true,
                 AliasQualifiedNameSyntax => true,
+                _ => false,
+            };
+
+        private bool IsEnum(TypeSyntax typeSyntax) =>
+            typeSyntax switch
+            {
+                IdentifierNameSyntax name => enumNames.Contains(name.Identifier.ValueText),
+                QualifiedNameSyntax qualified => enumNames.Contains(qualified.Right.Identifier.ValueText),
                 _ => false,
             };
     }
