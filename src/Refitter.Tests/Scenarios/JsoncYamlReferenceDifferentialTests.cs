@@ -46,10 +46,10 @@ public class JsoncYamlReferenceDifferentialTests
     private static string CreateSchema(string propertyName) =>
         "{\"type\":\"object\",\"properties\":{\"" + propertyName + "\":{\"type\":\"string\"}}}";
 
-    private static string CreateLayout(string documentName, string documentContent)
+    private static string CreateLayout(string documentName, string documentContent, string folder = "docs")
     {
         var parent = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
-        var root = Path.Combine(parent, "docs");
+        var root = Path.Combine(parent, folder);
         Directory.CreateDirectory(root);
         File.WriteAllText(
             Path.Combine(parent, "outside.json"),
@@ -64,9 +64,11 @@ public class JsoncYamlReferenceDifferentialTests
     }
 
     [TestMethod]
-    public async Task Guard_Blocks_Out_Of_Tree_Reference_Hidden_In_Yaml_Comment()
+    [DataRow("docs")]
+    [DataRow("has#hash")]
+    public async Task Guard_Blocks_Out_Of_Tree_Reference_Hidden_In_Yaml_Comment(string folder)
     {
-        var path = CreateLayout("openapi.yaml", CreateDocument("../outside.json"));
+        var path = CreateLayout("openapi.yaml", CreateDocument("../outside.json"), folder);
 
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
 
@@ -85,11 +87,14 @@ public class JsoncYamlReferenceDifferentialTests
     }
 
     [TestMethod]
-    public async Task Guard_Blocks_Hidden_Reference_In_Yaml_File_Referenced_From_Json_Root()
+    [DataRow("docs")]
+    [DataRow("has#hash")]
+    public async Task Guard_Blocks_Hidden_Reference_In_Yaml_File_Referenced_From_Json_Root(string folder)
     {
         var path = CreateLayout(
             "openapi.json",
-            CreateDocument("./child.yaml").Replace("/*: null,", "").Replace("# */", ""));
+            CreateDocument("./child.yaml").Replace("/*: null,", "").Replace("# */", ""),
+            folder);
         File.WriteAllText(
             Path.Combine(Path.GetDirectoryName(path)!, "child.yaml"),
             """

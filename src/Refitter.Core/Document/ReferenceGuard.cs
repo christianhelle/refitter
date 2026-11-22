@@ -156,7 +156,7 @@ internal static class ReferenceGuard
         string currentDirectory = Path.GetDirectoryName(filePath);
 
         // A YAML root document is loaded by a resolver that reads every referenced file as YAML
-        var readAsYaml = PathUtilities.IsYaml(rootDocumentPath);
+        var readAsYaml = MayBeReadAsYaml(rootDocumentPath);
         foreach (var reference in ExtractReferences(content, filePath, readAsYaml: readAsYaml))
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
@@ -243,7 +243,7 @@ internal static class ReferenceGuard
         // comment such as "/*: null, "$ref": "x" # */" is a mapping entry. When a YAML loader can read the
         // document, either because the root is YAML or because the file has a YAML extension, check the
         // references of both readings
-        if (jsonReferences != null && !readAsYaml && !PathUtilities.IsYaml(source))
+        if (jsonReferences != null && !readAsYaml && !MayBeReadAsYaml(source))
             return jsonReferences;
 
         // The YAML reader recurses per nesting level, and a stack overflow is uncatchable. The JSON reader
@@ -267,6 +267,14 @@ internal static class ReferenceGuard
                 $"OpenAPI document \"{source}\" could not be parsed for '$ref' validation: {ex.Message}", ex);
         }
     }
+
+    // A local path may contain "?" or "#", which PathUtilities.IsYaml reads as the start of a URL query or
+    // fragment, while a reader that picks its parser by the file name sees the literal extension. Either
+    // reading can lead a loader to YAML, so a match on either counts
+    private static bool MayBeReadAsYaml(string path) =>
+        PathUtilities.IsYaml(path) ||
+        path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+        path.EndsWith(".yml", StringComparison.OrdinalIgnoreCase);
 
     // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
     // reference resolvers decode them, and duplicate "$ref" keys are all inspected. The key is matched
