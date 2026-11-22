@@ -380,19 +380,86 @@ public class OpenApiValidatorExternalReferenceTests
     [TestMethod]
     public async Task Validate_Resolves_A_Relative_Reference_In_A_Remote_File_Against_Its_Url()
     {
-        // Every path serves this document, so P reaches Q only when "./other.json" resolves against the server
-        using var server = new LoopbackHttpServer(
-            "{" + Header + ",\"components\":{\"parameters\":{" +
-            "\"P\":{\"$ref\":\"./other.json#/components/parameters/Q\"}," +
-            "\"Q\":{\"name\":\"X-Bad\\\"Header\",\"in\":\"header\",\"schema\":{\"type\":\"string\"}}}}}");
+        // Q is served only next to params.json, so it is reached only when "./other.json" resolves against it
+        using var server = new LoopbackHttpServer(new Dictionary<string, string>
+        {
+            ["/nested/params.json"] =
+                "{" + Header + ",\"components\":{\"parameters\":{\"P\":{\"$ref\":\"./other.json#/components/parameters/Q\"}}}}",
+            ["/nested/other.json"] = HeaderParameter("X-Bad\\\"Header", withVersion: true).Replace("\"P\"", "\"Q\""),
+        });
         var root = await Write(
             TestDirectory.CreateFolder(),
             "root.json",
-            ParameterRoot(server.BaseUrl + "params.json#/components/parameters/P"));
+            ParameterRoot(server.BaseUrl + "nested/params.json#/components/parameters/P"));
 
         var result = await OpenApiValidator.Validate(root, allowRemoteReferences: true);
 
         result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Header parameter name"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_Declared_On_An_External_Path_Item()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "paths.json", """
+            {"components":{"pathItems":{"Pets":{
+              "parameters":[{"name":"X-Bad\"Param","in":"header","schema":{"type":"string"}}],
+              "get":{"responses":{"200":{"description":"ok"}}}}}}}
+            """);
+        var root = await Write(folder, "root.json", """
+            {"openapi":"3.1.0","info":{"title":"t","version":"1"},"paths":{
+              "/pets":{"$ref":"./paths.json#/components/pathItems/Pets"}}}
+            """);
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("X-Bad"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_Declared_On_A_Path_Item()
+    {
+        var root = await Write(TestDirectory.CreateFolder(), "root.json", "{" + Header + ",\"paths\":{\"/pets\":{" +
+            "\"parameters\":[{\"name\":\"X-Bad\\\"Param\",\"in\":\"header\",\"schema\":{\"type\":\"string\"}}]," +
+            "\"get\":{\"responses\":{\"200\":{\"description\":\"ok\"}}}}}}");
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("X-Bad"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_From_A_Parameter_File_Referenced_As_A_Whole()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "header.json", "{\"name\":\"X-Bad\\\"Header\",\"in\":\"header\",\"schema\":{\"type\":\"string\"}}");
+        var root = await Write(folder, "root.json", ParameterRoot("./header.json"));
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("X-Bad"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_In_A_Deeply_Nested_Referenced_File_Of_The_Set()
+    {
+        // Deeper than the 64 levels System.Text.Json reads by default, within the 256 the nesting guard accepts
+        var deep = string.Concat(Enumerable.Repeat("{\"a\":", 70)) + "1" + new string('}', 70);
+        var folder = Path.Combine(TestDirectory.Root, "validator-deep");
+        var paramsPath = Path.Combine(folder, "params.json");
+        var set = new DocumentSet(
+            Path.Combine(folder, "root.json"),
+            ParameterRoot(paramsPath.Replace(Path.DirectorySeparatorChar, '/') + "#/components/parameters/P"),
+            new Dictionary<string, string>
+            {
+                [paramsPath] = "{\"x-deep\":" + deep + ",\"components\":{\"parameters\":{\"P\":{\"name\":\"X-Bad\\\"Header\"," +
+                               "\"in\":\"header\",\"schema\":{\"type\":\"string\"}}}}}",
+            },
+            new Dictionary<string, string>());
+
+        var result = await OpenApiValidator.ValidateAsync(set);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("X-Bad"));
     }
 
     [TestMethod]
