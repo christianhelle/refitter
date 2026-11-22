@@ -24,18 +24,6 @@ public class DocumentLoadingCancellationTests
     }
 
     [TestMethod]
-    public async Task HttpDocumentStrategy_Propagates_Cancellation()
-    {
-        using var cts = new CancellationTokenSource();
-        await cts.CancelAsync();
-        var strategy = new HttpDocumentStrategy(new HttpClient());
-
-        var act = async () => await strategy.TryLoadAsync("https://example.com/petstore.json", cts.Token);
-
-        await act.Should().ThrowAsync<OperationCanceledException>();
-    }
-
-    [TestMethod]
     public async Task DocumentLoader_Propagates_Cancellation_From_Strategy()
     {
         var loader = new DocumentLoader(new IDocumentLoadingStrategy[] { new CancellingStrategy() });

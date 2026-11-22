@@ -79,7 +79,6 @@ internal sealed class DocumentLoader : IDocumentLoader
         return new List<IDocumentLoadingStrategy>
         {
             new FileDocumentStrategy(policy),
-            new HttpDocumentStrategy(policy),
             new OpenApiReaderDocumentStrategy(policy)
         };
     }
