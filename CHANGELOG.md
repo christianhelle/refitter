@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Bug Fixes
+- Drop integer defaults that do not fit the property type ([#1438](https://github.com/christianhelle/refitter/pull/1438)) ([@christianhelle](https://github.com/christianhelle/))
 - Load documents whose callbacks reference components/callbacks ([#1439](https://github.com/christianhelle/refitter/pull/1439)) ([@christianhelle](https://github.com/christianhelle/))
 - Keep enum properties nullable so native record constructors compile ([#1441](https://github.com/christianhelle/refitter/pull/1441)) ([@christianhelle](https://github.com/christianhelle/))
 - Drop enum defaults that are not an enum member ([#1434](https://github.com/christianhelle/refitter/pull/1434)) ([@christianhelle](https://github.com/christianhelle/))
