@@ -56,4 +56,34 @@ public class CallbackReferenceSanitizerTests
 
         OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
     }
+
+    [TestMethod]
+    [DataRow("default")]
+    [DataRow("example")]
+    [DataRow("x-sample")]
+    public void Keeps_Callback_Reference_Inside_Literal_Value(string keyword)
+    {
+        var json = "{ \"components\": { \"schemas\": { \"A\": { \"" + keyword +
+            "\": { \"callbacks\": { \"onEvent\": { \"$ref\": \"#/components/callbacks/OnEvent\" } } } } } } }";
+
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
+    }
+
+    [TestMethod]
+    public void Replaces_Callback_Reference_Next_To_Literal_Value()
+    {
+        var json = """
+            {
+              "paths": { "/a": { "post": {
+                "x-note": { "callbacks": { "kept": { "$ref": "#/components/callbacks/OnEvent" } } },
+                "callbacks": { "onEvent": { "$ref": "#/components/callbacks/OnEvent" } } } } }
+            }
+            """;
+
+        var result = JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json));
+
+        var post = result["paths"]!["/a"]!["post"]!;
+        ((JObject)post["callbacks"]!["onEvent"]!).Count.Should().Be(0);
+        post["x-note"]!["callbacks"]!["kept"]!["$ref"].Should().NotBeNull();
+    }
 }
