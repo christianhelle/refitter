@@ -2,6 +2,15 @@
 
 ## [Unreleased Changes]
 
+### Features
+- Collapse the document loader and cap remote root downloads ([#1444](https://github.com/christianhelle/refitter/pull/1444)) ([@christianhelle](https://github.com/christianhelle/))
+
+### Bug Fixes
+- GHSA-ch7x-rc9g-rhjc: Check the YAML reading of JSON-with-comments documents in the reference guard ([#1443](https://github.com/christianhelle/refitter/pull/1443)) ([@christianhelle](https://github.com/christianhelle/))
+
+
+## [2.4.2](https://github.com/christianhelle/refitter/releases/tag/2.4.2) (2026-11-22)
+
 ### Bug Fixes
 - GHSA-r2hq-86ch-hf3x: Escape response status keys in generated XML documentation ([#1442](https://github.com/christianhelle/refitter/pull/1442)) ([@christianhelle](https://github.com/christianhelle/))
 - Load OpenAPI 3.1 array schemas with boolean items ([#1440](https://github.com/christianhelle/refitter/pull/1440)) ([@christianhelle](https://github.com/christianhelle/))
@@ -13,6 +22,17 @@
 - Strip XML-invalid control characters from descriptions ([#1433](https://github.com/christianhelle/refitter/pull/1433)) ([@christianhelle](https://github.com/christianhelle/))
 - Rename record constructors when applying ContractTypeSuffix ([#1437](https://github.com/christianhelle/refitter/pull/1437)) ([@christianhelle](https://github.com/christianhelle/))
 - Emit Content-Type header for referenced request bodies ([#1435](https://github.com/christianhelle/refitter/pull/1435)) ([@christianhelle](https://github.com/christianhelle/))
+
+### Closed Issues
+- OpenAPI 3.1 prefixItems together with items: false fails to load ([#1427](https://github.com/christianhelle/refitter/issues/1427)) ([@christianhelle](https://github.com/christianhelle/))
+- Integer default larger than Int64 generates code that does not compile (CS1021) ([#1429](https://github.com/christianhelle/refitter/issues/1429)) ([@christianhelle](https://github.com/christianhelle/))
+- OpenAPI 3 operation callback defined as $ref to components/callbacks fails to load ([#1426](https://github.com/christianhelle/refitter/issues/1426)) ([@christianhelle](https://github.com/christianhelle/))
+- Native records with an enum property that has a default fail to compile (CS0266) ([#1432](https://github.com/christianhelle/refitter/issues/1432)) ([@christianhelle](https://github.com/christianhelle/))
+- KeyNotFoundException rendering Liquid CSharp/Class when enum default is not in enum with x-enumNames ([#1425](https://github.com/christianhelle/refitter/issues/1425)) ([@christianhelle](https://github.com/christianhelle/))
+- Invalid Swagger 2.0 collectionFormat value fails document load with no detail ([#1424](https://github.com/christianhelle/refitter/issues/1424)) ([@christianhelle](https://github.com/christianhelle/))
+- Control characters (VT, FF, NUL) in description crash XML documentation rendering ([#1428](https://github.com/christianhelle/refitter/issues/1428)) ([@christianhelle](https://github.com/christianhelle/))
+- ImmutableRecords combined with ContractTypeSuffix gives the record constructor the unsuffixed name (CS1520) ([#1431](https://github.com/christianhelle/refitter/issues/1431)) ([@christianhelle](https://github.com/christianhelle/))
+- No Content-Type header emitted when request body is a $ref to components/requestBodies ([#1430](https://github.com/christianhelle/refitter/issues/1430)) ([@christianhelle](https://github.com/christianhelle/))
 
 
 ## [2.4.1](https://github.com/christianhelle/refitter/releases/tag/2.4.1) (2026-11-21)
