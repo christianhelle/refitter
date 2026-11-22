@@ -1,4 +1,3 @@
-using System.Net;
 
 using OpenApiDocument = NSwag.OpenApiDocument;
 
@@ -86,13 +85,8 @@ public static class OpenApiDocumentFactory
             string content;
             try
             {
-                using var handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
-                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
-                using var httpResponse = await client.SendAsync(
-                    new HttpRequestMessage(HttpMethod.Get, openApiPath),
-                    cancellationToken).ConfigureAwait(false);
-                content = await httpResponse.Content
-                    .ReadAsStringWithCancellationAsync(cancellationToken)
+                content = await RemoteDocumentDownloader
+                    .DownloadAsync(openApiPath, cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
