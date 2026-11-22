@@ -68,15 +68,15 @@ public class RefitGenerator(
         {
             paths = settings.OpenApiPaths;
         }
-        else if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
+        else if (settings.OpenApiPath is { } openApiPath && !string.IsNullOrWhiteSpace(openApiPath))
+        {
+            paths = new[] { openApiPath };
+        }
+        else
         {
             throw new ArgumentException(
                 "Either OpenApiPath or OpenApiPaths must be provided with at least one valid OpenAPI specification path.",
                 nameof(settings));
-        }
-        else
-        {
-            paths = new[] { settings.OpenApiPath! };
         }
 
         var sets = new List<DocumentSet>(paths.Length);
