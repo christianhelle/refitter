@@ -64,17 +64,6 @@ internal static class OpenApiDocumentReader
     }
 
     /// <summary>
-    /// Replaces the OpenAPI document of <paramref name="set"/> with <paramref name="content"/>, such as a document
-    /// the multi-file reader merged, keeping the referenced files that were read with it.
-    /// </summary>
-    public static DocumentSet WithRootContent(DocumentSet set, string content)
-    {
-        var source = set.RootDocumentPath ?? "the OpenAPI document";
-        var (json, _) = ReadContent(content, source, readAsYaml: false);
-        return set.WithRootJson(OpenApiJsonNormalizer.NormalizeDocument(json));
-    }
-
-    /// <summary>
     /// Converts YAML to JSON the way the reader does, applying the nesting and alias expansion limits.
     /// </summary>
     internal static string ConvertYamlToJson(

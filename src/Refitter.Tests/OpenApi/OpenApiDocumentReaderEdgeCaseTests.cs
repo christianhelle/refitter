@@ -120,16 +120,4 @@ public class OpenApiDocumentReaderEdgeCaseTests
 
         await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*exa mple.com*");
     }
-
-    [TestMethod]
-    public async Task Replaces_The_Root_Of_A_Remote_Document_Set()
-    {
-        using var server = new LoopbackHttpServer(Spec("\"Pet\":" + NameSchema));
-        var set = await OpenApiDocumentReader.ReadAsync(server.BaseUrl + "openapi.json", allowRemoteReferences: false);
-
-        var replaced = OpenApiDocumentReader.WithRootContent(set, Spec("\"Owner\":" + NameSchema));
-
-        replaced.RootDocumentPath.Should().BeNull();
-        replaced.RootJson.Should().Contain("Owner");
-    }
 }
