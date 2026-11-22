@@ -166,7 +166,8 @@ internal static class OpenApiDocumentReader
             readAsYaml = MayBeReadAsYaml(url);
 
             // A reference back to the root document reuses the content that was read, never a second download
-            remoteRootUrl = url;
+            // The schema resolver asks for a document by its URL without the fragment
+            remoteRootUrl = url.Split('#')[0];
             remoteRootContent = content;
 
             var (json, references) = ReadContent(content, url, readAsYaml: false);

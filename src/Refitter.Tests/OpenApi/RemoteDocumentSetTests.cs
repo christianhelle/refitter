@@ -61,12 +61,14 @@ public class RemoteDocumentSetTests
     }
 
     [TestMethod]
-    public async Task Reuses_The_Remote_Root_For_A_Reference_Back_To_It()
+    [DataRow("openapi.json")]
+    [DataRow("openapi.json#selection")]
+    public async Task Reuses_The_Remote_Root_For_A_Reference_Back_To_It(string rootPath)
     {
         using var server = new LoopbackHttpServer(baseUrl =>
             Spec("\"Pet\":" + NameSchema + ",\"Alias\":{\"$ref\":\"" + baseUrl + "openapi.json#/components/schemas/Pet\"}"));
 
-        var document = await OpenApiDocumentFactory.CreateAsync(server.BaseUrl + "openapi.json", allowRemoteReferences: true);
+        var document = await OpenApiDocumentFactory.CreateAsync(server.BaseUrl + rootPath, allowRemoteReferences: true);
 
         document.Components.Schemas["Alias"].ActualSchema.Properties.Should().ContainKey("name");
         server.RequestCount.Should().Be(1);
