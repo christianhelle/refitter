@@ -5,8 +5,8 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.OpenApi;
 
 /// <summary>
-/// Covers the resolver-level enforcement of <see cref="ReferencePolicy"/> added for GHSA-5w8x-vqhx-3jrh, which
-/// backs up the reference guard if the guard and the resolver ever classify a reference differently.
+/// The parser reads remote references with the document only when they are allowed (GHSA-5w8x-vqhx-3jrh), and
+/// resolves them from what was read.
 /// </summary>
 [TestClass]
 public class ReferencePolicyTests
