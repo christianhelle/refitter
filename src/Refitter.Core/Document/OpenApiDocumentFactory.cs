@@ -9,7 +9,7 @@ namespace Refitter.Core;
 /// </summary>
 public static class OpenApiDocumentFactory
 {
-    private static readonly IDocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());
+    private static readonly DocumentMerger DocumentMerger = new DocumentMerger(new DocumentEquivalenceComparer());
 
     /// <summary>
     /// Creates a merged <see cref="NSwag.OpenApiDocument"/> from multiple paths or URLs.
