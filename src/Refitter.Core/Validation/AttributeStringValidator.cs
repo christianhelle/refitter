@@ -19,12 +19,16 @@ internal static class AttributeStringValidator
     private const char LineSeparator = (char)0x2028;
     private const char ParagraphSeparator = (char)0x2029;
 
-    internal static void Validate(OpenApiDocument? document, OpenApiDiagnostic diagnostic)
+    internal static void Validate(
+        OpenApiDocument? document,
+        OpenApiDiagnostic diagnostic,
+        IDictionary<string, IOpenApiSecurityScheme>? externalSecuritySchemes = null)
     {
         if (document == null)
             return;
 
-        ValidateSecuritySchemes(document, diagnostic);
+        ValidateSecuritySchemes(document.Components?.SecuritySchemes, diagnostic);
+        ValidateSecuritySchemes(externalSecuritySchemes, diagnostic);
 
         if (document.Paths == null)
             return;
@@ -53,13 +57,15 @@ internal static class AttributeStringValidator
         }
     }
 
-    private static void ValidateSecuritySchemes(OpenApiDocument document, OpenApiDiagnostic diagnostic)
+    private static void ValidateSecuritySchemes(
+        IDictionary<string, IOpenApiSecurityScheme>? securitySchemes,
+        OpenApiDiagnostic diagnostic)
     {
-        if (document.Components?.SecuritySchemes == null)
+        if (securitySchemes == null)
             return;
 
         // Validate security scheme names for API-key schemes with header location
-        foreach (var securityScheme in document.Components.SecuritySchemes)
+        foreach (var securityScheme in securitySchemes)
         {
             if (securityScheme.Value?.Type == SecuritySchemeType.ApiKey
                 && securityScheme.Value.In == ParameterLocation.Header
