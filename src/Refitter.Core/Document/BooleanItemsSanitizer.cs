@@ -13,9 +13,10 @@ namespace Refitter.Core;
 internal static class BooleanItemsSanitizer
 {
     // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
-    // so documents with one are always parsed.
+    // so documents with one are always parsed. The boolean is matched in any case because the YAML conversion
+    // writes the YAML 1.2 spellings True and FALSE as they appear.
     private static readonly Regex CandidateRegex = new(
-        @"""items""\s*:\s*""?(?:true|false)|\\u",
+        @"""items""\s*:\s*""?(?i:true|false)|\\u",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(5));
 
@@ -25,10 +26,11 @@ internal static class BooleanItemsSanitizer
 
     private static bool TryConvert(JProperty property)
     {
-        // A YAML document is converted to JSON without types, so its booleans are written as the strings "true" and
-        // "false", which is no more a schema than a boolean is
+        // A YAML document is converted to JSON without types, so its booleans are written as strings, in whichever
+        // YAML 1.2 spelling the document used ("true", "True", "TRUE"). None of them is a schema
         if (property.Name != "items" ||
-            property.Value is not JValue { Value: bool or "true" or "false" } ||
+            property.Value is not JValue value ||
+            !IsBoolean(value.Value) ||
             property.Parent is not JObject schema)
             return false;
 
@@ -41,10 +43,23 @@ internal static class BooleanItemsSanitizer
             return false;
 
         // Only an array schema has items. Anything else is literal data, like an example.
-        if (!schema.ContainsKey("prefixItems") && schema["type"] is not JValue { Value: "array" })
+        if (!schema.ContainsKey("prefixItems") && !IsArrayType(schema["type"]))
             return false;
 
         property.Remove();
         return true;
     }
+
+    private static bool IsBoolean(object? value) =>
+        value is bool ||
+        value is string text &&
+        (text.Equals("true", StringComparison.OrdinalIgnoreCase) || text.Equals("false", StringComparison.OrdinalIgnoreCase));
+
+    // OpenAPI 3.1 allows a list of types, so a nullable array is written as ["array", "null"]
+    private static bool IsArrayType(JToken? type) => type switch
+    {
+        JValue { Value: "array" } => true,
+        JArray types => types.Any(t => t is JValue { Value: "array" }),
+        _ => false,
+    };
 }
