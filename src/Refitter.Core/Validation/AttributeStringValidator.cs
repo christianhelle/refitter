@@ -77,6 +77,9 @@ internal static class AttributeStringValidator
         OpenApiDiagnostic diagnostic,
         bool validateContentTypes)
     {
+        // Parameters declared on the path item apply to each of its operations
+        ValidateHeaderParameters(pathItem?.Parameters, diagnostic);
+
         if (pathItem?.Operations == null)
             return;
 
