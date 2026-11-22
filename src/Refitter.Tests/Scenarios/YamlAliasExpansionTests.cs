@@ -45,7 +45,7 @@ public class YamlAliasExpansionTests
     [TestMethod]
     public void Rejects_Alias_Bomb_When_Converting_To_Json()
     {
-        var act = () => OpenApiDocumentParser.ConvertYamlToJson(Bomb(5), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
+        var act = () => OpenApiDocumentReader.ConvertYamlToJson(Bomb(5), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
 
         act.Should().Throw<ReferenceResolutionException>();
     }
@@ -86,7 +86,7 @@ components:
 ";
 
         var references = OpenApiDocumentReader.ExtractReferences(yaml, "spec.yaml", SmallBudget, SmallAmplification);
-        var json = OpenApiDocumentParser.ConvertYamlToJson(yaml, maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
+        var json = OpenApiDocumentReader.ConvertYamlToJson(yaml, maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
 
         references.Should().BeEmpty();
         json.Should().Contain("\"C\"");
@@ -203,7 +203,7 @@ components:
     [TestMethod]
     public void Rejects_A_Long_Scalar_Aliased_Many_Times_When_Converting_To_Json()
     {
-        var act = () => OpenApiDocumentParser.ConvertYamlToJson(
+        var act = () => OpenApiDocumentReader.ConvertYamlToJson(
             LongScalarAliasedManyTimes(500, 100), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification, maxExpandedSize: SmallSizeBudget);
 
         act.Should().Throw<ReferenceResolutionException>();
@@ -218,7 +218,7 @@ components:
 
         var references = () => OpenApiDocumentReader.ExtractReferences(
             yaml.ToString(), "strings.yaml", SmallBudget, SmallAmplification, SmallSizeBudget);
-        var json = () => OpenApiDocumentParser.ConvertYamlToJson(
+        var json = () => OpenApiDocumentReader.ConvertYamlToJson(
             yaml.ToString(), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification, maxExpandedSize: SmallSizeBudget);
 
         references.Should().NotThrow();

@@ -25,7 +25,7 @@ public class BooleanItemsSanitizerTests
     [DataRow("true")]
     public void Drops_Boolean_Written_As_String_By_The_YAML_Conversion(string value)
     {
-        var json = OpenApiDocumentParser.ConvertYamlToJson($"type: array\nprefixItems: [ {{ type: string }} ]\nitems: {value}\n");
+        var json = OpenApiDocumentReader.ConvertYamlToJson($"type: array\nprefixItems: [ {{ type: string }} ]\nitems: {value}\n");
 
         JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json)).ContainsKey("items").Should().BeFalse();
     }
@@ -38,7 +38,7 @@ public class BooleanItemsSanitizerTests
     public void Drops_Capitalized_YAML_Boolean(string value)
     {
         // YAML 1.2 resolves these spellings to booleans, but the YAML conversion writes them as strings
-        var json = OpenApiDocumentParser.ConvertYamlToJson($"type: array\nprefixItems: [ {{ type: string }} ]\nitems: {value}\n");
+        var json = OpenApiDocumentReader.ConvertYamlToJson($"type: array\nprefixItems: [ {{ type: string }} ]\nitems: {value}\n");
 
         JObject.Parse(OpenApiJsonNormalizer.NormalizeDocument(json)).ContainsKey("items").Should().BeFalse();
     }

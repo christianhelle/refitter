@@ -82,7 +82,7 @@ public class DeeplyNestedDocumentTests
     [TestMethod]
     public void Rejects_Deep_Yaml_When_Converting_To_Json()
     {
-        var act = () => OpenApiDocumentParser.ConvertYamlToJson(YamlSpec(TooDeep));
+        var act = () => OpenApiDocumentReader.ConvertYamlToJson(YamlSpec(TooDeep));
 
         act.Should().Throw<ReferenceResolutionException>();
     }

@@ -38,14 +38,6 @@ internal static class OpenApiDocumentParser
         return await ParseAsync(set, cancellationToken).ConfigureAwait(false);
     }
 
-    internal static string ConvertYamlToJson(
-        string yaml,
-        string? source = null,
-        long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
-        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification,
-        long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize) =>
-        OpenApiDocumentReader.ConvertYamlToJson(yaml, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
-
     /// <summary>
     /// Serves referenced files from the set. A file that is not in the set was never checked, so it is
     /// rejected rather than read.
