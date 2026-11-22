@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Bug Fixes
+- GHSA-r2hq-86ch-hf3x: Escape response status keys in generated XML documentation ([#1442](https://github.com/christianhelle/refitter/pull/1442)) ([@christianhelle](https://github.com/christianhelle/))
 - Load OpenAPI 3.1 array schemas with boolean items ([#1440](https://github.com/christianhelle/refitter/pull/1440)) ([@christianhelle](https://github.com/christianhelle/))
 - Drop integer defaults that do not fit the property type ([#1438](https://github.com/christianhelle/refitter/pull/1438)) ([@christianhelle](https://github.com/christianhelle/))
 - Load documents whose callbacks reference components/callbacks ([#1439](https://github.com/christianhelle/refitter/pull/1439)) ([@christianhelle](https://github.com/christianhelle/))
