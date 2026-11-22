@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Features
+- Read each OpenAPI file once into a document set ([#1445](https://github.com/christianhelle/refitter/pull/1445)) ([@christianhelle](https://github.com/christianhelle/))
 - Collapse the document loader and cap remote root downloads ([#1444](https://github.com/christianhelle/refitter/pull/1444)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Bug Fixes
