@@ -39,6 +39,26 @@ public class OversizedIntegerDefaultTests
                 fitsInt:
                   type: integer
                   default: 42
+                uintTooBigForInt:
+                  type: integer
+                  format: uint32
+                  default: 3000000000
+                byteTooBig:
+                  type: integer
+                  format: byte
+                  default: 300
+                byteFits:
+                  type: integer
+                  format: byte
+                  default: 200
+                widenedByMaximum:
+                  type: integer
+                  maximum: 4000000000
+                  default: 3000000000
+                ulongFits:
+                  type: integer
+                  format: uint64
+                  default: 10000000000000000000
         """;
 
     [TestMethod]
@@ -46,7 +66,7 @@ public class OversizedIntegerDefaultTests
     {
         string generatedCode = await GenerateCode();
         generatedCode.Should().NotContain("123456789012345678901234567890");
-        generatedCode.Should().NotContain("= 3000000000;", "the default does not fit an int");
+        generatedCode.Should().NotContain("TooBigForInt { get; set; } = 3000000000", "the default does not fit an int");
     }
 
     [TestMethod]
@@ -55,6 +75,16 @@ public class OversizedIntegerDefaultTests
         string generatedCode = await GenerateCode();
         generatedCode.Should().Contain("= 3000000000L;");
         generatedCode.Should().Contain("= 42;");
+    }
+
+    [TestMethod]
+    public async Task Integer_Default_Is_Checked_Against_The_Type_NJsonSchema_Generates()
+    {
+        string generatedCode = await GenerateCode();
+        generatedCode.Should().NotContain("(byte)300", "the default does not fit a byte");
+        generatedCode.Should().Contain("= (byte)200;");
+        generatedCode.Should().NotContain("UintTooBigForInt { get; set; } = 3000000000", "uint32 is generated as int");
+        generatedCode.Should().Contain("long WidenedByMaximum { get; set; } = 3000000000;", "the bounds make the property a long");
     }
 
     [TestMethod]

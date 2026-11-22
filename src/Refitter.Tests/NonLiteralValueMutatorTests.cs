@@ -82,6 +82,75 @@ public class NonLiteralValueMutatorTests
         Mutate(schema).Type.Should().Be(JsonObjectType.String);
     }
 
+    // NJsonSchema maps byte to byte, int64/long to long, uint64/ulong to ulong, int32 to int, and everything else
+    // (uint32, int16, ...) to int, so a default is kept only when it fits that type
+    [TestMethod]
+    [DataRow("byte", "255", true)]
+    [DataRow("byte", "300", false)]
+    [DataRow("byte", "-1", false)]
+    [DataRow("uint32", "3000000000", false)]
+    [DataRow("uint32", "2147483647", true)]
+    [DataRow("int16", "3000000000", false)]
+    [DataRow("int32", "3000000000", false)]
+    [DataRow("int64", "3000000000", true)]
+    [DataRow("long", "3000000000", true)]
+    [DataRow("int64", "9223372036854775808", false)]
+    [DataRow("uint64", "9223372036854775808", true)]
+    [DataRow("ulong", "18446744073709551615", true)]
+    [DataRow("uint64", "18446744073709551616", false)]
+    [DataRow("uint64", "-1", false)]
+    [DataRow(null, "3000000000", false)]
+    [DataRow(null, "42", true)]
+    public void Keeps_Integer_Default_Only_When_It_Fits_The_Generated_Type(string? format, string defaultValue, bool kept)
+    {
+        var schema = Mutate(new JsonSchema { Type = JsonObjectType.Integer, Format = format, Default = defaultValue });
+
+        if (kept)
+            schema.Default.Should().Be(defaultValue);
+        else
+            schema.Default.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void Keeps_Integer_Default_For_Property_Widened_To_Long_By_Its_Bounds()
+    {
+        var schema = Mutate(new JsonSchema
+        {
+            Type = JsonObjectType.Integer,
+            Maximum = 4000000000m,
+            Default = "3000000000",
+        });
+
+        schema.Default.Should().Be("3000000000");
+    }
+
+    [TestMethod]
+    public void Drops_Integer_Default_When_Bounds_Fit_Int()
+    {
+        var schema = Mutate(new JsonSchema
+        {
+            Type = JsonObjectType.Integer,
+            Maximum = 100m,
+            Default = "3000000000",
+        });
+
+        schema.Default.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void Drops_Integer_Default_When_Format_Prevents_Widening()
+    {
+        var schema = Mutate(new JsonSchema
+        {
+            Type = JsonObjectType.Integer,
+            Format = "int32",
+            Maximum = 4000000000m,
+            Default = "3000000000",
+        });
+
+        schema.Default.Should().BeNull();
+    }
+
     private static JsonSchema Mutate(JsonSchema schema)
     {
         var document = new OpenApiDocument();
