@@ -217,4 +217,50 @@ namespace TestNamespace
         result.Should().Contain("TestNamespace.TaskDto GetTask()");
         result.Should().Contain("System.Object Describe(TaskDto task)");
     }
+
+    [TestMethod]
+    public void ContractTypeSuffixApplier_Does_Not_Rename_Interface_Constructor_Named_Like_A_Contract()
+    {
+        const string code = @"
+namespace Contracts
+{
+    public partial record Item(string Name);
+}
+
+namespace Other
+{
+    public interface Item
+    {
+        static Item() { }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("record ItemDto");
+        result.Should().Contain("interface Item");
+        result.Should().Contain("static Item()");
+        result.Should().NotContain("static ItemDto()");
+    }
+
+    [TestMethod]
+    public void ContractTypeSuffixApplier_Renames_Escaped_Record_Constructor()
+    {
+        const string code = @"
+namespace Contracts
+{
+    public partial record Item
+    {
+        public @Item(string name) { Name = name; }
+
+        public string Name { get; }
+    }
+}";
+
+        var result = ContractTypeSuffixApplier.ApplySuffix(code, "Dto");
+
+        result.Should().Contain("record ItemDto");
+        result.Should().Contain("public ItemDto(string name)");
+        result.Should().NotContain("@Item(");
+    }
 }
