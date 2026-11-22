@@ -155,7 +155,9 @@ internal static class ReferenceGuard
 
         string currentDirectory = Path.GetDirectoryName(filePath);
 
-        foreach (var reference in ExtractReferences(content, filePath))
+        // A YAML root document is loaded by a resolver that reads every referenced file as YAML
+        var readAsYaml = PathUtilities.IsYaml(rootDocumentPath);
+        foreach (var reference in ExtractReferences(content, filePath, readAsYaml: readAsYaml))
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 continue;
@@ -222,18 +224,27 @@ internal static class ReferenceGuard
         string source,
         long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
         int maxAmplification = YamlAliasExpansionGuard.MaxAmplification,
-        long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize)
+        long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize,
+        bool readAsYaml = false)
     {
         // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
         // valid JSON without starting with '{' or '['
+        List<string>? jsonReferences = null;
         try
         {
-            return ExtractJsonReferences(content, source);
+            jsonReferences = ExtractJsonReferences(content, source);
         }
         catch (JsonReaderException)
         {
             // Not valid JSON, fall through to the YAML reader
         }
+
+        // A document can be valid JSON with comments and still read differently as YAML, where the text of a
+        // comment such as "/*: null, "$ref": "x" # */" is a mapping entry. When a YAML loader can read the
+        // document, either because the root is YAML or because the file has a YAML extension, check the
+        // references of both readings
+        if (jsonReferences != null && !readAsYaml && !PathUtilities.IsYaml(source))
+            return jsonReferences;
 
         // The YAML reader recurses per nesting level, and a stack overflow is uncatchable. The JSON reader
         // above is iterative and checks the depth as it reads, so only the YAML path needs this walk first.
@@ -242,7 +253,11 @@ internal static class ReferenceGuard
 
         try
         {
-            return ExtractYamlReferences(content, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
+            var references = ExtractYamlReferences(content, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
+            if (jsonReferences != null)
+                references.AddRange(jsonReferences);
+
+            return references;
         }
         catch (YamlException ex)
         {
