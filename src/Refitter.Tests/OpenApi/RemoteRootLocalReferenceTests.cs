@@ -50,9 +50,11 @@ public class RemoteRootLocalReferenceTests
     {
         var secret = CreateSecretFile();
         var rooted = secret.Substring(Path.GetPathRoot(secret)!.Length - 1).Replace('\\', '/');
+        // Relative to the working directory, so a resolver that read local files would find the secret
+        var relative = Path.GetRelativePath(Environment.CurrentDirectory, secret).Replace('\\', '/');
         yield return new object[] { rooted };
-        yield return new object[] { "./secret.json" };
-        yield return new object[] { "secret.json" };
+        yield return new object[] { "./" + relative };
+        yield return new object[] { relative };
     }
 
     [TestMethod]
