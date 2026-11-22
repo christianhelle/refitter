@@ -26,7 +26,24 @@ public class RefitGenerator(
     {
         if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-        var openApiDocument = await GetOpenApiDocument(settings, cancellationToken).ConfigureAwait(false);
+        var sets = await ReadDocumentSetsAsync(settings, cancellationToken).ConfigureAwait(false);
+        return await CreateAsync(settings, sets, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Creates a generator from document sets that were already read, so that the OpenAPI documents are
+    /// not read again.
+    /// </summary>
+    internal static async Task<RefitGenerator> CreateAsync(
+        RefitGeneratorSettings settings,
+        IReadOnlyList<DocumentSet> documentSets,
+        CancellationToken cancellationToken = default)
+    {
+        if (settings == null) throw new ArgumentNullException(nameof(settings));
+
+        var openApiDocument = await OpenApiDocumentFactory
+            .CreateAsync(documentSets, cancellationToken)
+            .ConfigureAwait(false);
         var processed = RefitDocumentFilter.FilterByTags(openApiDocument, settings.IncludeTags);
         processed = RefitDocumentFilter.FilterByPath(processed, settings.IncludePathMatches);
         processed = await CleanSchemaAsync(
@@ -39,25 +56,39 @@ public class RefitGenerator(
         return new(settings, processed);
     }
 
-    private static async Task<OpenApiDocument> GetOpenApiDocument(
+    /// <summary>
+    /// Reads the OpenAPI documents of the settings, and every file they reference, once.
+    /// </summary>
+    internal static async Task<IReadOnlyList<DocumentSet>> ReadDocumentSetsAsync(
         RefitGeneratorSettings settings,
         CancellationToken cancellationToken = default)
     {
+        string[] paths;
         if (settings.OpenApiPaths is { Length: > 0 })
-            return await OpenApiDocumentFactory
-                .CreateAsync(settings.OpenApiPaths, settings.AllowRemoteReferences, cancellationToken)
-                .ConfigureAwait(false);
-
-        if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
+        {
+            paths = settings.OpenApiPaths;
+        }
+        else if (string.IsNullOrWhiteSpace(settings.OpenApiPath))
         {
             throw new ArgumentException(
                 "Either OpenApiPath or OpenApiPaths must be provided with at least one valid OpenAPI specification path.",
                 nameof(settings));
         }
+        else
+        {
+            paths = new[] { settings.OpenApiPath! };
+        }
 
-        return await OpenApiDocumentFactory
-            .CreateAsync(settings.OpenApiPath!, settings.AllowRemoteReferences, cancellationToken)
-            .ConfigureAwait(false);
+        var sets = new List<DocumentSet>(paths.Length);
+        foreach (var path in paths)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            sets.Add(await OpenApiDocumentFactory
+                .ReadAsync(path, settings.AllowRemoteReferences, cancellationToken)
+                .ConfigureAwait(false));
+        }
+
+        return sets;
     }
 
     private static async Task<OpenApiDocument> CleanSchemaAsync(
