@@ -18,6 +18,11 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
         RegexOptions.Compiled | RegexOptions.CultureInvariant,
         TimeSpan.FromSeconds(1));
 
+    private static readonly Regex WholeNumber = new(
+        @"^-?[0-9]+$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
+
     public void Mutate(OpenApiDocument document)
     {
         SchemaWalker.TraverseDocumentSchemas(document, Sanitize);
@@ -26,7 +31,7 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
     private static void Sanitize(JsonSchema schema)
     {
         if (schema.Default is { } defaultValue &&
-            (!IsLiteral(schema.Type, defaultValue) || !IsEnumMember(schema, defaultValue)))
+            (!IsLiteral(schema, defaultValue) || !IsEnumMember(schema, defaultValue)))
         {
             schema.Default = null;
         }
@@ -40,15 +45,57 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
 
     // String defaults are escaped, but NJsonSchema skips the string branch for some formats (date-time, uuid, ...),
     // so a schema that is also boolean or numeric only keeps a default that is safe in those branches
-    private static bool IsLiteral(JsonObjectType type, object value)
+    private static bool IsLiteral(JsonSchema schema, object value)
     {
+        var type = schema.Type;
         var isBoolean = type.HasFlag(JsonObjectType.Boolean);
         var isNumeric = type.HasFlag(JsonObjectType.Integer) || type.HasFlag(JsonObjectType.Number);
         if (!isBoolean && !isNumeric)
             return true;
 
+        if (isNumeric && !isBoolean && !type.HasFlag(JsonObjectType.Number) && IsNumber(value))
+            return FitsInteger(schema, value);
+
         return (isBoolean && IsBoolean(value)) || (isNumeric && IsNumber(value));
     }
+
+    // NJsonSchema writes an integer default as it is, so one that does not fit the CLR type of the property is a
+    // compile error (or makes the generator throw). The type is resolved like CSharpTypeResolver.ResolveInteger does:
+    // byte is byte, int64 and long are long, uint64 and ulong are ulong, int32 is int, a schema without a format whose
+    // bounds are outside the int range is long, and anything else (uint32, int16, ...) is the integer type, int
+    private static bool FitsInteger(JsonSchema schema, object value)
+    {
+        string text = string.Format(CultureInfo.InvariantCulture, "{0}", value);
+        if (!WholeNumber.IsMatch(text))
+            return true;
+
+        const NumberStyles signed = NumberStyles.AllowLeadingSign;
+        IFormatProvider culture = CultureInfo.InvariantCulture;
+        switch (schema.Format)
+        {
+            case "byte":
+                return byte.TryParse(text, NumberStyles.None, culture, out _);
+            case "int64":
+            case "long":
+                return long.TryParse(text, signed, culture, out _);
+            case "uint64":
+            case "ulong":
+                return ulong.TryParse(text, NumberStyles.None, culture, out _);
+            case "int32":
+                return int.TryParse(text, signed, culture, out _);
+            default:
+                return IsWidenedToLong(schema)
+                    ? long.TryParse(text, signed, culture, out _)
+                    : int.TryParse(text, signed, culture, out _);
+        }
+    }
+
+    private static bool IsWidenedToLong(JsonSchema schema) =>
+        (schema.Minimum.HasValue || schema.Maximum.HasValue) &&
+        string.IsNullOrEmpty(schema.Format) &&
+        schema.Type == JsonObjectType.Integer &&
+        (schema.Minimum < int.MinValue || schema.Minimum > int.MaxValue ||
+         schema.Maximum < int.MinValue || schema.Maximum > int.MaxValue);
 
     // NJsonSchema looks the default up among the enum values to build its member name, which throws for a default
     // that is not one of them. It uses Enumeration.IndexOf, which compares by equality, so membership is decided
