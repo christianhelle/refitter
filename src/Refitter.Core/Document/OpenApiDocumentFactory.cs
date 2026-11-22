@@ -33,18 +33,42 @@ public static class OpenApiDocumentFactory
         if (paths.Length == 0)
             throw new ArgumentException("At least one OpenAPI path must be specified.", nameof(openApiPaths));
 
-        if (paths.Length == 1)
-            return await CreateAsync(paths[0], allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-
-        var documents = new OpenApiDocument[paths.Length];
+        var sets = new DocumentSet[paths.Length];
         for (var i = 0; i < paths.Length; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            documents[i] = await CreateAsync(paths[i], allowRemoteReferences, cancellationToken)
-                .ConfigureAwait(false);
+            sets[i] = await ReadAsync(paths[i], allowRemoteReferences, cancellationToken).ConfigureAwait(false);
         }
 
-        return DocumentMerger.Merge(documents);
+        return await CreateAsync(sets, paths, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Parses the document sets one by one, and merges them into one document when there is more than one.
+    /// </summary>
+    internal static Task<OpenApiDocument> CreateAsync(
+        IReadOnlyList<DocumentSet> sets,
+        CancellationToken cancellationToken = default) =>
+        CreateAsync(sets, sets.Select(set => set.RootDocumentPath ?? string.Empty).ToArray(), cancellationToken);
+
+    private static async Task<OpenApiDocument> CreateAsync(
+        IReadOnlyList<DocumentSet> sets,
+        IReadOnlyList<string> paths,
+        CancellationToken cancellationToken)
+    {
+        if (sets.Count == 0)
+            throw new ArgumentException("At least one OpenAPI document must be specified.", nameof(sets));
+
+        var documents = new OpenApiDocument[sets.Count];
+        for (var i = 0; i < sets.Count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            documents[i] = sets[i].RootDocumentPath is null
+                ? await OpenApiDocumentParser.ParseAsync(sets[i], cancellationToken).ConfigureAwait(false)
+                : await DocumentLoader.ParseAsync(paths[i], sets[i], cancellationToken).ConfigureAwait(false);
+        }
+
+        return documents.Length == 1 ? documents[0] : DocumentMerger.Merge(documents);
     }
 
     /// <summary>
@@ -70,6 +94,18 @@ public static class OpenApiDocumentFactory
         bool allowRemoteReferences = false,
         CancellationToken cancellationToken = default)
     {
+        var set = await ReadAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
+        return await CreateAsync(new[] { set }, new[] { openApiPath }, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Reads the OpenAPI document at the path or URL, and every file it references, once.
+    /// </summary>
+    internal static async Task<DocumentSet> ReadAsync(
+        string openApiPath,
+        bool allowRemoteReferences,
+        CancellationToken cancellationToken = default)
+    {
         cancellationToken.ThrowIfCancellationRequested();
 
         // For remote URLs, report a failed download as such before the document is read
@@ -87,14 +123,13 @@ public static class OpenApiDocumentFactory
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}': {ex.Message}", ex);
             }
 
-            var set = await OpenApiDocumentReader
+            return await OpenApiDocumentReader
                 .ReadAsync(openApiPath, content, allowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
-            return await OpenApiDocumentParser.ParseAsync(set, cancellationToken).ConfigureAwait(false);
         }
 
         return await DocumentLoader
-            .LoadAsync(openApiPath, allowRemoteReferences, cancellationToken)
+            .ReadAsync(openApiPath, allowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
     }
 }

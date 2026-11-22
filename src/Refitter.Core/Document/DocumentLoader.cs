@@ -12,6 +12,15 @@ internal static class DocumentLoader
         bool allowRemoteReferences,
         CancellationToken cancellationToken = default)
     {
+        var set = await ReadAsync(path, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
+        return await ParseAsync(path, set, cancellationToken).ConfigureAwait(false);
+    }
+
+    public static async Task<DocumentSet> ReadAsync(
+        string path,
+        bool allowRemoteReferences,
+        CancellationToken cancellationToken = default)
+    {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException(
                 "The path parameter cannot be null, empty, or contain only whitespace.",
@@ -19,10 +28,16 @@ internal static class DocumentLoader
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var set = await OpenApiDocumentReader
+        return await OpenApiDocumentReader
             .ReadAsync(path, allowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
+    }
 
+    public static async Task<OpenApiDocument> ParseAsync(
+        string path,
+        DocumentSet set,
+        CancellationToken cancellationToken = default)
+    {
         try
         {
             return await OpenApiDocumentParser.ParseAsync(set, cancellationToken).ConfigureAwait(false);
