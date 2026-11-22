@@ -27,21 +27,6 @@ internal static class ItemSchemaSanitizer
         "x-oai-itemSchema",
     };
 
-    // Keywords whose values hold no media types, like example payloads and other literal JSON. A link's
-    // requestBody and parameters are literal values too, and nothing else under a links map is a media type.
-    private static readonly HashSet<string> LiteralValueKeywords = new(StringComparer.Ordinal)
-    {
-        "example",
-        "examples",
-        "default",
-        "const",
-        "enum",
-        "value",
-        "dataValue",
-        "serializedValue",
-        "links",
-    };
-
     // Finds candidate objects. A \u escape could spell a property name the scan cannot see,
     // so documents with one are always parsed.
     private static readonly Regex CandidateRegex = new(
@@ -157,13 +142,5 @@ internal static class ItemSchemaSanitizer
         mediaType.Parent is JProperty &&
         mediaType.Ancestors().ElementAtOrDefault(2) is JProperty { Name: "content" } content &&
         !NamedMapEntries.IsEntry(content) &&
-        !IsInsideLiteralValue(content);
-
-    private static bool IsInsideLiteralValue(JToken token) =>
-        token
-            .Ancestors()
-            .OfType<JProperty>()
-            .Any(ancestor =>
-                (LiteralValueKeywords.Contains(ancestor.Name) || ancestor.Name.StartsWith("x-", StringComparison.Ordinal)) &&
-                !NamedMapEntries.IsEntry(ancestor));
+        !NamedMapEntries.IsInsideLiteralValue(content);
 }

@@ -139,6 +139,29 @@ internal static class ContractTypeSuffixApplier
         }
 
         /// <summary>
+        /// Rename constructors along with the type that declares them, e.g. the explicit constructor
+        /// emitted for immutable records (#1431). A constructor is only renamed when it is named after
+        /// its own declaring type. Interfaces are not renamed, so their static constructors are left alone,
+        /// and names are compared by value so an escaped spelling such as <c>@Item</c> still matches.
+        /// </summary>
+        public override SyntaxNode? VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+        {
+            var visited = (ConstructorDeclarationSyntax)base.VisitConstructorDeclaration(node)!;
+            if (node.Parent is not (ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax) ||
+                node.Parent is not TypeDeclarationSyntax declaringType ||
+                declaringType.Identifier.ValueText != node.Identifier.ValueText)
+            {
+                return visited;
+            }
+
+            // Look the new name up by the declaring type's own identifier, which is what the type is renamed by
+            var renamed = GetRenamedIdentifier(declaringType.Identifier);
+            return renamed == declaringType.Identifier
+                ? visited
+                : visited.WithIdentifier(renamed.WithTriviaFrom(node.Identifier));
+        }
+
+        /// <summary>
         /// Rename type references (IdentifierNameSyntax like "Pet" in properties, parameters, etc.)
         /// </summary>
         public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)

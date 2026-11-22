@@ -2,13 +2,24 @@
 
 ## [Unreleased Changes]
 
+### Bug Fixes
+- Keep enum properties nullable so native record constructors compile ([#1441](https://github.com/christianhelle/refitter/pull/1441)) ([@christianhelle](https://github.com/christianhelle/))
+- Drop enum defaults that are not an enum member ([#1434](https://github.com/christianhelle/refitter/pull/1434)) ([@christianhelle](https://github.com/christianhelle/))
+- Tolerate unknown collectionFormat and report document load errors ([#1436](https://github.com/christianhelle/refitter/pull/1436)) ([@christianhelle](https://github.com/christianhelle/))
+- Strip XML-invalid control characters from descriptions ([#1433](https://github.com/christianhelle/refitter/pull/1433)) ([@christianhelle](https://github.com/christianhelle/))
+- Rename record constructors when applying ContractTypeSuffix ([#1437](https://github.com/christianhelle/refitter/pull/1437)) ([@christianhelle](https://github.com/christianhelle/))
+- Emit Content-Type header for referenced request bodies ([#1435](https://github.com/christianhelle/refitter/pull/1435)) ([@christianhelle](https://github.com/christianhelle/))
+
+
+## [2.4.1](https://github.com/christianhelle/refitter/releases/tag/2.4.1) (2026-11-21)
+
 ### Features
 - Bump version to 2.4.1 ([#1420](https://github.com/christianhelle/refitter/pull/1420)) ([@christianhelle](https://github.com/christianhelle/))
 - Add security policy ([#1408](https://github.com/christianhelle/refitter/pull/1408)) ([@christianhelle](https://github.com/christianhelle/))
-- Escape Unicode line terminators and settings values in generated string literals ([#1409](https://github.com/christianhelle/refitter/pull/1409)) ([@christianhelle](https://github.com/christianhelle/))
-- Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Bug Fixes
+- Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
+- Escape Unicode line terminators and settings values in generated string literals ([#1409](https://github.com/christianhelle/refitter/pull/1409)) ([@christianhelle](https://github.com/christianhelle/))
 - Bound YAML alias expansion when loading OpenAPI documents ([#1423](https://github.com/christianhelle/refitter/pull/1423)) ([@christianhelle](https://github.com/christianhelle/))
 - Reject deeply nested OpenAPI documents before parsing ([#1422](https://github.com/christianhelle/refitter/pull/1422)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-7q2f-m7jf-3gp6: Refuse symlinked settings files and output directories ([#1421](https://github.com/christianhelle/refitter/pull/1421)) ([@christianhelle](https://github.com/christianhelle/))
