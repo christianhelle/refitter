@@ -18,6 +18,11 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
         RegexOptions.Compiled | RegexOptions.CultureInvariant,
         TimeSpan.FromSeconds(1));
 
+    private static readonly Regex WholeNumber = new(
+        @"^-?[0-9]+$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
+
     public void Mutate(OpenApiDocument document)
     {
         SchemaWalker.TraverseDocumentSchemas(document, Sanitize);
@@ -25,7 +30,7 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
 
     private static void Sanitize(JsonSchema schema)
     {
-        if (schema.Default is { } defaultValue && !IsLiteral(schema.Type, defaultValue))
+        if (schema.Default is { } defaultValue && !IsLiteral(schema, defaultValue))
         {
             schema.Default = null;
         }
@@ -39,14 +44,35 @@ internal sealed class NonLiteralValueMutator : IOpenApiDocumentMutator
 
     // String defaults are escaped, but NJsonSchema skips the string branch for some formats (date-time, uuid, ...),
     // so a schema that is also boolean or numeric only keeps a default that is safe in those branches
-    private static bool IsLiteral(JsonObjectType type, object value)
+    private static bool IsLiteral(JsonSchema schema, object value)
     {
+        var type = schema.Type;
         var isBoolean = type.HasFlag(JsonObjectType.Boolean);
         var isNumeric = type.HasFlag(JsonObjectType.Integer) || type.HasFlag(JsonObjectType.Number);
         if (!isBoolean && !isNumeric)
             return true;
 
+        if (isNumeric && !isBoolean && !type.HasFlag(JsonObjectType.Number) && IsNumber(value))
+            return FitsInteger(schema, value);
+
         return (isBoolean && IsBoolean(value)) || (isNumeric && IsNumber(value));
+    }
+
+    // NJsonSchema writes an integer default as it is, so one that does not fit the CLR type of the property
+    // (int, or long for int64) is a compile error
+    private static bool FitsInteger(JsonSchema schema, object value)
+    {
+        string text = string.Format(CultureInfo.InvariantCulture, "{0}", value);
+        if (!WholeNumber.IsMatch(text))
+            return true;
+
+        return schema.Format switch
+        {
+            "int64" => long.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _),
+            "uint64" => ulong.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out _),
+            "uint32" => uint.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out _),
+            _ => int.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _),
+        };
     }
 
     private static bool IsBoolean(object value) => value switch
