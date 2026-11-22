@@ -21,6 +21,14 @@ public class OpenApiDocumentFactoryTests
     }
 
     [TestMethod]
+    public async Task Create_From_No_Document_Sets_Throws()
+    {
+        var act = () => OpenApiDocumentFactory.CreateAsync(Array.Empty<DocumentSet>());
+
+        await act.Should().ThrowAsync<ArgumentException>();
+    }
+
+    [TestMethod]
     public async Task Create_From_Remote_Json_Uses_Remote_Branch()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
