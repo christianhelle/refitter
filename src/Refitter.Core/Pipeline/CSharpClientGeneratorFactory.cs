@@ -55,6 +55,9 @@ internal class CSharpClientGeneratorFactory
         // Always on, last, so no other mutator can bring back a value that NJsonSchema emits unescaped
         new NonLiteralValueMutator().Mutate(document);
 
+        // Doc comments are XML, which rejects control characters (#1428)
+        new XmlInvalidCharacterMutator().Mutate(document);
+
         // The property name generator needs the contract type names, which the generator resolves
         CustomCSharpClientGenerator? generator = null;
 
