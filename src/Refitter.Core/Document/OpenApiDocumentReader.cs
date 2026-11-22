@@ -130,10 +130,6 @@ internal static class OpenApiDocumentReader
         }
     }
 
-    private static bool IsHttpScheme(Uri uri) =>
-        uri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
-        uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
-
     /// <summary>
     /// The state of one read: the files read so far and the rules they are checked against.
     /// </summary>
@@ -168,43 +164,57 @@ internal static class OpenApiDocumentReader
 
             var (json, references) = ReadContent(content, url, readAsYaml: false);
 
-            // The root document is parsed without a document path, so its relative references are never
-            // resolved; only absolute remote references are read
             foreach (var reference in references)
             {
-                if (reference.StartsWith("#", StringComparison.Ordinal))
-                    continue;
-
-                Uri? resolvedUri = null;
-                if (Uri.TryCreate(reference, UriKind.Absolute, out var absoluteUri))
-                {
-                    resolvedUri = absoluteUri;
-                }
-                else if (Uri.TryCreate(new Uri(url), reference.Split('#')[0], out var relativeUri))
-                {
-                    resolvedUri = relativeUri;
-                }
-
-                if (resolvedUri != null && !string.IsNullOrEmpty(resolvedUri.Scheme))
-                {
-                    // Non-HTTP schemes (file:, data:, etc.) are always blocked
-                    if (!IsHttpScheme(resolvedUri) || !allowRemoteReferences)
-                        throw RemoteBlocked(reference, url);
-
-                    if (PathUtilities.IsHttp(reference))
-                        await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
-                }
-                else if (!reference.StartsWith("/", StringComparison.Ordinal) &&
-                         !reference.StartsWith("./", StringComparison.Ordinal) &&
-                         !reference.StartsWith("../", StringComparison.Ordinal))
-                {
-                    // Relative references from remote documents treated as remote
-                    if (!allowRemoteReferences)
-                        throw RemoteBlocked(reference, url);
-                }
+                if (!reference.StartsWith("#", StringComparison.Ordinal))
+                    await ReadRemoteRootReferenceAsync(reference, url).ConfigureAwait(false);
             }
 
             return OpenApiJsonNormalizer.NormalizeDocument(json);
+        }
+
+        // The root document is parsed without a document path, so its relative references are never
+        // resolved; only absolute remote references are read
+        private async Task ReadRemoteRootReferenceAsync(string reference, string url)
+        {
+            var resolvedUri = ResolveAgainst(url, reference);
+            if (resolvedUri != null && !string.IsNullOrEmpty(resolvedUri.Scheme))
+            {
+                // Non-HTTP schemes (file:, data:, etc.) are always blocked
+                if (!IsHttpScheme(resolvedUri) || !allowRemoteReferences)
+                    throw RemoteBlocked(reference, url);
+
+                if (PathUtilities.IsHttp(reference))
+                    await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
+            }
+            else if (!allowRemoteReferences &&
+                     !reference.StartsWith("/", StringComparison.Ordinal) &&
+                     !reference.StartsWith("./", StringComparison.Ordinal) &&
+                     !reference.StartsWith("../", StringComparison.Ordinal))
+            {
+                // Relative references from remote documents treated as remote
+                throw RemoteBlocked(reference, url);
+            }
+        }
+
+        private static Uri? ResolveAgainst(string url, string reference)
+        {
+            if (Uri.TryCreate(reference, UriKind.Absolute, out var absoluteUri))
+                return absoluteUri;
+
+            return Uri.TryCreate(new Uri(url), reference.Split('#')[0], out var relativeUri) ? relativeUri : null;
+        }
+
+        private static bool IsHttpScheme(Uri uri) =>
+            uri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
+            uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
+
+        private static async Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken)
+        {
+            using var reader = new StreamReader(path);
+            return await reader
+                .ReadToEndWithCancellationAsync(cancellationToken)
+                .ConfigureAwait(false);
         }
 
         // Reads a referenced remote document once. Its relative references resolve against its URL, the way the
@@ -731,12 +741,4 @@ internal static class OpenApiDocumentReader
         new($"Remote '$ref' \"{reference}\" in \"{source}\" was blocked. " +
             "Remote reference resolution is disabled by default; pass --allow-remote-refs " +
             "(or set allowRemoteReferences: true) to enable it.");
-
-    private static async Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken)
-    {
-        using var reader = new StreamReader(path);
-        return await reader
-            .ReadToEndWithCancellationAsync(cancellationToken)
-            .ConfigureAwait(false);
-    }
 }
