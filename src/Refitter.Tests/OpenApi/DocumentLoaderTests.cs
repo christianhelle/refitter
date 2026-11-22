@@ -28,7 +28,7 @@ public class DocumentLoaderTests
         """;
 
     private static Task<NSwag.OpenApiDocument> Load(string path, CancellationToken cancellationToken = default) =>
-        DocumentLoader.LoadAsync(path, ReferencePolicy.Unrestricted, cancellationToken);
+        DocumentLoader.LoadAsync(path, allowRemoteReferences: true, cancellationToken);
 
     [TestMethod]
     [DataRow("")]
@@ -57,8 +57,9 @@ public class DocumentLoaderTests
 
         var act = () => Load(swaggerFile);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*Failed to load OpenAPI document*");
+        // Read as YAML it is a bare scalar, which another parser might read differently, so it is rejected
+        await act.Should().ThrowAsync<ReferenceResolutionException>()
+            .WithMessage("*could not be parsed*");
     }
 
     [TestMethod]
@@ -97,7 +98,7 @@ public class DocumentLoaderTests
             "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{}," +
             "\"components\":{\"schemas\":{\"Pet\":{\"$ref\":\"http://127.0.0.1:1/s.json\"}}}}");
 
-        var act = () => DocumentLoader.LoadAsync(path, new ReferencePolicy(allowRemoteReferences: false));
+        var act = () => DocumentLoader.LoadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*127.0.0.1:1*");
     }

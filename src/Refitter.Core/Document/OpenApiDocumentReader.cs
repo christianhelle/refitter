@@ -73,6 +73,30 @@ internal static class OpenApiDocumentReader
         return set.WithRootJson(OpenApiJsonNormalizer.NormalizeDocument(json));
     }
 
+    /// <summary>
+    /// Converts YAML to JSON the way the reader does, applying the nesting and alias expansion limits.
+    /// </summary>
+    internal static string ConvertYamlToJson(
+        string yaml,
+        string? source = null,
+        long maxExpandedNodes = YamlAliasExpansionGuard.MaxExpandedNodes,
+        int maxAmplification = YamlAliasExpansionGuard.MaxAmplification,
+        long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize)
+    {
+        source ??= "the YAML document";
+        DocumentNestingGuard.EnsureYamlWithinLimit(yaml, source);
+        try
+        {
+            var root = DeserializeYaml(yaml, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
+            return new SerializerBuilder().JsonCompatible().Build().Serialize(root!);
+        }
+        catch (YamlException ex)
+        {
+            throw new ReferenceResolutionException(
+                $"OpenAPI document \"{source}\" could not be parsed for '$ref' validation: {ex.Message}", ex);
+        }
+    }
+
     private static string ReadRootFile(string openApiPath, string fullPath)
     {
         try
@@ -139,6 +163,9 @@ internal static class OpenApiDocumentReader
 
         public async Task<string> ReadRemoteRootAsync(string url, string content)
         {
+            // A YAML root document is loaded by a reader that reads every referenced document as YAML
+            readAsYaml = MayBeReadAsYaml(url);
+
             var (json, references) = ReadContent(content, url, readAsYaml: false);
 
             // The root document is parsed without a document path, so its relative references are never
@@ -192,7 +219,7 @@ internal static class OpenApiDocumentReader
             var content = await RemoteDocumentDownloader
                 .DownloadAsync(url, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            var (json, references) = ReadContent(content, url, readAsYaml: false);
+            var (json, references) = ReadContent(content, url, readAsYaml);
             urls[url] = OpenApiJsonNormalizer.NormalizeReferencedFile(json);
 
             foreach (var reference in references)
@@ -242,7 +269,14 @@ internal static class OpenApiDocumentReader
 
             string currentDirectory = Path.GetDirectoryName(filePath);
             foreach (var reference in references)
+            {
                 await ReadLocalReferenceAsync(reference, filePath, currentDirectory).ConfigureAwait(false);
+
+                // The rebaser cannot pin the references of a file whose path contains '#', so the schema
+                // resolver resolves them against the root document's directory. Read that file too
+                if (filePath.IndexOf('#') >= 0 && !filePath.Equals(rootDocumentPath, StringComparison.Ordinal))
+                    await ReadLocalReferenceAsync(reference, filePath, rootDirectory).ConfigureAwait(false);
+            }
 
             return json;
         }
@@ -357,12 +391,10 @@ internal static class OpenApiDocumentReader
             var root = DeserializeYaml(content, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
             var references = ExtractYamlReferences(root);
             if (jsonReferences != null)
-            {
                 references.AddRange(jsonReferences);
-                return (content, references);
-            }
 
-            // Same conversion as NSwag's OpenApiYamlDocument and NJsonSchema's JsonSchemaYaml
+            // A document a YAML loader reads is parsed as YAML, even when it is also valid JSON, the way NSwag
+            // reads a YAML document. Same conversion as NSwag's OpenApiYamlDocument and NJsonSchema's JsonSchemaYaml
             return (new SerializerBuilder().JsonCompatible().Build().Serialize(root!), references);
         }
         catch (YamlException ex)

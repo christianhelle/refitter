@@ -17,26 +17,22 @@ public class ReferencePolicyTests
         "\"components\":{\"schemas\":{\"Pet\":{\"$ref\":\"http://127.0.0.1:1/s.json\"}}}}";
 
     [TestMethod]
-    [DataRow(false)]
-    [DataRow(true)]
-    public async Task Resolver_Blocks_Url_Reference_When_Remote_References_Are_Disallowed(bool isYaml)
+    [DataRow("spec.json")]
+    [DataRow("spec.yaml")]
+    public async Task Resolver_Blocks_Url_Reference_When_Remote_References_Are_Disallowed(string fileName)
     {
         var act = () => OpenApiDocumentParser.ParseAsync(
             Spec,
-            Path.Combine(Path.GetTempPath(), "spec.json"),
-            isYaml,
-            new ReferencePolicy(allowRemoteReferences: false));
+            Path.Combine(Path.GetTempPath(), fileName),
+            allowRemoteReferences: false);
 
-        // NJsonSchema wraps whatever the resolver throws
-        var thrown = await act.Should().ThrowAsync<InvalidOperationException>();
-        thrown.Which.InnerException.Should().BeOfType<ReferenceResolutionException>()
-            .Which.Message.Should().Contain("127.0.0.1:1");
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*127.0.0.1:1*");
     }
 
     [TestMethod]
-    [DataRow(false)]
-    [DataRow(true)]
-    public async Task Resolver_Fetches_Url_Reference_When_Remote_References_Are_Allowed(bool isYaml)
+    [DataRow("spec.json")]
+    [DataRow("spec.yaml")]
+    public async Task Resolver_Fetches_Url_Reference_When_Remote_References_Are_Allowed(string fileName)
     {
         using var server = new LoopbackHttpServer(
             "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}");
@@ -44,9 +40,8 @@ public class ReferencePolicyTests
 
         var document = await OpenApiDocumentParser.ParseAsync(
             spec,
-            Path.Combine(Path.GetTempPath(), "spec.json"),
-            isYaml,
-            new ReferencePolicy(allowRemoteReferences: true));
+            Path.Combine(Path.GetTempPath(), fileName),
+            allowRemoteReferences: true);
 
         server.RequestCount.Should().BeGreaterThan(0);
         document.Components.Schemas.Should().ContainKey("Pet");

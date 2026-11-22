@@ -90,7 +90,7 @@ public class DeeplyNestedDocumentTests
     [TestMethod]
     public async Task Rejects_Deep_Document_When_Parsing()
     {
-        var act = () => OpenApiDocumentParser.ParseAsync(JsonSpec(TooDeep), null, isYaml: false);
+        var act = () => OpenApiDocumentParser.ParseAsync(JsonSpec(TooDeep), Path.Combine(Path.GetTempPath(), "spec.json"), allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }

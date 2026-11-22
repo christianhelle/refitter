@@ -23,9 +23,8 @@ public class RemoteReferenceNestingTests
     private static Task<NSwag.OpenApiDocument> Parse(string spec, bool isYaml) =>
         OpenApiDocumentParser.ParseAsync(
             spec,
-            Path.Combine(Path.GetTempPath(), "spec.json"),
-            isYaml,
-            new ReferencePolicy(allowRemoteReferences: true));
+            Path.Combine(Path.GetTempPath(), isYaml ? "spec.yaml" : "spec.json"),
+            allowRemoteReferences: true);
 
     [TestMethod]
     [DataRow(false)]
