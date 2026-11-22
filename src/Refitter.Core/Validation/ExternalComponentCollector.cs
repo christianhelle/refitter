@@ -85,7 +85,7 @@ internal sealed class ExternalComponentCollector
         if (file is null || file == rootKey || reference.Id is null)
             return;
 
-        if (!reached.Add(reference.Type + "|" + file + "#" + reference.Id))
+        if (!Kinds.TryGetValue(reference.Type, out var kind) || !reached.Add(reference.Type + "|" + file + "#" + reference.Id))
             return;
 
         if (!set.TryGetFile(file, out var json) && !set.TryGetUrl(file, out json))
@@ -98,67 +98,9 @@ internal sealed class ExternalComponentCollector
         // A reference to a whole file has the file name as its id, and the file is the component itself
         var whole = reference.IsExternal && id == Path.GetFileName(reference.ExternalResource) ? node : null;
 
-        var item = reference.Type switch
-        {
-            ReferenceType.Schema => Add(
-                components?.Schemas, Components.Schemas!, file, id, (c, d) => c.Schemas = d,
-                () => Fragment<OpenApiSchema>(whole)),
-            ReferenceType.Response => Add(
-                components?.Responses, Components.Responses!, file, id, (c, d) => c.Responses = d,
-                () => Fragment<OpenApiResponse>(whole)),
-            ReferenceType.Parameter => Add(
-                components?.Parameters, Components.Parameters!, file, id, (c, d) => c.Parameters = d,
-                () => Fragment<OpenApiParameter>(whole)),
-            ReferenceType.Example => Add(
-                components?.Examples, Components.Examples!, file, id, (c, d) => c.Examples = d,
-                () => Fragment<OpenApiExample>(whole)),
-            ReferenceType.RequestBody => Add(
-                components?.RequestBodies, Components.RequestBodies!, file, id, (c, d) => c.RequestBodies = d,
-                () => Fragment<OpenApiRequestBody>(whole)),
-            ReferenceType.Header => Add(
-                components?.Headers, Components.Headers!, file, id, (c, d) => c.Headers = d,
-                () => Fragment<OpenApiHeader>(whole)),
-            ReferenceType.SecurityScheme => Add(
-                components?.SecuritySchemes, Components.SecuritySchemes!, file, id, (c, d) => c.SecuritySchemes = d,
-                () => Fragment<OpenApiSecurityScheme>(whole)),
-            ReferenceType.Link => Add(
-                components?.Links, Components.Links!, file, id, (c, d) => c.Links = d,
-                () => Fragment<OpenApiLink>(whole)),
-            ReferenceType.Callback => Add(
-                components?.Callbacks, Components.Callbacks!, file, id, (c, d) => c.Callbacks = d,
-                () => Fragment<OpenApiCallback>(whole)),
-            ReferenceType.PathItem => Add(
-                components?.PathItems, Components.PathItems!, file, id, (c, d) => c.PathItems = d,
-                () => Fragment<OpenApiPathItem>(whole)),
-            _ => null,
-        };
-
+        var item = kind.Add(this, components, file, id, whole);
         if (item is not null)
             pending.Enqueue((file, item));
-    }
-
-    // Adds the component the file defines under the id, or the whole file, and returns a document holding only
-    // it, to walk for the references it holds
-    private static OpenApiDocument? Add<T>(
-        IDictionary<string, T>? defined,
-        IDictionary<string, T> collected,
-        string file,
-        string id,
-        Action<OpenApiComponents, IDictionary<string, T>> assign,
-        Func<T?> whole)
-        where T : class
-    {
-        var component = defined is not null && defined.TryGetValue(id, out var found) ? found : whole();
-        if (component is null)
-            return null;
-
-        // Two files can define a component with the same name, so the second one is keyed by its file too
-        var name = collected.ContainsKey(id) ? file + "#" + id : id;
-        collected[name] = component;
-
-        var item = new OpenApiComponents();
-        assign(item, new Dictionary<string, T> { [name] = component });
-        return new OpenApiDocument { Components = item };
     }
 
     private T? Fragment<T>(JsonObject? node) where T : class, IOpenApiElement =>
@@ -238,6 +180,71 @@ internal sealed class ExternalComponentCollector
         var root = JsonObjectOf(rootJson)!;
         var key = root.ContainsKey("swagger") ? "swagger" : "openapi";
         return new KeyValuePair<string, JsonNode?>(key, root[key]);
+    }
+
+    private static readonly Dictionary<ReferenceType, Kind> Kinds = new()
+    {
+        [ReferenceType.Schema] = new Kind<IOpenApiSchema, OpenApiSchema>(c => c.Schemas, (c, d) => c.Schemas = d),
+        [ReferenceType.Response] = new Kind<IOpenApiResponse, OpenApiResponse>(c => c.Responses, (c, d) => c.Responses = d),
+        [ReferenceType.Parameter] = new Kind<IOpenApiParameter, OpenApiParameter>(c => c.Parameters, (c, d) => c.Parameters = d),
+        [ReferenceType.Example] = new Kind<IOpenApiExample, OpenApiExample>(c => c.Examples, (c, d) => c.Examples = d),
+        [ReferenceType.RequestBody] =
+            new Kind<IOpenApiRequestBody, OpenApiRequestBody>(c => c.RequestBodies, (c, d) => c.RequestBodies = d),
+        [ReferenceType.Header] = new Kind<IOpenApiHeader, OpenApiHeader>(c => c.Headers, (c, d) => c.Headers = d),
+        [ReferenceType.SecurityScheme] =
+            new Kind<IOpenApiSecurityScheme, OpenApiSecurityScheme>(c => c.SecuritySchemes, (c, d) => c.SecuritySchemes = d),
+        [ReferenceType.Link] = new Kind<IOpenApiLink, OpenApiLink>(c => c.Links, (c, d) => c.Links = d),
+        [ReferenceType.Callback] = new Kind<IOpenApiCallback, OpenApiCallback>(c => c.Callbacks, (c, d) => c.Callbacks = d),
+        [ReferenceType.PathItem] = new Kind<IOpenApiPathItem, OpenApiPathItem>(c => c.PathItems, (c, d) => c.PathItems = d),
+    };
+
+    /// <summary>
+    /// A kind of component, and where the components of that kind are kept.
+    /// </summary>
+    private abstract class Kind
+    {
+        /// <summary>
+        /// Adds the component the file defines under the id, or the whole file, and returns a document holding
+        /// only it, to walk for the references it holds.
+        /// </summary>
+        public abstract OpenApiDocument? Add(
+            ExternalComponentCollector collector,
+            OpenApiComponents? defined,
+            string file,
+            string id,
+            JsonObject? whole);
+    }
+
+    private sealed class Kind<TComponent, TElement>(
+        Func<OpenApiComponents, IDictionary<string, TComponent>?> get,
+        Action<OpenApiComponents, IDictionary<string, TComponent>> set) : Kind
+        where TComponent : class
+        where TElement : class, TComponent, IOpenApiElement
+    {
+        public override OpenApiDocument? Add(
+            ExternalComponentCollector collector,
+            OpenApiComponents? defined,
+            string file,
+            string id,
+            JsonObject? whole)
+        {
+            TComponent? component = null;
+            if (defined is not null && get(defined) is { } components)
+                components.TryGetValue(id, out component);
+
+            component ??= collector.Fragment<TElement>(whole);
+            if (component is null)
+                return null;
+
+            // Two files can define a component with the same name, so the second one is keyed by its file too
+            var collected = get(collector.Components)!;
+            var name = collected.ContainsKey(id) ? file + "#" + id : id;
+            collected[name] = component;
+
+            var item = new OpenApiComponents();
+            set(item, new Dictionary<string, TComponent> { [name] = component });
+            return new OpenApiDocument { Components = item };
+        }
     }
 
     private sealed class ReferenceVisitor : OpenApiVisitorBase
