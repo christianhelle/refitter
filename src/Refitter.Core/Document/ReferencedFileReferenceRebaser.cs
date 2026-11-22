@@ -5,7 +5,7 @@ namespace Refitter.Core;
 
 /// <summary>
 /// Rewrites the relative file <c>$ref</c> values of a referenced file into absolute paths. The reference
-/// resolvers resolve every nested reference against the root document, while <see cref="ReferenceGuard"/>
+/// resolvers resolve every nested reference against the root document, while <see cref="OpenApiDocumentReader"/>
 /// validates it against the file that contains it. Making each reference absolute, relative to its own
 /// file, removes the disagreement, so the file that is read is the file that was validated.
 /// </summary>

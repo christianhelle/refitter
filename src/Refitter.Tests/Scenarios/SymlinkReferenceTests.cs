@@ -104,7 +104,7 @@ public class SymlinkReferenceTests
         await File.WriteAllTextAsync(Path.Combine(root, "sub", "secret.json"), Schema);
         string main = await WriteMain(root, "secret.json");
 
-        var act = () => ReferenceGuard.ValidateAsync(main, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(main, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
