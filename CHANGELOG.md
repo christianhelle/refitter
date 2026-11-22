@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Bug Fixes
+- Strip XML-invalid control characters from descriptions ([#1433](https://github.com/christianhelle/refitter/pull/1433)) ([@christianhelle](https://github.com/christianhelle/))
 - Rename record constructors when applying ContractTypeSuffix ([#1437](https://github.com/christianhelle/refitter/pull/1437)) ([@christianhelle](https://github.com/christianhelle/))
 - Emit Content-Type header for referenced request bodies ([#1435](https://github.com/christianhelle/refitter/pull/1435)) ([@christianhelle](https://github.com/christianhelle/))
 
