@@ -392,12 +392,6 @@ internal static class OpenApiDocumentReader
             if (ContainsLinkBelowRoot(rootDirectory, resolved, rootDocumentPath))
                 throw SymbolicLinkBlocked(reference, resolved);
 
-            // OasReader resolves a reference whose file is missing at its literal path by searching the
-            // whole tree for a file whose path ends with the reference, so a link elsewhere can be read
-            if (!File.Exists(resolved) &&
-                FindLinkedSearchMatch(rootDirectory, fileRef, rootDocumentPath) is { } linked)
-                throw SymbolicLinkBlocked(reference, linked);
-
             await ReadLocalFileAsync(resolved).ConfigureAwait(false);
         }
     }
@@ -728,51 +722,6 @@ internal static class OpenApiDocumentReader
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Mirrors the file search of OasReader: a file whose path ends with the reference, anywhere below the root.
-    /// Directories are enumerated by hand so that links are never followed into a cycle; the files of a
-    /// linked directory are still reported, because their path passes through the link.
-    /// </summary>
-    private static string? FindLinkedSearchMatch(string rootDirectory, string fileReference, string? rootDocumentPath)
-    {
-        var separator = Path.DirectorySeparatorChar;
-        var suffix = fileReference.Replace('\\', separator).Replace('/', separator);
-        while (suffix.StartsWith("." + separator, StringComparison.Ordinal))
-            suffix = suffix.Substring(2);
-
-        if (suffix.Length == 0)
-            return null;
-
-        var pending = new Stack<(string Directory, bool ThroughLink)>();
-        pending.Push((Path.GetFullPath(rootDirectory), false));
-        while (pending.Count > 0)
-        {
-            var (directory, throughLink) = pending.Pop();
-            try
-            {
-                foreach (var file in Directory.EnumerateFiles(directory))
-                {
-                    if (file.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) &&
-                        ContainsLinkBelowRoot(rootDirectory, file, rootDocumentPath))
-                        return file;
-                }
-
-                foreach (var subdirectory in Directory.EnumerateDirectories(directory))
-                {
-                    var isLink = (File.GetAttributes(subdirectory) & FileAttributes.ReparsePoint) != 0;
-                    if (!(isLink && throughLink))
-                        pending.Push((subdirectory, throughLink || isLink));
-                }
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                // A directory that cannot be listed cannot be searched by the resolver either
-            }
-        }
-
-        return null;
     }
 
     internal static bool IsWithin(string rootDirectory, string candidate)
