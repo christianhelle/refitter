@@ -87,7 +87,7 @@ public static class OpenApiValidator
             {
                 // The references to other files are followed through the set, each file parsed on its own
                 externalComponents = ExternalComponentCollector
-                    .Collect(set, document, diagnostic.SpecificationVersion, cancellationToken);
+                    .Collect(set, document, cancellationToken);
                 walker.Walk(new OpenApiDocument { Components = externalComponents });
             }
         }
