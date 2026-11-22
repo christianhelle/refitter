@@ -82,24 +82,65 @@ internal sealed class ExternalComponentCollector
         if (file is null || file == rootKey || reference.Id is null)
             return;
 
-        var type = reference.Type;
-
-        if (!reached.Add(type + "|" + file + "#" + reference.Id))
+        if (!reached.Add(reference.Type + "|" + file + "#" + reference.Id))
             return;
 
-        var target = await FindAsync(file, type, reference, cancellationToken).ConfigureAwait(false);
-        if (target is null)
+        if (!set.TryGetFile(file, out var json) && !set.TryGetUrl(file, out json))
             return;
 
-        // Two files can define a component with the same name, so the second one is keyed by its file too
-        var name = reference.Id;
-        if (Contains(type, name))
-            name = file + "#" + reference.Id;
+        var components = (await ParseAsync(file, json, cancellationToken).ConfigureAwait(false))?.Components;
+        var id = reference.Id;
+        var item = reference.Type switch
+        {
+            ReferenceType.Schema => Collect(
+                components?.Schemas, Components.Schemas!, file, id, (c, d) => c.Schemas = d, WholeFileSchema(reference, json)),
+            ReferenceType.Response => Collect(components?.Responses, Components.Responses!, file, id, (c, d) => c.Responses = d),
+            ReferenceType.Parameter => Collect(components?.Parameters, Components.Parameters!, file, id, (c, d) => c.Parameters = d),
+            ReferenceType.Example => Collect(components?.Examples, Components.Examples!, file, id, (c, d) => c.Examples = d),
+            ReferenceType.RequestBody => Collect(
+                components?.RequestBodies, Components.RequestBodies!, file, id, (c, d) => c.RequestBodies = d),
+            ReferenceType.Header => Collect(components?.Headers, Components.Headers!, file, id, (c, d) => c.Headers = d),
+            ReferenceType.SecurityScheme => Collect(
+                components?.SecuritySchemes, Components.SecuritySchemes!, file, id, (c, d) => c.SecuritySchemes = d),
+            ReferenceType.Link => Collect(components?.Links, Components.Links!, file, id, (c, d) => c.Links = d),
+            ReferenceType.Callback => Collect(components?.Callbacks, Components.Callbacks!, file, id, (c, d) => c.Callbacks = d),
+            ReferenceType.PathItem => Collect(components?.PathItems, Components.PathItems!, file, id, (c, d) => c.PathItems = d),
+            _ => null,
+        };
 
-        var item = Add(type, name, target);
         if (item is not null)
             pending.Enqueue((file, item));
     }
+
+    // Adds the component the file defines under the id, and returns a document holding only it, to walk for the
+    // references it holds
+    private static OpenApiDocument? Collect<T>(
+        IDictionary<string, T>? defined,
+        IDictionary<string, T> collected,
+        string file,
+        string id,
+        Action<OpenApiComponents, IDictionary<string, T>> assign,
+        T? fallback = null)
+        where T : class
+    {
+        var component = defined is not null && defined.TryGetValue(id, out var found) ? found : fallback;
+        if (component is null)
+            return null;
+
+        // Two files can define a component with the same name, so the second one is keyed by its file too
+        var name = collected.ContainsKey(id) ? file + "#" + id : id;
+        collected[name] = component;
+
+        var item = new OpenApiComponents();
+        assign(item, new Dictionary<string, T> { [name] = component });
+        return new OpenApiDocument { Components = item };
+    }
+
+    // A reference to a whole file has the file name as its id, and the file is a schema of its own
+    private IOpenApiSchema? WholeFileSchema(BaseOpenApiReference reference, string json) =>
+        reference.IsExternal && reference.Id == Path.GetFileName(reference.ExternalResource)
+            ? ParseSchema(json)
+            : null;
 
     // A reference is resolved against the file it is written in. A remote document is keyed by its URL
     // as written, and a local file by its full path, as the reader keyed them
@@ -124,31 +165,6 @@ internal sealed class ExternalComponentCollector
         {
             return null;
         }
-    }
-
-    private async Task<object?> FindAsync(
-        string file,
-        ReferenceType type,
-        BaseOpenApiReference reference,
-        CancellationToken cancellationToken)
-    {
-        if (!set.TryGetFile(file, out var json) && !set.TryGetUrl(file, out json))
-            return null;
-
-        var document = await ParseAsync(file, json, cancellationToken).ConfigureAwait(false);
-        var component = Find(document?.Components, type, reference.Id!);
-        if (component is not null)
-            return component;
-
-        // A reference to a whole file has the file name as its id, and the file is a schema of its own
-        if (type == ReferenceType.Schema
-            && reference.IsExternal
-            && reference.Id == Path.GetFileName(reference.ExternalResource))
-        {
-            return ParseSchema(json);
-        }
-
-        return null;
     }
 
     private async Task<OpenApiDocument?> ParseAsync(string file, string json, CancellationToken cancellationToken)
@@ -203,95 +219,6 @@ internal sealed class ExternalComponentCollector
         }
 
         return new KeyValuePair<string, JsonNode?>("openapi", null);
-    }
-
-    private static object? Find(OpenApiComponents? components, ReferenceType type, string id) =>
-        components is null
-            ? null
-            : type switch
-            {
-                ReferenceType.Schema => Find(components.Schemas, id),
-                ReferenceType.Response => Find(components.Responses, id),
-                ReferenceType.Parameter => Find(components.Parameters, id),
-                ReferenceType.Example => Find(components.Examples, id),
-                ReferenceType.RequestBody => Find(components.RequestBodies, id),
-                ReferenceType.Header => Find(components.Headers, id),
-                ReferenceType.SecurityScheme => Find(components.SecuritySchemes, id),
-                ReferenceType.Link => Find(components.Links, id),
-                ReferenceType.Callback => Find(components.Callbacks, id),
-                ReferenceType.PathItem => Find(components.PathItems, id),
-                _ => null,
-            };
-
-    private static object? Find<T>(IDictionary<string, T>? components, string id) where T : class =>
-        components is not null && components.TryGetValue(id, out var component) ? component : null;
-
-    private bool Contains(ReferenceType type, string name) => type switch
-    {
-        ReferenceType.Schema => Components.Schemas!.ContainsKey(name),
-        ReferenceType.Response => Components.Responses!.ContainsKey(name),
-        ReferenceType.Parameter => Components.Parameters!.ContainsKey(name),
-        ReferenceType.Example => Components.Examples!.ContainsKey(name),
-        ReferenceType.RequestBody => Components.RequestBodies!.ContainsKey(name),
-        ReferenceType.Header => Components.Headers!.ContainsKey(name),
-        ReferenceType.SecurityScheme => Components.SecuritySchemes!.ContainsKey(name),
-        ReferenceType.Link => Components.Links!.ContainsKey(name),
-        ReferenceType.Callback => Components.Callbacks!.ContainsKey(name),
-        ReferenceType.PathItem => Components.PathItems!.ContainsKey(name),
-        _ => false,
-    };
-
-    // Adds the component, and returns a document holding only it, to walk for the references it holds
-    private OpenApiDocument? Add(ReferenceType type, string name, object target)
-    {
-        var item = new OpenApiComponents();
-        switch (type, target)
-        {
-            case (ReferenceType.Schema, IOpenApiSchema schema):
-                Components.Schemas![name] = schema;
-                item.Schemas = new Dictionary<string, IOpenApiSchema> { [name] = schema };
-                break;
-            case (ReferenceType.Response, IOpenApiResponse response):
-                Components.Responses![name] = response;
-                item.Responses = new Dictionary<string, IOpenApiResponse> { [name] = response };
-                break;
-            case (ReferenceType.Parameter, IOpenApiParameter parameter):
-                Components.Parameters![name] = parameter;
-                item.Parameters = new Dictionary<string, IOpenApiParameter> { [name] = parameter };
-                break;
-            case (ReferenceType.Example, IOpenApiExample example):
-                Components.Examples![name] = example;
-                item.Examples = new Dictionary<string, IOpenApiExample> { [name] = example };
-                break;
-            case (ReferenceType.RequestBody, IOpenApiRequestBody requestBody):
-                Components.RequestBodies![name] = requestBody;
-                item.RequestBodies = new Dictionary<string, IOpenApiRequestBody> { [name] = requestBody };
-                break;
-            case (ReferenceType.Header, IOpenApiHeader header):
-                Components.Headers![name] = header;
-                item.Headers = new Dictionary<string, IOpenApiHeader> { [name] = header };
-                break;
-            case (ReferenceType.SecurityScheme, IOpenApiSecurityScheme securityScheme):
-                Components.SecuritySchemes![name] = securityScheme;
-                item.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme> { [name] = securityScheme };
-                break;
-            case (ReferenceType.Link, IOpenApiLink link):
-                Components.Links![name] = link;
-                item.Links = new Dictionary<string, IOpenApiLink> { [name] = link };
-                break;
-            case (ReferenceType.Callback, IOpenApiCallback callback):
-                Components.Callbacks![name] = callback;
-                item.Callbacks = new Dictionary<string, IOpenApiCallback> { [name] = callback };
-                break;
-            case (ReferenceType.PathItem, IOpenApiPathItem pathItem):
-                Components.PathItems![name] = pathItem;
-                item.PathItems = new Dictionary<string, IOpenApiPathItem> { [name] = pathItem };
-                break;
-            default:
-                return null;
-        }
-
-        return new OpenApiDocument { Components = item };
     }
 
     private sealed class ReferenceVisitor : OpenApiVisitorBase
