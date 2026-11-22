@@ -120,4 +120,18 @@ public class OpenApiDocumentReaderEdgeCaseTests
 
         await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*exa mple.com*");
     }
+
+    [TestMethod]
+    public async Task Yml_File_With_Json_Content_Is_Served_As_Its_Yaml_Reading()
+    {
+        var folder = TestDirectory.CreateFolder();
+        var path = await WriteSpec(folder, "\"Pet\":{\"$ref\":\"./pet.yml\"}");
+        var pet = Path.Combine(folder, "pet.yml");
+        await File.WriteAllTextAsync(pet, "{\"type\":\"number\",\"default\":1.5e10}");
+
+        var set = await OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
+
+        set.TryGetFile(pet, out var json).Should().BeTrue();
+        json.Should().Contain("\"1.5e10\"");
+    }
 }
