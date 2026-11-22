@@ -22,38 +22,72 @@ internal static class AttributeStringValidator
     internal static void Validate(
         OpenApiDocument? document,
         OpenApiDiagnostic diagnostic,
-        IDictionary<string, IOpenApiSecurityScheme>? externalSecuritySchemes = null)
+        OpenApiComponents? externalComponents = null)
     {
         if (document == null)
             return;
 
         ValidateSecuritySchemes(document.Components?.SecuritySchemes, diagnostic);
-        ValidateSecuritySchemes(externalSecuritySchemes, diagnostic);
-
-        if (document.Paths == null)
-            return;
 
         // Accept/Content-Type headers are only emitted from content map keys for OpenAPI 3.0+,
         // so only reject unsafe content-type keys for those documents to avoid Swagger 2.0 false positives.
         var validateContentTypes = diagnostic.SpecificationVersion != OpenApiSpecVersion.OpenApi2_0;
 
+        ValidateExternalComponents(externalComponents, diagnostic, validateContentTypes);
+
+        if (document.Paths == null)
+            return;
+
         foreach (var path in document.Paths)
         {
             ValidatePath(path.Key, diagnostic);
+            ValidateOperations(path.Value, diagnostic, validateContentTypes);
+        }
+    }
 
-            if (path.Value?.Operations == null)
+    // The references of the OpenAPI document do not resolve to components in other files, so those components
+    // are checked where they are defined
+    private static void ValidateExternalComponents(
+        OpenApiComponents? components,
+        OpenApiDiagnostic diagnostic,
+        bool validateContentTypes)
+    {
+        if (components == null)
+            return;
+
+        ValidateSecuritySchemes(components.SecuritySchemes, diagnostic);
+        ValidateHeaderParameters(components.Parameters?.Values, diagnostic);
+
+        if (validateContentTypes)
+        {
+            foreach (var requestBody in components.RequestBodies?.Values ?? Enumerable.Empty<IOpenApiRequestBody>())
+                ValidateContentTypeKeys(requestBody?.Content, diagnostic);
+
+            foreach (var response in components.Responses?.Values ?? Enumerable.Empty<IOpenApiResponse>())
+                ValidateContentTypeKeys(response?.Content, diagnostic);
+        }
+
+        foreach (var pathItem in components.PathItems?.Values ?? Enumerable.Empty<IOpenApiPathItem>())
+            ValidateOperations(pathItem, diagnostic, validateContentTypes);
+    }
+
+    private static void ValidateOperations(
+        IOpenApiPathItem? pathItem,
+        OpenApiDiagnostic diagnostic,
+        bool validateContentTypes)
+    {
+        if (pathItem?.Operations == null)
+            return;
+
+        foreach (var operation in pathItem.Operations.Values)
+        {
+            if (operation == null)
                 continue;
 
-            foreach (var operation in path.Value.Operations.Values)
-            {
-                if (operation == null)
-                    continue;
+            ValidateHeaderParameters(operation.Parameters, diagnostic);
 
-                ValidateHeaderParameters(operation, diagnostic);
-
-                if (validateContentTypes)
-                    ValidateContentTypeKeys(operation, diagnostic);
-            }
+            if (validateContentTypes)
+                ValidateContentTypeKeys(operation, diagnostic);
         }
     }
 
@@ -95,14 +129,16 @@ internal static class AttributeStringValidator
         }
     }
 
-    private static void ValidateHeaderParameters(OpenApiOperation operation, OpenApiDiagnostic diagnostic)
+    private static void ValidateHeaderParameters(
+        IEnumerable<IOpenApiParameter>? parameters,
+        OpenApiDiagnostic diagnostic)
     {
-        if (operation.Parameters == null)
+        if (parameters == null)
             return;
 
-        foreach (var parameter in operation.Parameters)
+        foreach (var parameter in parameters)
         {
-            if (parameter.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
+            if (parameter?.In == ParameterLocation.Header && ContainsUnsafeCharacters(parameter.Name))
             {
                 diagnostic.Errors.Add(new OpenApiError(
                     parameter.Name ?? string.Empty,
@@ -113,27 +149,24 @@ internal static class AttributeStringValidator
 
     private static void ValidateContentTypeKeys(OpenApiOperation operation, OpenApiDiagnostic diagnostic)
     {
-        if (operation.RequestBody?.Content != null)
-        {
-            foreach (var contentType in operation.RequestBody.Content.Keys)
-            {
-                AddContentTypeErrorIfUnsafe(contentType, diagnostic);
-            }
-        }
+        ValidateContentTypeKeys(operation.RequestBody?.Content, diagnostic);
 
         if (operation.Responses == null)
             return;
 
         foreach (var response in operation.Responses.Values)
-        {
-            if (response?.Content == null)
-                continue;
+            ValidateContentTypeKeys(response?.Content, diagnostic);
+    }
 
-            foreach (var contentType in response.Content.Keys)
-            {
-                AddContentTypeErrorIfUnsafe(contentType, diagnostic);
-            }
-        }
+    private static void ValidateContentTypeKeys(
+        IDictionary<string, IOpenApiMediaType>? content,
+        OpenApiDiagnostic diagnostic)
+    {
+        if (content == null)
+            return;
+
+        foreach (var contentType in content.Keys)
+            AddContentTypeErrorIfUnsafe(contentType, diagnostic);
     }
 
     private static void AddContentTypeErrorIfUnsafe(string contentType, OpenApiDiagnostic diagnostic)

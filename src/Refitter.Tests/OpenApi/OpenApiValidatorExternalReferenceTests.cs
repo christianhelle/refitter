@@ -146,7 +146,8 @@ public class OpenApiValidatorExternalReferenceTests
 
         var result = await OpenApiValidator.Validate(root);
 
-        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Security scheme 'Alias'"));
+        // Reported by the name it is defined with in its own file
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Security scheme 'Key'"));
     }
 
     [TestMethod]
@@ -167,6 +168,109 @@ public class OpenApiValidatorExternalReferenceTests
             new Dictionary<string, string>());
 
         var result = await OpenApiValidator.ValidateAsync(set);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Header parameter name"));
+    }
+
+    private static string ParameterRoot(params string[] refs) =>
+        "{" + Header + ",\"paths\":{\"/pets\":{\"get\":{\"parameters\":[" +
+        string.Join(",", refs.Select(r => "{\"$ref\":\"" + r + "\"}")) +
+        "],\"responses\":{\"200\":{\"description\":\"ok\"}}}}}}";
+
+    private static string HeaderParameter(string headerName, bool withVersion) =>
+        "{" + (withVersion ? Header + "," : "") + "\"components\":{\"parameters\":{\"P\":{\"name\":\"" + headerName +
+        "\",\"in\":\"header\",\"schema\":{\"type\":\"string\"}}}}}";
+
+    [TestMethod]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_From_External_File_Without_Version()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "params.json", HeaderParameter("X-Bad\\\"Header", withVersion: false));
+        var root = await Write(folder, "root.json", ParameterRoot("./params.json#/components/parameters/P"));
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Header parameter name"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Counts_Statistics_For_External_Components_File_Without_Version()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "with.json", Components(Pet(""), withVersion: true));
+        await Write(folder, "without.json", Components(Pet(""), withVersion: false));
+        var with = await Write(folder, "with-root.json", Root("./with.json#/components/schemas/Pet"));
+        var without = await Write(folder, "without-root.json", Root("./without.json#/components/schemas/Pet"));
+
+        var expected = await OpenApiValidator.Validate(with);
+        var result = await OpenApiValidator.Validate(without);
+
+        result.Statistics.SchemaCount.Should().Be(expected.Statistics.SchemaCount).And.BeGreaterThan(0);
+    }
+
+    [TestMethod]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_Sharing_A_Name_With_A_Safe_One()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "safe.json", HeaderParameter("X-Safe", withVersion: true));
+        await Write(folder, "unsafe.json", HeaderParameter("X-Bad\\\"Header", withVersion: true));
+        var root = await Write(
+            folder,
+            "root.json",
+            ParameterRoot("./safe.json#/components/parameters/P", "./unsafe.json#/components/parameters/P"));
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("X-Bad"));
+    }
+
+    [TestMethod]
+    public async Task Validate_Counts_Components_Reached_Through_A_Reference_Inside_An_External_File()
+    {
+        var folder = TestDirectory.CreateFolder();
+        string Owner(string properties) =>
+            Components(
+                Pet(",\"owner\":{\"$ref\":\"#/components/schemas/Owner\"}") +
+                ",\"Owner\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"}" + properties + "}}",
+                withVersion: true);
+        await Write(folder, "small.json", Owner(""));
+        await Write(folder, "large.json", Owner(",\"x\":{\"type\":\"string\"},\"y\":{\"type\":\"string\"}"));
+        var small = await Write(folder, "small-root.json", Root("./small.json#/components/schemas/Pet"));
+        var large = await Write(folder, "large-root.json", Root("./large.json#/components/schemas/Pet"));
+
+        var smallResult = await OpenApiValidator.Validate(small);
+        var largeResult = await OpenApiValidator.Validate(large);
+
+        largeResult.Statistics.SchemaCount.Should().Be(smallResult.Statistics.SchemaCount + 2);
+    }
+
+    [TestMethod]
+    public async Task Validate_Counts_A_Schema_File_Referenced_As_A_Whole()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "pet.json", "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}");
+        var root = await Write(folder, "root.json", Root("./pet.json"));
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().BeEmpty();
+        result.Statistics.SchemaCount.Should().Be(2);
+    }
+
+    [TestMethod]
+    public async Task Validate_Resolves_A_Relative_Reference_In_A_Remote_File_Against_Its_Url()
+    {
+        // Every path serves this document, so P reaches Q only when "./other.json" resolves against the server
+        using var server = new LoopbackHttpServer(
+            "{" + Header + ",\"components\":{\"parameters\":{" +
+            "\"P\":{\"$ref\":\"./other.json#/components/parameters/Q\"}," +
+            "\"Q\":{\"name\":\"X-Bad\\\"Header\",\"in\":\"header\",\"schema\":{\"type\":\"string\"}}}}}");
+        var root = await Write(
+            TestDirectory.CreateFolder(),
+            "root.json",
+            ParameterRoot(server.BaseUrl + "params.json#/components/parameters/P"));
+
+        var result = await OpenApiValidator.Validate(root, allowRemoteReferences: true);
 
         result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("Header parameter name"));
     }

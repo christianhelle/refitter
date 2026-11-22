@@ -76,54 +76,26 @@ public static class OpenApiValidator
         var diagnostic = diagnosticsResult.Diagnostic ?? new OpenApiDiagnostic();
 
         var document = diagnosticsResult.Document;
-        if (isLocal)
-        {
-            // A second reading follows the external references, so that their components are available
-            var documentSettings = new OpenApiReaderSettings
-            {
-                LoadExternalRefs = true,
-                BaseUrl = new Uri(set.RootDocumentPath!),
-                CustomExternalLoader = new DocumentSetStreamLoader(set),
-            };
-            document = (await LoadAsync(set.RootJson, documentSettings, cancellationToken).ConfigureAwait(false)).Document;
-        }
-
         var stats = new OpenApiStats();
         var walker = new OpenApiWalker(stats);
-        IDictionary<string, IOpenApiSecurityScheme>? externalSecuritySchemes = null;
+        OpenApiComponents? externalComponents = null;
         if (document is not null)
         {
             walker.Walk(document);
 
             if (isLocal)
             {
-                var external = CollectExternalComponents(document);
-                var components = external.Snapshot();
-                walker.Walk(new OpenApiDocument { Components = components });
-                externalSecuritySchemes = components.SecuritySchemes;
+                // The references to other files are followed through the set, each file parsed on its own
+                externalComponents = await ExternalComponentCollector
+                    .CollectAsync(set, document, diagnostic.SpecificationVersion, cancellationToken)
+                    .ConfigureAwait(false);
+                walker.Walk(new OpenApiDocument { Components = externalComponents });
             }
         }
 
-        AttributeStringValidator.Validate(document, diagnostic, externalSecuritySchemes);
+        AttributeStringValidator.Validate(document, diagnostic, externalComponents);
 
         return new(diagnostic, stats);
-    }
-
-    // Referenced components can reference more components, so collecting repeats until nothing new is found
-    private static ExternalComponentCollector CollectExternalComponents(OpenApiDocument document)
-    {
-        var collector = new ExternalComponentCollector();
-        var walker = new OpenApiWalker(collector);
-        walker.Walk(document);
-
-        var count = -1;
-        while (count != collector.Count)
-        {
-            count = collector.Count;
-            walker.Walk(new OpenApiDocument { Components = collector.Snapshot() });
-        }
-
-        return collector;
     }
 
     private static Task<ReadResult> LoadAsync(
