@@ -173,11 +173,8 @@ internal static class OpenApiDocumentReader
             var normalized = OpenApiJsonNormalizer.NormalizeDocument(json);
             var resolvable = ResolvableReferences(normalized);
 
-            foreach (var reference in references)
-            {
-                if (!reference.StartsWith("#", StringComparison.Ordinal))
-                    await ReadRemoteRootReferenceAsync(reference, url, resolvable.Contains(reference)).ConfigureAwait(false);
-            }
+            foreach (var reference in references.Where(reference => !reference.StartsWith("#", StringComparison.Ordinal)))
+                await ReadRemoteRootReferenceAsync(reference, url, resolvable.Contains(reference)).ConfigureAwait(false);
 
             return normalized;
         }
@@ -221,6 +218,38 @@ internal static class OpenApiDocumentReader
             reference.StartsWith("https://", StringComparison.Ordinal)
                 ? reference.Split('#')[0]
                 : resolved.ToString().Split('#')[0];
+
+        /// <summary>
+        /// The references the schema resolver follows: <c>$ref</c> values and discriminator mappings outside example,
+        /// default, enum, const and extension values, which are only data. Every reference is still checked, but only
+        /// these are downloaded.
+        /// </summary>
+        private static HashSet<string> ResolvableReferences(string json)
+        {
+            var references = new HashSet<string>(StringComparer.Ordinal);
+            if (SanitizerJson.Parse(json) is not JContainer document)
+                return references;
+
+            foreach (var property in document.Descendants().OfType<JProperty>())
+            {
+                if (property.Value is not JValue { Type: JTokenType.String } value ||
+                    NamedMapEntries.IsInsideLiteralValue(property) ||
+                    !(string.Equals(property.Name, "$ref", StringComparison.OrdinalIgnoreCase) || IsDiscriminatorMapping(property)))
+                    continue;
+
+                var reference = ((string)value.Value!).Trim();
+                if (reference.Length > 0)
+                    references.Add(reference);
+            }
+
+            return references;
+        }
+
+        private static bool IsDiscriminatorMapping(JProperty property) =>
+            property.Parent?.Parent is JProperty mapping &&
+            string.Equals(mapping.Name, "mapping", StringComparison.OrdinalIgnoreCase) &&
+            mapping.Parent?.Parent is JProperty discriminator &&
+            string.Equals(discriminator.Name, "discriminator", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsHttpScheme(Uri uri) =>
             uri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
@@ -313,6 +342,28 @@ internal static class OpenApiDocumentReader
             return json;
         }
 
+        // A remote reference in a local file
+        private async Task ReadRemoteReferenceAsync(string reference, string filePath, Uri? remoteUri, bool resolvable)
+        {
+            var isHttpScheme = remoteUri == null || IsHttpScheme(remoteUri);
+
+            // Non-HTTP schemes (ftp:, data:, etc.) are always blocked
+            if (!isHttpScheme || !allowRemoteReferences)
+                throw RemoteBlocked(reference, filePath);
+
+            // Resolvers only fetch the standard "http://" and "https://" spellings and read anything else,
+            // such as "http:/\\host/../x", as a local file name that would escape the confinement check
+            if (!PathUtilities.IsHttp(reference))
+            {
+                throw new ReferenceResolutionException(
+                    $"Remote '$ref' \"{reference}\" in \"{filePath}\" does not use a standard " +
+                    "\"http://\" or \"https://\" prefix and is rejected.");
+            }
+
+            if (resolvable)
+                await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
+        }
+
         private async Task ReadLocalReferenceAsync(
             string reference,
             string filePath,
@@ -326,24 +377,7 @@ internal static class OpenApiDocumentReader
             // forms such as "http:/\\host" as network locations, so they must not pass as local paths
             if (PathUtilities.TryGetRemoteUri(reference, out Uri? remoteUri) || PathUtilities.IsHttp(reference))
             {
-                var isHttpScheme = remoteUri == null || IsHttpScheme(remoteUri);
-
-                // Non-HTTP schemes (ftp:, data:, etc.) are always blocked
-                if (!isHttpScheme || !allowRemoteReferences)
-                    throw RemoteBlocked(reference, filePath);
-
-                // Resolvers only fetch the standard "http://" and "https://" spellings and read anything else,
-                // such as "http:/\\host/../x", as a local file name that would escape the confinement check
-                if (!PathUtilities.IsHttp(reference))
-                {
-                    throw new ReferenceResolutionException(
-                        $"Remote '$ref' \"{reference}\" in \"{filePath}\" does not use a standard " +
-                        "\"http://\" or \"https://\" prefix and is rejected.");
-                }
-
-                if (resolvable)
-                    await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
-
+                await ReadRemoteReferenceAsync(reference, filePath, remoteUri, resolvable).ConfigureAwait(false);
                 return;
             }
 
@@ -378,38 +412,6 @@ internal static class OpenApiDocumentReader
             await ReadLocalFileAsync(resolved).ConfigureAwait(false);
         }
     }
-
-    /// <summary>
-    /// The references the schema resolver follows: <c>$ref</c> values and discriminator mappings outside example,
-    /// default, enum, const and extension values, which are only data. Every reference is still checked, but only
-    /// these are downloaded.
-    /// </summary>
-    private static HashSet<string> ResolvableReferences(string json)
-    {
-        var references = new HashSet<string>(StringComparer.Ordinal);
-        if (SanitizerJson.Parse(json) is not JContainer document)
-            return references;
-
-        foreach (var property in document.Descendants().OfType<JProperty>())
-        {
-            if (property.Value is not JValue { Type: JTokenType.String } value ||
-                NamedMapEntries.IsInsideLiteralValue(property) ||
-                !(string.Equals(property.Name, "$ref", StringComparison.OrdinalIgnoreCase) || IsDiscriminatorMapping(property)))
-                continue;
-
-            var reference = ((string)value.Value!).Trim();
-            if (reference.Length > 0)
-                references.Add(reference);
-        }
-
-        return references;
-    }
-
-    private static bool IsDiscriminatorMapping(JProperty property) =>
-        property.Parent?.Parent is JProperty mapping &&
-        string.Equals(mapping.Name, "mapping", StringComparison.OrdinalIgnoreCase) &&
-        mapping.Parent?.Parent is JProperty discriminator &&
-        string.Equals(discriminator.Name, "discriminator", StringComparison.OrdinalIgnoreCase);
 
     internal static List<string> ExtractReferences(
         string content,
