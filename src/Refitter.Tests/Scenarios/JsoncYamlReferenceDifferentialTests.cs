@@ -115,9 +115,22 @@ public class JsoncYamlReferenceDifferentialTests
     {
         var path = CreateLayout(
             "openapi.json",
-            CreateDocument("../outside.json").Replace("/*: null,", "/*"));
+            CreateDocument("../outside.json"));
 
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+
+        await act.Should().NotThrowAsync();
+    }
+
+    [TestMethod]
+    public async Task Guard_Ignores_Reference_In_Comment_Of_Json_Url_With_Yaml_Query()
+    {
+        var content = CreateDocument("http://127.0.0.1:1/schema.json");
+
+        var act = () => ReferenceGuard.ValidateAsync(
+            "http://127.0.0.1:1/openapi.json?download=spec.yaml",
+            content,
+            allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }

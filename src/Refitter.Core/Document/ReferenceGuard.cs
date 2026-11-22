@@ -270,11 +270,13 @@ internal static class ReferenceGuard
 
     // A local path may contain "?" or "#", which PathUtilities.IsYaml reads as the start of a URL query or
     // fragment, while a reader that picks its parser by the file name sees the literal extension. Either
-    // reading can lead a loader to YAML, so a match on either counts
+    // reading can lead a loader to YAML, so a match on either counts. A URL has a real query and fragment,
+    // so only its path decides
     private static bool MayBeReadAsYaml(string path) =>
         PathUtilities.IsYaml(path) ||
-        path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
-        path.EndsWith(".yml", StringComparison.OrdinalIgnoreCase);
+        !PathUtilities.IsHttp(path) &&
+        (path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase) ||
+         path.EndsWith(".yml", StringComparison.OrdinalIgnoreCase));
 
     // Reads the token stream rather than a DOM, so escaped keys and values are decoded the way the
     // reference resolvers decode them, and duplicate "$ref" keys are all inspected. The key is matched
