@@ -78,7 +78,8 @@ internal sealed class ExternalComponentCollector
             return;
 
         var file = reference.IsExternal ? Resolve(host, reference.ExternalResource) : host;
-        if (file is null || reference.Id is null)
+        // A reference back into the OpenAPI document reaches a component that is walked with it
+        if (file is null || file == rootKey || reference.Id is null)
             return;
 
         var type = reference.Type;

@@ -245,6 +245,31 @@ public class OpenApiValidatorExternalReferenceTests
     }
 
     [TestMethod]
+    public async Task Validate_Does_Not_Count_A_Root_Component_Reached_Back_From_An_External_File_Twice()
+    {
+        var folder = TestDirectory.CreateFolder();
+        var rootPath = Path.Combine(folder, "root.json");
+        const string Owner = "\"Owner\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\"}}}";
+        string RootWith(string ownerRef) =>
+            "{" + Header + ",\"paths\":{\"/pets\":{\"get\":{\"responses\":{\"200\":{\"description\":\"ok\"," +
+            "\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"./pet.json#/components/schemas/Pet\"}}}}}}}}," +
+            "\"components\":{\"schemas\":{" + Owner + "}}}";
+        await Write(folder, "pet.json", Components(Pet(",\"owner\":{\"$ref\":\"./root.json#/components/schemas/Owner\"}"), withVersion: true));
+        await Write(folder, "root.json", RootWith(""));
+        await Write(folder, "plain.json", Components(Pet(""), withVersion: true));
+        var plainRoot = await Write(
+            folder,
+            "plain-root.json",
+            RootWith("").Replace("./pet.json", "./plain.json"));
+
+        var backReference = await OpenApiValidator.Validate(rootPath);
+        var plain = await OpenApiValidator.Validate(plainRoot);
+
+        // The owner property is a reference, so the only difference is that it does not add Owner again
+        backReference.Statistics.SchemaCount.Should().Be(plain.Statistics.SchemaCount);
+    }
+
+    [TestMethod]
     public async Task Validate_Counts_A_Schema_File_Referenced_As_A_Whole()
     {
         var folder = TestDirectory.CreateFolder();
