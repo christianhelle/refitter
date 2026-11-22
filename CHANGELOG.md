@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Bug Fixes
+- Rename record constructors when applying ContractTypeSuffix ([#1437](https://github.com/christianhelle/refitter/pull/1437)) ([@christianhelle](https://github.com/christianhelle/))
 - Emit Content-Type header for referenced request bodies ([#1435](https://github.com/christianhelle/refitter/pull/1435)) ([@christianhelle](https://github.com/christianhelle/))
 
 
