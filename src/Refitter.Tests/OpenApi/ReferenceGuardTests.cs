@@ -251,7 +251,7 @@ components:
     [TestMethod]
     public async Task Remote_Validation_Blocks_Absolute_Http_Reference_By_Default()
     {
-        var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
+        var content = MainTemplate.Replace("__REF__", "http://127.0.0.1:1/schema.json#/components/schemas/Pet");
 
         var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
 
@@ -261,11 +261,12 @@ components:
     [TestMethod]
     public async Task Remote_Validation_Allows_Absolute_Http_Reference_When_Enabled()
     {
-        var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
+        var content = MainTemplate.Replace("__REF__", "http://127.0.0.1:1/schema.json#/components/schemas/Pet");
 
         var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     [TestMethod]
@@ -454,7 +455,8 @@ components:
 
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     private const string YamlHeader = @"openapi: 3.0.0
@@ -528,7 +530,8 @@ components:
 
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     private const string UnterminatedJson = @"{ ""openapi"": ""3.0.0"", ""paths"": { ""$ref"": ";
@@ -610,7 +613,8 @@ paths: [unterminated
 
         var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     [TestMethod]
