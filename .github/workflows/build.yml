@@ -20,7 +20,7 @@ on:
       - '*'
 
 env:
-  VERSION: 2.4.2.${{ github.run_number }}
+  VERSION: 2.4.3.${{ github.run_number }}
 
 permissions:
   contents: read
