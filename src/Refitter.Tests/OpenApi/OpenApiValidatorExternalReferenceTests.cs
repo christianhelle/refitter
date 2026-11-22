@@ -270,6 +270,66 @@ public class OpenApiValidatorExternalReferenceTests
     }
 
     [TestMethod]
+    public async Task Validate_Checks_And_Counts_Every_Kind_Of_External_Component()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "components.json", """
+            {"components":{
+              "pathItems":{"Pets":{"get":{
+                "parameters":[{"name":"X-Bad\"Param","in":"header","schema":{"type":"string"}}],
+                "responses":{"200":{"description":"ok"}}}}},
+              "requestBodies":{"Body":{"content":{"application/bad\"json":{"schema":{"type":"string"}}}}},
+              "responses":{"Ok":{"description":"ok",
+                "headers":{"H":{"$ref":"#/components/headers/H"}},
+                "links":{"L":{"$ref":"#/components/links/L"}},
+                "content":{"text/bad\"plain":{"examples":{"E":{"$ref":"#/components/examples/E"}}}}}},
+              "headers":{"H":{"schema":{"type":"string"}}},
+              "links":{"L":{"operationId":"x"}},
+              "examples":{"E":{"value":1}},
+              "callbacks":{"Cb":{"{$request.body#/url}":{"post":{"responses":{"200":{"description":"ok"}}}}}}}}
+            """);
+        var root = await Write(folder, "root.json", """
+            {"openapi":"3.1.0","info":{"title":"t","version":"1"},"paths":{
+              "/pets":{"$ref":"./components.json#/components/pathItems/Pets"},
+              "/owners":{"post":{
+                "requestBody":{"$ref":"./components.json#/components/requestBodies/Body"},
+                "responses":{"200":{"$ref":"./components.json#/components/responses/Ok"}},
+                "callbacks":{"cb":{"$ref":"./components.json#/components/callbacks/Cb"}}}}}}
+            """);
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Select(e => e.Message).Should().Contain(m => m.Contains("X-Bad"))
+            .And.Contain(m => m.Contains("application/bad"))
+            .And.Contain(m => m.Contains("text/bad"));
+        result.Statistics.RequestBodyCount.Should().BePositive();
+        result.Statistics.LinkCount.Should().BePositive();
+        result.Statistics.CallbackCount.Should().BePositive();
+    }
+
+    [TestMethod]
+    [DataRow("missing.json", null)]
+    [DataRow("broken.json", "{not json")]
+    [DataRow("array.json", "[]")]
+    public async Task Validate_Skips_A_Referenced_File_It_Cannot_Read_As_A_Document(string name, string? content)
+    {
+        var folder = Path.Combine(TestDirectory.Root, "validator-unreadable");
+        var file = Path.Combine(folder, name);
+        var files = new Dictionary<string, string>();
+        if (content is not null)
+            files[file] = content;
+        var set = new DocumentSet(
+            Path.Combine(folder, "root.json"),
+            Root(file.Replace(Path.DirectorySeparatorChar, '/') + "#/components/schemas/Pet"),
+            files,
+            new Dictionary<string, string>());
+
+        var result = await OpenApiValidator.ValidateAsync(set);
+
+        result.Diagnostics.Errors.Should().BeEmpty();
+    }
+
+    [TestMethod]
     public async Task Validate_Counts_A_Schema_File_Referenced_As_A_Whole()
     {
         var folder = TestDirectory.CreateFolder();
