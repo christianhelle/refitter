@@ -308,6 +308,23 @@ public class OpenApiValidatorExternalReferenceTests
     }
 
     [TestMethod]
+    public async Task Validate_Counts_External_Definitions_Of_A_Swagger_Document()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "definitions.json", "{\"definitions\":{" + Pet("") + "}}");
+        var root = await Write(folder, "root.json", """
+            {"swagger":"2.0","info":{"title":"t","version":"1"},"paths":{"/pets":{"get":{
+              "responses":{"200":{"description":"ok","schema":{"$ref":"./definitions.json#/definitions/Pet"}}}}}}}
+            """);
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().BeEmpty();
+        result.Statistics.SchemaCount.Should().Be(2);
+    }
+
+    [TestMethod]
+    [DataRow("http://[bad/pet.json#/components/schemas/Pet")]
     [DataRow("ftp://127.0.0.1/pet.json#/components/schemas/Pet")]
     [DataRow("./pet.json")]
     public async Task Validate_Skips_A_Reference_That_Reaches_No_Document(string reference)

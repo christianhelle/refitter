@@ -207,16 +207,12 @@ internal sealed class ExternalComponentCollector
         }
     }
 
+    // The OpenAPI document was read, so it is an object with a version
     private static KeyValuePair<string, JsonNode?> ReadVersionField(string rootJson)
     {
-        var root = JsonObjectOf(rootJson);
-        foreach (var key in new[] { "openapi", "swagger" })
-        {
-            if (root?[key] is { } value)
-                return new KeyValuePair<string, JsonNode?>(key, value);
-        }
-
-        return new KeyValuePair<string, JsonNode?>("openapi", null);
+        var root = JsonObjectOf(rootJson)!;
+        var key = root.ContainsKey("swagger") ? "swagger" : "openapi";
+        return new KeyValuePair<string, JsonNode?>(key, root[key]);
     }
 
     private sealed class ReferenceVisitor : OpenApiVisitorBase
