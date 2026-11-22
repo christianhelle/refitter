@@ -91,7 +91,7 @@ public static class OpenApiDocumentFactory
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}'.", ex);
+                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}': {ex.Message}", ex);
             }
 
             await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);

@@ -34,7 +34,7 @@ public static class OpenApiValidator
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}'.", ex);
+                throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}': {ex.Message}", ex);
             }
 
             await ReferenceGuard.ValidateAsync(openApiFile, content, allowRemoteReferences, cancellationToken)

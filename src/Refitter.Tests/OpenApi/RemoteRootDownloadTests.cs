@@ -23,7 +23,7 @@ public class RemoteRootDownloadTests
         var act = () => OpenApiDocumentFactory.CreateAsync(server.Url);
 
         await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*Failed to download OpenAPI document*");
+            .WithMessage("*Failed to download OpenAPI document*404*");
     }
 
     [TestMethod]
@@ -34,7 +34,7 @@ public class RemoteRootDownloadTests
         var act = () => OpenApiValidator.Validate(server.Url);
 
         await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*Failed to download OpenAPI document*");
+            .WithMessage("*Failed to download OpenAPI document*404*");
     }
 
     [TestMethod]
@@ -45,7 +45,7 @@ public class RemoteRootDownloadTests
         var act = () => OpenApiDocumentFactory.CreateAsync(server.Url);
 
         var thrown = await act.Should().ThrowAsync<InvalidOperationException>();
-        thrown.Which.ToString().Should().Contain(RemoteDocumentDownloader.MaxResponseBytes.ToString());
+        thrown.Which.Message.Should().Contain(RemoteDocumentDownloader.MaxResponseBytes.ToString());
     }
 
     [TestMethod]
@@ -56,7 +56,7 @@ public class RemoteRootDownloadTests
         var act = () => OpenApiValidator.Validate(server.Url);
 
         var thrown = await act.Should().ThrowAsync<InvalidOperationException>();
-        thrown.Which.ToString().Should().Contain(RemoteDocumentDownloader.MaxResponseBytes.ToString());
+        thrown.Which.Message.Should().Contain(RemoteDocumentDownloader.MaxResponseBytes.ToString());
     }
 
     /// <summary>
