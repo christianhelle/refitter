@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Bug Fixes
+- Keep enum properties nullable so native record constructors compile ([#1441](https://github.com/christianhelle/refitter/pull/1441)) ([@christianhelle](https://github.com/christianhelle/))
 - Drop enum defaults that are not an enum member ([#1434](https://github.com/christianhelle/refitter/pull/1434)) ([@christianhelle](https://github.com/christianhelle/))
 - Tolerate unknown collectionFormat and report document load errors ([#1436](https://github.com/christianhelle/refitter/pull/1436)) ([@christianhelle](https://github.com/christianhelle/))
 - Strip XML-invalid control characters from descriptions ([#1433](https://github.com/christianhelle/refitter/pull/1433)) ([@christianhelle](https://github.com/christianhelle/))
