@@ -15,8 +15,15 @@ public sealed class LoopbackHttpServer : IDisposable
     private int requestCount;
 
     public LoopbackHttpServer(string responseBody, string contentType = "application/json")
+        : this(_ => responseBody, contentType)
     {
-        body = Encoding.UTF8.GetBytes(responseBody);
+    }
+
+    /// <summary>
+    /// Answers with a body built from the server's base address, for a document that refers to the server itself
+    /// </summary>
+    public LoopbackHttpServer(Func<string, string> responseBody, string contentType = "application/json")
+    {
         this.contentType = contentType;
 
         var probe = new TcpListener(IPAddress.Loopback, 0);
@@ -25,6 +32,7 @@ public sealed class LoopbackHttpServer : IDisposable
         probe.Stop();
 
         BaseUrl = $"http://127.0.0.1:{port}/";
+        body = Encoding.UTF8.GetBytes(responseBody(BaseUrl));
         listener.Prefixes.Add(BaseUrl);
         listener.Start();
         _ = Task.Run(ServeAsync);

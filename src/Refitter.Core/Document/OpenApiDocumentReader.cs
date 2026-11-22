@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
@@ -141,6 +142,8 @@ internal static class OpenApiDocumentReader
         private readonly HashSet<string> visitedUrls = new(StringComparer.Ordinal);
         private string rootDirectory = string.Empty;
         private string rootDocumentPath = string.Empty;
+        private string? remoteRootUrl;
+        private string? remoteRootContent;
         private bool readAsYaml;
 
         public DocumentSet ToSet(string? rootPath, string rootJson) => new(rootPath, rootJson, files, urls);
@@ -162,20 +165,26 @@ internal static class OpenApiDocumentReader
             // A YAML root document is loaded by a reader that reads every referenced document as YAML
             readAsYaml = MayBeReadAsYaml(url);
 
+            // A reference back to the root document reuses the content that was read, never a second download
+            remoteRootUrl = url;
+            remoteRootContent = content;
+
             var (json, references) = ReadContent(content, url, readAsYaml: false);
+            var normalized = OpenApiJsonNormalizer.NormalizeDocument(json);
+            var resolvable = ResolvableReferences(normalized);
 
             foreach (var reference in references)
             {
                 if (!reference.StartsWith("#", StringComparison.Ordinal))
-                    await ReadRemoteRootReferenceAsync(reference, url).ConfigureAwait(false);
+                    await ReadRemoteRootReferenceAsync(reference, url, resolvable.Contains(reference)).ConfigureAwait(false);
             }
 
-            return OpenApiJsonNormalizer.NormalizeDocument(json);
+            return normalized;
         }
 
         // The root document is parsed without a document path, so its relative references are never
         // resolved; only absolute remote references are read
-        private async Task ReadRemoteRootReferenceAsync(string reference, string url)
+        private async Task ReadRemoteRootReferenceAsync(string reference, string url, bool resolvable)
         {
             var resolvedUri = ResolveAgainst(url, reference);
             if (resolvedUri != null && !string.IsNullOrEmpty(resolvedUri.Scheme))
@@ -184,7 +193,7 @@ internal static class OpenApiDocumentReader
                 if (!IsHttpScheme(resolvedUri) || !allowRemoteReferences)
                     throw RemoteBlocked(reference, url);
 
-                if (PathUtilities.IsHttp(reference))
+                if (resolvable && PathUtilities.IsHttp(reference))
                     await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
             }
             else if (!allowRemoteReferences &&
@@ -204,6 +213,14 @@ internal static class OpenApiDocumentReader
 
             return Uri.TryCreate(new Uri(url), reference.Split('#')[0], out var relativeUri) ? relativeUri : null;
         }
+
+        // The schema resolver passes an absolute reference through as written and resolves a relative one
+        // against the document's URL, which normalizes it (a default port, for example, is dropped)
+        private static string RemoteKey(string reference, Uri resolved) =>
+            reference.StartsWith("http://", StringComparison.Ordinal) ||
+            reference.StartsWith("https://", StringComparison.Ordinal)
+                ? reference.Split('#')[0]
+                : resolved.ToString().Split('#')[0];
 
         private static bool IsHttpScheme(Uri uri) =>
             uri.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) ||
@@ -226,12 +243,16 @@ internal static class OpenApiDocumentReader
             if (!visitedUrls.Add(url))
                 return;
 
-            var content = await RemoteDocumentDownloader
-                .DownloadAsync(url, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            var content = url.Equals(remoteRootUrl, StringComparison.Ordinal)
+                ? remoteRootContent!
+                : await RemoteDocumentDownloader
+                    .DownloadAsync(url, cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
             var (json, references) = ReadContent(content, url, readAsYaml);
-            urls[url] = OpenApiJsonNormalizer.NormalizeReferencedFile(json);
+            var normalized = OpenApiJsonNormalizer.NormalizeReferencedFile(json);
+            urls[url] = normalized;
 
+            var resolvable = ResolvableReferences(normalized);
             foreach (var reference in references)
             {
                 if (reference.StartsWith("#", StringComparison.Ordinal))
@@ -240,8 +261,8 @@ internal static class OpenApiDocumentReader
                 if (!Uri.TryCreate(new Uri(url), reference, out var resolved) || !IsHttpScheme(resolved))
                     throw RemoteBlocked(reference, url);
 
-                // The key the schema resolver asks for
-                await ReadRemoteFileAsync(resolved.ToString().Split('#')[0]).ConfigureAwait(false);
+                if (resolvable.Contains(reference))
+                    await ReadRemoteFileAsync(RemoteKey(reference, resolved)).ConfigureAwait(false);
             }
         }
 
@@ -270,28 +291,33 @@ internal static class OpenApiDocumentReader
             }
 
             var (json, references) = ReadContent(content, filePath, readAsYaml);
+            var normalized = OpenApiJsonNormalizer.NormalizeReferencedFile(json);
 
             // The schema resolver resolves nested references against the root document, but they were checked
             // against this file, so pin them to this file's directory
-            files[filePath] = ReferencedFileReferenceRebaser.Rebase(
-                OpenApiJsonNormalizer.NormalizeReferencedFile(json),
-                filePath);
+            files[filePath] = ReferencedFileReferenceRebaser.Rebase(normalized, filePath);
 
+            var resolvable = ResolvableReferences(normalized);
             string currentDirectory = Path.GetDirectoryName(filePath);
             foreach (var reference in references)
             {
-                await ReadLocalReferenceAsync(reference, filePath, currentDirectory).ConfigureAwait(false);
+                var download = resolvable.Contains(reference);
+                await ReadLocalReferenceAsync(reference, filePath, currentDirectory, download).ConfigureAwait(false);
 
                 // The rebaser cannot pin the references of a file whose path contains '#', so the schema
                 // resolver resolves them against the root document's directory. Read that file too
                 if (filePath.IndexOf('#') >= 0 && !filePath.Equals(rootDocumentPath, StringComparison.Ordinal))
-                    await ReadLocalReferenceAsync(reference, filePath, rootDirectory).ConfigureAwait(false);
+                    await ReadLocalReferenceAsync(reference, filePath, rootDirectory, download).ConfigureAwait(false);
             }
 
             return json;
         }
 
-        private async Task ReadLocalReferenceAsync(string reference, string filePath, string currentDirectory)
+        private async Task ReadLocalReferenceAsync(
+            string reference,
+            string filePath,
+            string currentDirectory,
+            bool resolvable)
         {
             if (reference.StartsWith("#", StringComparison.Ordinal))
                 return;
@@ -315,7 +341,9 @@ internal static class OpenApiDocumentReader
                         "\"http://\" or \"https://\" prefix and is rejected.");
                 }
 
-                await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
+                if (resolvable)
+                    await ReadRemoteFileAsync(reference.Split('#')[0]).ConfigureAwait(false);
+
                 return;
             }
 
@@ -350,6 +378,38 @@ internal static class OpenApiDocumentReader
             await ReadLocalFileAsync(resolved).ConfigureAwait(false);
         }
     }
+
+    /// <summary>
+    /// The references the schema resolver follows: <c>$ref</c> values and discriminator mappings outside example,
+    /// default, enum, const and extension values, which are only data. Every reference is still checked, but only
+    /// these are downloaded.
+    /// </summary>
+    private static HashSet<string> ResolvableReferences(string json)
+    {
+        var references = new HashSet<string>(StringComparer.Ordinal);
+        if (SanitizerJson.Parse(json) is not JContainer document)
+            return references;
+
+        foreach (var property in document.Descendants().OfType<JProperty>())
+        {
+            if (property.Value is not JValue { Type: JTokenType.String } value ||
+                NamedMapEntries.IsInsideLiteralValue(property) ||
+                !(string.Equals(property.Name, "$ref", StringComparison.OrdinalIgnoreCase) || IsDiscriminatorMapping(property)))
+                continue;
+
+            var reference = ((string)value.Value!).Trim();
+            if (reference.Length > 0)
+                references.Add(reference);
+        }
+
+        return references;
+    }
+
+    private static bool IsDiscriminatorMapping(JProperty property) =>
+        property.Parent?.Parent is JProperty mapping &&
+        string.Equals(mapping.Name, "mapping", StringComparison.OrdinalIgnoreCase) &&
+        mapping.Parent?.Parent is JProperty discriminator &&
+        string.Equals(discriminator.Name, "discriminator", StringComparison.OrdinalIgnoreCase);
 
     internal static List<string> ExtractReferences(
         string content,
