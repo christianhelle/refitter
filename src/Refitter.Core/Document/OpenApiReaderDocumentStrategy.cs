@@ -4,7 +4,7 @@ using OpenApiDocument = NSwag.OpenApiDocument;
 
 namespace Refitter.Core;
 
-internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
+internal sealed class OpenApiReaderDocumentStrategy : IFailureReportingStrategy
 {
     private readonly ReferencePolicy policy;
 
@@ -19,6 +19,24 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
     }
 
     public async Task<OpenApiDocument?> TryLoadAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await LoadAsync(path, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException
+                                       and not TaskCanceledException)
+        {
+            if (ReferenceResolutionException.FindIn(ex) is { } rejection)
+                throw rejection;
+
+            return null;
+        }
+    }
+
+    public async Task<OpenApiDocument?> LoadAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
@@ -45,8 +63,14 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
             if (ReferenceResolutionException.FindIn(ex) is { } rejection)
                 throw rejection;
 
-            return await FallbackToNSwagAsync(path, cancellationToken)
+            // With no fallback, the reader's own failure is the one to report
+            var fallback = await FallbackToNSwagAsync(path, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (fallback is null)
+                throw;
+
+            return fallback;
         }
     }
 
@@ -82,6 +106,8 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
             .ConfigureAwait(false);
     }
 
+    // When the reader fails, NSwag reads the document itself. Its error is the one worth reporting, because the
+    // reader's covers only a document with external references.
     private async Task<OpenApiDocument?> FallbackToNSwagAsync(
         string path,
         CancellationToken cancellationToken)
@@ -89,18 +115,8 @@ internal sealed class OpenApiReaderDocumentStrategy : IDocumentLoadingStrategy
         if (PathUtilities.IsHttp(path))
             return null;
 
-        try
-        {
-            return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken)
-                .ConfigureAwait(false);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            if (ReferenceResolutionException.FindIn(ex) is { } rejection)
-                throw rejection;
-
-            return null;
-        }
+        return await OpenApiDocumentParser.FromFileAsync(path, policy, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private static void PopulateMissingRequiredFields(

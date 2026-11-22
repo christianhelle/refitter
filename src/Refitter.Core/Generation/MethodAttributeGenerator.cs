@@ -73,7 +73,9 @@ internal class MethodAttributeGenerator(
         OpenApiOperation operation,
         CSharpOperationModel operationModel)
     {
-        var uniqueContentTypes = operation.RequestBody?.Content.Keys ?? Array.Empty<string>();
+        // A request body declared as a $ref to components/requestBodies carries no inline
+        // content, so resolve through ActualRequestBody like AddAcceptHeader does for responses.
+        var uniqueContentTypes = operation.RequestBody?.ActualRequestBody.Content.Keys ?? Array.Empty<string>();
         var contentType =
             uniqueContentTypes.FirstOrDefault(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase)) ??
             uniqueContentTypes.FirstOrDefault();

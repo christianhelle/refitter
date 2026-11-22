@@ -37,7 +37,7 @@ internal static class BooleanItemsSanitizer
             return false;
 
         // Literal data, like a default or an example, can hold an object that only looks like an array schema
-        if (LiteralValues.IsInside(property))
+        if (NamedMapEntries.IsInsideLiteralValue(property))
             return false;
 
         // Only an array schema has items. Anything else is literal data, like an example.

@@ -142,5 +142,5 @@ internal static class ItemSchemaSanitizer
         mediaType.Parent is JProperty &&
         mediaType.Ancestors().ElementAtOrDefault(2) is JProperty { Name: "content" } content &&
         !NamedMapEntries.IsEntry(content) &&
-        !LiteralValues.IsInside(content);
+        !NamedMapEntries.IsInsideLiteralValue(content);
 }
