@@ -98,6 +98,30 @@ public class OpenApiDocumentReaderEdgeCaseTests
     }
 
     [TestMethod]
+    public async Task Does_Not_Download_A_Property_Named_Mapping_Outside_A_Discriminator()
+    {
+        // Port 1 refuses connections, so a download would fail the read
+        var path = await WriteSpec(
+            TestDirectory.CreateFolder(),
+            "\"Pet\":{\"type\":\"object\",\"properties\":{\"mapping\":{\"type\":\"object\"," +
+            "\"x-source\":\"http://127.0.0.1:1/mapping.json\"}}}");
+
+        var set = await OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
+
+        set.TryGetUrl("http://127.0.0.1:1/mapping.json", out _).Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task Rejects_A_Remote_Reference_The_Uri_Parser_Cannot_Read_When_Remote_References_Are_Disallowed()
+    {
+        var path = await WriteSpec(TestDirectory.CreateFolder(), "\"Pet\":{\"$ref\":\"http://exa mple.com/pet.json\"}");
+
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*exa mple.com*");
+    }
+
+    [TestMethod]
     public async Task Replaces_The_Root_Of_A_Remote_Document_Set()
     {
         using var server = new LoopbackHttpServer(Spec("\"Pet\":" + NameSchema));
