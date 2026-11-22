@@ -429,11 +429,26 @@ public class OpenApiValidatorExternalReferenceTests
     }
 
     [TestMethod]
-    public async Task Validate_Flags_Unsafe_Header_Parameter_From_A_Parameter_File_Referenced_As_A_Whole()
+    public async Task Validate_Flags_Unsafe_Header_Parameter_Reached_Through_An_Alias_File()
+    {
+        var folder = TestDirectory.CreateFolder();
+        await Write(folder, "params.json", HeaderParameter("X-Bad\\\"Header", withVersion: false));
+        await Write(folder, "alias.json", "{\"$ref\":\"./params.json#/components/parameters/P\"}");
+        var root = await Write(folder, "root.json", ParameterRoot("./alias.json"));
+
+        var result = await OpenApiValidator.Validate(root);
+
+        result.Diagnostics.Errors.Should().Contain(e => e.Message.Contains("X-Bad"));
+    }
+
+    [TestMethod]
+    [DataRow("./header.json")]
+    [DataRow("./header.json#")]
+    public async Task Validate_Flags_Unsafe_Header_Parameter_From_A_Parameter_File_Referenced_As_A_Whole(string reference)
     {
         var folder = TestDirectory.CreateFolder();
         await Write(folder, "header.json", "{\"name\":\"X-Bad\\\"Header\",\"in\":\"header\",\"schema\":{\"type\":\"string\"}}");
-        var root = await Write(folder, "root.json", ParameterRoot("./header.json"));
+        var root = await Write(folder, "root.json", ParameterRoot(reference));
 
         var result = await OpenApiValidator.Validate(root);
 
