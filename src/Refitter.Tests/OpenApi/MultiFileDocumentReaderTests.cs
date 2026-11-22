@@ -453,9 +453,16 @@ paths:
             Path.Combine(folder, "child.json"),
             "{\"type\":\"object\",\"properties\":{\"x\":{\"$ref\":\"http://127.0.0.1:1/s.json\"}}}");
 
-        var act = async () => await MultiFileDocumentReader.TryReadAsync(
+        // A set read with remote references disallowed would reject child.json before the reader runs, so the
+        // set holds child.json but not the remote document it refers to
+        var child = Path.Combine(folder, "child.json");
+        var set = new DocumentSet(
             path,
-            await OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false));
+            "{}",
+            new Dictionary<string, string> { [child] = await File.ReadAllTextAsync(child) },
+            new Dictionary<string, string>());
+
+        var act = () => MultiFileDocumentReader.TryReadAsync(path, set);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*127.0.0.1:1*");
     }
