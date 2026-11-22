@@ -8,6 +8,21 @@ namespace Refitter.Core;
 /// </summary>
 internal static class NamedMapEntries
 {
+    // Keywords whose values hold literal JSON, like example payloads, rather than OpenAPI objects. A link's
+    // requestBody and parameters are literal values too, and nothing else under a links map is a media type.
+    private static readonly HashSet<string> LiteralValueKeywords = new(StringComparer.Ordinal)
+    {
+        "example",
+        "examples",
+        "default",
+        "const",
+        "enum",
+        "value",
+        "dataValue",
+        "serializedValue",
+        "links",
+    };
+
     // OpenAPI and JSON Schema maps whose keys are user-chosen names
     private static readonly HashSet<string> NamedMapKeywords = new(StringComparer.Ordinal)
     {
@@ -39,4 +54,14 @@ internal static class NamedMapEntries
         property.Parent!.Parent is JProperty map &&
         NamedMapKeywords.Contains(map.Name) &&
         !IsEntry(map);
+
+    // Whether the token is inside an example, default, enum, const or x-* extension value, where objects are
+    // only data. An entry of a named map, like a schema property called "default", is not such a value.
+    public static bool IsInsideLiteralValue(JToken token) =>
+        token
+            .Ancestors()
+            .OfType<JProperty>()
+            .Any(ancestor =>
+                (LiteralValueKeywords.Contains(ancestor.Name) || ancestor.Name.StartsWith("x-", StringComparison.Ordinal)) &&
+                !IsEntry(ancestor));
 }

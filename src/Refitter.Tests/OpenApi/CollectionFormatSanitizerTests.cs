@@ -57,4 +57,18 @@ public class CollectionFormatSanitizerTests
 
         OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
     }
+
+    [TestMethod]
+    [DataRow("example")]
+    [DataRow("examples")]
+    [DataRow("default")]
+    [DataRow("enum")]
+    [DataRow("const")]
+    [DataRow("x-sample")]
+    public void Keeps_Array_Shaped_Literal_Data(string keyword)
+    {
+        var json = $$"""{ "schema": { "{{keyword}}": { "type": "array", "collectionFormat": "bogus" } } }""";
+
+        OpenApiJsonNormalizer.NormalizeDocument(json).Should().BeSameAs(json);
+    }
 }

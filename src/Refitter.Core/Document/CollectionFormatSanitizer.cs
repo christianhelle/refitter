@@ -43,6 +43,10 @@ internal static class CollectionFormatSanitizer
         if (property.Parent is not JObject owner || owner["type"] is not JValue { Value: "array" })
             return false;
 
+        // Literal data, like an example or default value, is left as written
+        if (NamedMapEntries.IsInsideLiteralValue(property))
+            return false;
+
         property.Remove();
         return true;
     }
