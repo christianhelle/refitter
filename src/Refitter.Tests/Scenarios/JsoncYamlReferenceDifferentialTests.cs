@@ -70,7 +70,7 @@ public class JsoncYamlReferenceDifferentialTests
     {
         var path = CreateLayout("openapi.yaml", CreateDocument("../outside.json"), folder);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*outside the input directory*");
@@ -81,7 +81,7 @@ public class JsoncYamlReferenceDifferentialTests
     {
         var path = CreateLayout("openapi.yaml", CreateDocument("http://127.0.0.1:1/schema.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -104,7 +104,7 @@ public class JsoncYamlReferenceDifferentialTests
             }
             """);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*outside the input directory*");
@@ -117,7 +117,7 @@ public class JsoncYamlReferenceDifferentialTests
             "openapi.json",
             CreateDocument("../outside.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -127,7 +127,7 @@ public class JsoncYamlReferenceDifferentialTests
     {
         var content = CreateDocument("http://127.0.0.1:1/schema.json");
 
-        var act = () => ReferenceGuard.ValidateAsync(
+        var act = () => OpenApiDocumentReader.ReadAsync(
             "http://127.0.0.1:1/openapi.json?download=spec.yaml",
             content,
             allowRemoteReferences: false);

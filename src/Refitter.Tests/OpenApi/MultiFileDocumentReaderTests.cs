@@ -9,8 +9,29 @@ namespace Refitter.Tests.OpenApi;
 [TestClass]
 public class MultiFileDocumentReaderTests
 {
-    private static Task<NSwag.OpenApiDocument?> Read(string path) =>
-        MultiFileDocumentReader.TryReadAsync(path, ReferencePolicy.Unrestricted);
+    private static async Task<NSwag.OpenApiDocument?> Read(string path)
+    {
+        // Documents the reader rejects, or cannot download, are still offered to the multi-file reader
+        var set = File.Exists(path)
+            ? await ReadSetOrEmpty(path)
+            : EmptySet(path);
+        return await MultiFileDocumentReader.TryReadAsync(path, set);
+    }
+
+    private static async Task<DocumentSet> ReadSetOrEmpty(string path)
+    {
+        try
+        {
+            return await OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
+        }
+        catch (ReferenceResolutionException)
+        {
+            return EmptySet(path);
+        }
+    }
+
+    private static DocumentSet EmptySet(string path) =>
+        new(null, "{}", new Dictionary<string, string>(), new Dictionary<string, string>());
 
 
 
@@ -432,7 +453,16 @@ paths:
             Path.Combine(folder, "child.json"),
             "{\"type\":\"object\",\"properties\":{\"x\":{\"$ref\":\"http://127.0.0.1:1/s.json\"}}}");
 
-        var act = () => MultiFileDocumentReader.TryReadAsync(path, new ReferencePolicy(allowRemoteReferences: false));
+        // A set read with remote references disallowed would reject child.json before the reader runs, so the
+        // set holds child.json but not the remote document it refers to
+        var child = Path.Combine(folder, "child.json");
+        var set = new DocumentSet(
+            path,
+            "{}",
+            new Dictionary<string, string> { [child] = await File.ReadAllTextAsync(child) },
+            new Dictionary<string, string>());
+
+        var act = () => MultiFileDocumentReader.TryReadAsync(path, set);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*127.0.0.1:1*");
     }

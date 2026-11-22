@@ -99,7 +99,7 @@ internal static class YamlAliasExpansionGuard
             return Scalar(root);
 
         // The size of the document itself: a string shared by aliases is stored once however often it is referenced
-        var seenStrings = new HashSet<object>(ReferenceGuard.ReferenceComparer.Instance);
+        var seenStrings = new HashSet<object>(OpenApiDocumentReader.ReferenceComparer.Instance);
         Cost Distinct(List<object?> list)
         {
             var cost = new Cost(1 + list.Count, NodeOverhead * (1 + list.Count));
@@ -112,8 +112,8 @@ internal static class YamlAliasExpansionGuard
             return cost;
         }
 
-        var sizes = new Dictionary<object, Cost>(ReferenceGuard.ReferenceComparer.Instance);
-        var inProgress = new HashSet<object>(ReferenceGuard.ReferenceComparer.Instance);
+        var sizes = new Dictionary<object, Cost>(OpenApiDocumentReader.ReferenceComparer.Instance);
+        var inProgress = new HashSet<object>(OpenApiDocumentReader.ReferenceComparer.Instance);
         var frames = new Stack<Frame>();
         frames.Push(new Frame(root!, children));
         inProgress.Add(root!);

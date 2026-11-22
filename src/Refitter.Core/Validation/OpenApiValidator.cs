@@ -37,7 +37,7 @@ public static class OpenApiValidator
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiFile}': {ex.Message}", ex);
             }
 
-            await ReferenceGuard.ValidateAsync(openApiFile, content, allowRemoteReferences, cancellationToken)
+            await OpenApiDocumentReader.ReadAsync(openApiFile, content, allowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
 
             // Parse the already-fetched content using Microsoft.OpenApi
@@ -57,8 +57,8 @@ public static class OpenApiValidator
             return new(diagnostic, statsVisitor);
         }
 
-        // For local files, validate first (reads once), then parse with OpenApiMultiFileReader
-        await ReferenceGuard.ValidateAsync(openApiFile, allowRemoteReferences, cancellationToken)
+        // For local files, check the references first, then parse with OpenApiMultiFileReader
+        await OpenApiDocumentReader.ReadAsync(openApiFile, allowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
 
         var result = await OpenApiMultiFileReader.Read(

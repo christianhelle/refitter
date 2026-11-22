@@ -11,12 +11,13 @@ namespace Refitter.Core;
 internal static class MultiFileDocumentReader
 {
     /// <summary>
-    /// Returns <c>null</c> when the document has no external references or the reader cannot read it. A policy
-    /// rejection is fatal and is thrown.
+    /// Returns <c>null</c> when the document has no external references or the reader cannot read it. A
+    /// rejection is fatal and is thrown. The merged document is parsed with the referenced files of
+    /// <paramref name="set"/>.
     /// </summary>
     public static async Task<OpenApiDocument?> TryReadAsync(
         string path,
-        ReferencePolicy policy,
+        DocumentSet set,
         CancellationToken cancellationToken = default)
     {
         try
@@ -33,7 +34,7 @@ internal static class MultiFileDocumentReader
             var specificationVersion = readResult.OpenApiDiagnostic.SpecificationVersion;
             PopulateMissingRequiredFields(path, readResult);
 
-            return await SerializeRoundTripAsync(readResult, path, specificationVersion, policy, cancellationToken)
+            return await SerializeRoundTripAsync(readResult, path, specificationVersion, set, cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -49,7 +50,7 @@ internal static class MultiFileDocumentReader
         Result readResult,
         string path,
         OpenApiSpecVersion specificationVersion,
-        ReferencePolicy policy,
+        DocumentSet set,
         CancellationToken cancellationToken)
     {
         var document = readResult.OpenApiDocument;
@@ -65,7 +66,7 @@ internal static class MultiFileDocumentReader
                 .ConfigureAwait(false);
 
             return await OpenApiDocumentParser
-                .ParseAsync(yaml, path, isYaml: true, policy, cancellationToken)
+                .ParseAsync(OpenApiDocumentReader.WithRootContent(set, yaml), cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -74,7 +75,7 @@ internal static class MultiFileDocumentReader
             .ConfigureAwait(false);
 
         return await OpenApiDocumentParser
-            .ParseAsync(json, path, isYaml: false, policy, cancellationToken)
+            .ParseAsync(OpenApiDocumentReader.WithRootContent(set, json), cancellationToken)
             .ConfigureAwait(false);
     }
 

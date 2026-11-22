@@ -20,4 +20,4 @@ _Avoid_: snapshot, bundle, multi-file spec
 
 **Reference policy**:
 The rules deciding which referenced files a document set may contain: whether remote references are allowed, and the directory local references must stay inside.
-_Avoid_: reference guard rules, security settings
+_Avoid_: reference guard, security settings

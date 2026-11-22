@@ -36,7 +36,7 @@ public class YamlAliasExpansionTests
     [TestMethod]
     public void Rejects_Alias_Bomb_Above_The_Budget()
     {
-        var act = () => ReferenceGuard.ExtractReferences(Bomb(5), "bomb.yaml", SmallBudget, SmallAmplification);
+        var act = () => OpenApiDocumentReader.ExtractReferences(Bomb(5), "bomb.yaml", SmallBudget, SmallAmplification);
 
         act.Should().Throw<ReferenceResolutionException>()
             .Which.Message.Should().Contain("bomb.yaml").And.Contain(SmallBudget.ToString());
@@ -45,7 +45,7 @@ public class YamlAliasExpansionTests
     [TestMethod]
     public void Rejects_Alias_Bomb_When_Converting_To_Json()
     {
-        var act = () => OpenApiDocumentParser.ConvertYamlToJson(Bomb(5), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
+        var act = () => OpenApiDocumentReader.ConvertYamlToJson(Bomb(5), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
 
         act.Should().Throw<ReferenceResolutionException>();
     }
@@ -85,8 +85,8 @@ components:
     C: *base
 ";
 
-        var references = ReferenceGuard.ExtractReferences(yaml, "spec.yaml", SmallBudget, SmallAmplification);
-        var json = OpenApiDocumentParser.ConvertYamlToJson(yaml, maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
+        var references = OpenApiDocumentReader.ExtractReferences(yaml, "spec.yaml", SmallBudget, SmallAmplification);
+        var json = OpenApiDocumentReader.ConvertYamlToJson(yaml, maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification);
 
         references.Should().BeEmpty();
         json.Should().Contain("\"C\"");
@@ -151,7 +151,7 @@ components:
             yaml.Append($"l{level}: &a{level} [*a{level - 1}, *a{level - 1}]\n");
 
         var stopwatch = Stopwatch.StartNew();
-        var act = () => ReferenceGuard.ExtractReferences(yaml.ToString(), "chain.yaml");
+        var act = () => OpenApiDocumentReader.ExtractReferences(yaml.ToString(), "chain.yaml");
         act.Should().Throw<ReferenceResolutionException>();
         stopwatch.Stop();
 
@@ -166,7 +166,7 @@ components:
             yaml.Append($"k{i}: [a, b, c, d]\n");
 
         // 5000 sequences of 4 scalars is far above the budget, but nothing is amplified
-        var act = () => ReferenceGuard.ExtractReferences(yaml.ToString(), "big.yaml", SmallBudget, SmallAmplification);
+        var act = () => OpenApiDocumentReader.ExtractReferences(yaml.ToString(), "big.yaml", SmallBudget, SmallAmplification);
 
         act.Should().NotThrow();
     }
@@ -194,7 +194,7 @@ components:
         // 101 nodes is far below the node budget, but the expansion is about 50,000 characters
         var yaml = LongScalarAliasedManyTimes(500, 100);
 
-        var act = () => ReferenceGuard.ExtractReferences(
+        var act = () => OpenApiDocumentReader.ExtractReferences(
             yaml, "long.yaml", SmallBudget, SmallAmplification, SmallSizeBudget);
 
         act.Should().Throw<ReferenceResolutionException>().Which.Message.Should().Contain("long.yaml");
@@ -203,7 +203,7 @@ components:
     [TestMethod]
     public void Rejects_A_Long_Scalar_Aliased_Many_Times_When_Converting_To_Json()
     {
-        var act = () => OpenApiDocumentParser.ConvertYamlToJson(
+        var act = () => OpenApiDocumentReader.ConvertYamlToJson(
             LongScalarAliasedManyTimes(500, 100), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification, maxExpandedSize: SmallSizeBudget);
 
         act.Should().Throw<ReferenceResolutionException>();
@@ -216,9 +216,9 @@ components:
         for (var i = 0; i < 100; i++)
             yaml.Append($"k{i}: \"{new string('y', 500)}\"\n");
 
-        var references = () => ReferenceGuard.ExtractReferences(
+        var references = () => OpenApiDocumentReader.ExtractReferences(
             yaml.ToString(), "strings.yaml", SmallBudget, SmallAmplification, SmallSizeBudget);
-        var json = () => OpenApiDocumentParser.ConvertYamlToJson(
+        var json = () => OpenApiDocumentReader.ConvertYamlToJson(
             yaml.ToString(), maxExpandedNodes: SmallBudget, maxAmplification: SmallAmplification, maxExpandedSize: SmallSizeBudget);
 
         references.Should().NotThrow();

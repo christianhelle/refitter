@@ -82,7 +82,7 @@ public class DeeplyNestedDocumentTests
     [TestMethod]
     public void Rejects_Deep_Yaml_When_Converting_To_Json()
     {
-        var act = () => OpenApiDocumentParser.ConvertYamlToJson(YamlSpec(TooDeep));
+        var act = () => OpenApiDocumentReader.ConvertYamlToJson(YamlSpec(TooDeep));
 
         act.Should().Throw<ReferenceResolutionException>();
     }
@@ -90,7 +90,7 @@ public class DeeplyNestedDocumentTests
     [TestMethod]
     public async Task Rejects_Deep_Document_When_Parsing()
     {
-        var act = () => OpenApiDocumentParser.ParseAsync(JsonSpec(TooDeep), null, isYaml: false);
+        var act = () => OpenApiDocumentParser.ParseAsync(JsonSpec(TooDeep), Path.Combine(Path.GetTempPath(), "spec.json"), allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -121,7 +121,7 @@ public class DeeplyNestedDocumentTests
     public void Extracts_References_From_Json_Nested_Beyond_The_Default_Reader_Depth()
     {
         // Newtonsoft's own limit of 64 would report invalid JSON and hand the document to the YAML reader
-        var act = () => ReferenceGuard.ExtractReferences(JsonSpec(150), "spec.json");
+        var act = () => OpenApiDocumentReader.ExtractReferences(JsonSpec(150), "spec.json");
 
         act.Should().NotThrow();
     }
@@ -130,7 +130,7 @@ public class DeeplyNestedDocumentTests
     public void Rejects_Very_Deep_Json_Without_Falling_Back_To_The_Yaml_Reader()
     {
         // 20,000 levels overflow the YAML reader, so this passes only if the JSON path rejects it itself
-        var act = () => ReferenceGuard.ExtractReferences(JsonSpec(20_000), "spec.json");
+        var act = () => OpenApiDocumentReader.ExtractReferences(JsonSpec(20_000), "spec.json");
 
         act.Should().Throw<ReferenceResolutionException>();
     }
@@ -138,7 +138,7 @@ public class DeeplyNestedDocumentTests
     [TestMethod]
     public void Rejects_Very_Deep_Yaml_When_Extracting_References()
     {
-        var act = () => ReferenceGuard.ExtractReferences(YamlSpec(20_000), "spec.yaml");
+        var act = () => OpenApiDocumentReader.ExtractReferences(YamlSpec(20_000), "spec.yaml");
 
         act.Should().Throw<ReferenceResolutionException>();
     }

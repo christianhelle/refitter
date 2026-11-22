@@ -60,7 +60,7 @@ components:
         for (int i = 0; i < schemas; i++)
             yaml.Append($"    S{i}:\n      type: object\n      discriminator: *disc\n    T{i}:\n      type: object\n      discriminator:\n        propertyName: kind\n        mapping: *map\n");
 
-        var references = ReferenceGuard.ExtractReferences(yaml.ToString(), "spec.yaml");
+        var references = OpenApiDocumentReader.ExtractReferences(yaml.ToString(), "spec.yaml");
 
         // Without identity tracking every aliased schema would repeat the whole mapping
         references.Should().HaveCount(mappings);
@@ -91,7 +91,7 @@ components:
       discriminator: *shared
 ";
 
-        var references = ReferenceGuard.ExtractReferences(yaml, "spec.yaml");
+        var references = OpenApiDocumentReader.ExtractReferences(yaml, "spec.yaml");
 
         references.Should().Contain("../outside.json");
     }

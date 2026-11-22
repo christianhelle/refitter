@@ -88,33 +88,36 @@ flowchart TD
     MULTI -- no --> KIND
     EACH -.-> KIND
     KIND{"http(s) URL?"}
-    KIND -- yes --> HTTP["RemoteDocumentDownloader<br/>50 MB limit, 30s deadline"] --> RG1["ReferenceGuard.ValidateAsync"] --> PARSE
-    KIND -- no --> RG2["ReferenceGuard.ValidateAsync"] --> LOADER
+    KIND -- yes --> HTTP["RemoteDocumentDownloader<br/>50 MB limit, 30s deadline"] --> READ
+    KIND -- no --> READ
 
+    subgraph READ["OpenApiDocumentReader (each file read once)"]
+        direction TB
+        R1["check $ref rules"] --> R2["YAML → JSON (YamlDotNet)"] --> R3["OpenApiJsonNormalizer"]
+    end
+
+    READ --> SET["DocumentSet"]
+    SET --> LOADER
     subgraph LOADER["DocumentLoader"]
         direction TB
-        S1["NSwag parse"] -- fails --> S2["MultiFileDocumentReader<br/>only when the spec has external refs"]
+        S1["OpenApiDocumentParser<br/>NSwag, resolving refs from the set only"] -- fails --> S2["MultiFileDocumentReader<br/>only when the spec has external refs"]
     end
-
-    LOADER --> PARSE
-    subgraph PARSE["OpenApiDocumentParser"]
-        direction TB
-        P1["YAML → JSON (YamlDotNet)"] --> P2["OpenApiJsonNormalizer"] --> P3["NSwag OpenApiDocument.FromJsonAsync<br/>with sanitizing reference resolvers"]
-    end
-    PARSE --> DOC["OpenApiDocument"]
+    LOADER --> DOC["OpenApiDocument"]
     MERGE --> DOC
 ```
 
-### Reference guard
+### Reading the document set
 
-Before a specification is parsed, [`ReferenceGuard`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/ReferenceGuard.cs) scans its `$ref` values. It enforces two separate rules:
+[`OpenApiDocumentReader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/OpenApiDocumentReader.cs) reads the specification and every file it references exactly once into a [`DocumentSet`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/DocumentSet.cs). Each file is checked as it is read, converted to JSON and normalized. NSwag's reference resolvers then serve files from the set only: a file the reader did not read is rejected, never read from disk or the network, so the file that is parsed is the file that was checked. The one exception is the multi-file fallback described below: OasReader reads the root document and its references from disk itself before its merged result is parsed against the set.
+
+The reader checks each `$ref` against two separate rules:
 
 - Remote `http(s)` references are rejected, to avoid server-side request forgery when Refitter runs on a build server. Setting `allowRemoteReferences` in the `.refitter` file allows them.
 - Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths, and any referenced file that is, or sits below, a symbolic link inside the directory is rejected, because a link can point outside it. The input specification itself, and the directories above it, are not checked.
 
 ### Loading a local document
 
-[`DocumentLoader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/DocumentLoader.cs) parses a local file with NSwag. When that fails, [`MultiFileDocumentReader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/MultiFileDocumentReader.cs) tries the document, but only when it contains external references. It uses Microsoft.OpenApi's multi-file reader (via OasReader) to inline them into one document, fills in a missing `info.title` / `info.version`, serializes the result back in its original OpenAPI version and re-parses it with NSwag. If neither reads the document, NSwag's error is reported. A reference rejected by the reference guard rules is never retried by the reader.
+[`DocumentLoader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/DocumentLoader.cs) parses a local file with NSwag. When that fails for any reason other than a rejected reference, [`MultiFileDocumentReader`](https://github.com/christianhelle/refitter/blob/main/src/Refitter.Core/Document/MultiFileDocumentReader.cs) reads the document, and returns a result only when it contains external references. It uses Microsoft.OpenApi's multi-file reader (via OasReader) to inline them into one document, fills in a missing `info.title` / `info.version`, serializes the result back in its original OpenAPI version and re-parses it with NSwag. If neither reads the document, NSwag's error is reported. A rejected reference is never retried by the multi-file reader.
 
 Remote documents are downloaded by `RemoteDocumentDownloader`, which rejects responses larger than 50 MB or slower than 30 seconds.
 
@@ -299,4 +302,4 @@ Hosts decide which of these to surface. On success, the CLI prints the configura
 
 ## Validation
 
-Validation is optional and pluggable through `IValidator`. The CLI's [`OpenApiValidatorAdapter`](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core/Validation) runs the reference guard, loads the specification with Microsoft.OpenApi (independently of NSwag), walks it to collect statistics (paths, operations, schemas and so on, shown by the CLI), and checks strings that end up inside C# attributes. Errors make `ThrowIfInvalid()` throw an `OpenApiValidationException` before anything is written.
+Validation is optional and pluggable through `IValidator`. The CLI's [`OpenApiValidatorAdapter`](https://github.com/christianhelle/refitter/tree/main/src/Refitter.Core/Validation) checks the references with `OpenApiDocumentReader`, loads the specification with Microsoft.OpenApi (independently of NSwag), walks it to collect statistics (paths, operations, schemas and so on, shown by the CLI), and checks strings that end up inside C# attributes. Errors make `ThrowIfInvalid()` throw an `OpenApiValidationException` before anything is written.

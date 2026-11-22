@@ -47,13 +47,6 @@ public static class OpenApiDocumentFactory
         return DocumentMerger.Merge(documents);
     }
 
-    // Same root the reference guard confines local references to
-    private static ReferencePolicy CreatePolicy(string openApiPath, bool allowRemoteReferences)
-    {
-        var fullPath = Path.GetFullPath(openApiPath);
-        return new(allowRemoteReferences, Path.GetDirectoryName(fullPath), fullPath);
-    }
-
     /// <summary>
     /// Creates a new instance of the <see cref="NSwag.OpenApiDocument"/> class asynchronously.
     /// </summary>
@@ -79,7 +72,7 @@ public static class OpenApiDocumentFactory
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // For remote URLs, fetch once and reuse content for both validation and parsing
+        // For remote URLs, report a failed download as such before the document is read
         if (PathUtilities.IsHttp(openApiPath))
         {
             string content;
@@ -94,21 +87,14 @@ public static class OpenApiDocumentFactory
                 throw new InvalidOperationException($"Failed to download OpenAPI document from '{openApiPath}': {ex.Message}", ex);
             }
 
-            await ReferenceGuard.ValidateAsync(openApiPath, content, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-
-            return await OpenApiDocumentParser
-                .ParseAsync(
-                    content,
-                    null,
-                    PathUtilities.IsYaml(openApiPath),
-                    new ReferencePolicy(allowRemoteReferences),
-                    cancellationToken)
+            var set = await OpenApiDocumentReader
+                .ReadAsync(openApiPath, content, allowRemoteReferences, cancellationToken)
                 .ConfigureAwait(false);
+            return await OpenApiDocumentParser.ParseAsync(set, cancellationToken).ConfigureAwait(false);
         }
 
-        await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
         return await DocumentLoader
-            .LoadAsync(openApiPath, CreatePolicy(openApiPath, allowRemoteReferences), cancellationToken)
+            .LoadAsync(openApiPath, allowRemoteReferences, cancellationToken)
             .ConfigureAwait(false);
     }
 }

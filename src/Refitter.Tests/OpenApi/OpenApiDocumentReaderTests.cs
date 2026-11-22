@@ -5,7 +5,7 @@ using Refitter.Tests.TestUtilities;
 namespace Refitter.Tests.OpenApi;
 
 [TestClass]
-public class ReferenceGuardTests
+public class OpenApiDocumentReaderTests
 {
     private const string MainTemplate = @"{
   ""openapi"": ""3.0.0"",
@@ -61,7 +61,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "http://127.0.0.1:1/evil.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -72,7 +72,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "http://127.0.0.1:1/evil.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
         await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
@@ -84,7 +84,7 @@ components:
         var outside = Write(NewRoot(), "secret.json", Leaf);
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", outside.Replace("\\", "/")));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -95,7 +95,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "../../secret.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -107,7 +107,7 @@ components:
         Write(root, "leaf.json", Leaf);
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "./leaf.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -123,7 +123,7 @@ components:
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", reference));
         Write(root, "other.json", Leaf);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*File URIs are not supported*relative path*");
@@ -137,7 +137,7 @@ components:
         Write(root, "child.json", @"{ ""$ref"": ""file:./leaf.json"" }");
         Write(root, "leaf.json", Leaf);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*File URIs are not supported*");
     }
@@ -148,7 +148,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "#/components/schemas/Pet"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -159,7 +159,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "swagger.json", Swagger2Template.Replace("__REF__", "http://evil.com/schema.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -171,7 +171,7 @@ components:
         Write(root, "leaf.json", Leaf);
         var path = Write(root, "swagger.json", Swagger2Template.Replace("__REF__", "./leaf.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -182,7 +182,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.yaml", YamlMainTemplate.Replace("__REF__", "http://evil.com/schema.yaml"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -194,7 +194,7 @@ components:
         Write(root, "leaf.json", Leaf);
         var path = Write(root, "spec.yaml", YamlMainTemplate.Replace("__REF__", "./leaf.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -205,27 +205,28 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.yaml", YamlMainTemplate.Replace("__REF__", "../secret.yaml#/Pet"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
 
     [TestMethod]
-    public async Task Ignores_Whitespace_OpenApiPath()
+    public async Task Rejects_Whitespace_OpenApiPath()
     {
-        var act = () => ReferenceGuard.ValidateAsync("   ", allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("   ", allowRemoteReferences: false);
 
-        await act.Should().NotThrowAsync();
+        await act.Should().ThrowAsync<ArgumentException>();
     }
 
     [TestMethod]
-    public async Task Ignores_Missing_Local_File()
+    public async Task Reports_Missing_Local_File_As_A_Load_Failure()
     {
         var path = Path.Combine(NewRoot(), "does-not-exist.json");
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
-        await act.Should().NotThrowAsync();
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Failed to load OpenAPI document*");
     }
 
     [TestMethod]
@@ -233,7 +234,7 @@ components:
     {
         var content = MainTemplate.Replace("__REF__", "./schema.json#/components/schemas/Pet");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -243,7 +244,7 @@ components:
     {
         var content = MainTemplate.Replace("__REF__", "./schema.json#/components/schemas/Pet");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
 
         await act.Should().NotThrowAsync();
     }
@@ -251,9 +252,9 @@ components:
     [TestMethod]
     public async Task Remote_Validation_Blocks_Absolute_Http_Reference_By_Default()
     {
-        var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
+        var content = MainTemplate.Replace("__REF__", "http://127.0.0.1:1/schema.json#/components/schemas/Pet");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -261,11 +262,12 @@ components:
     [TestMethod]
     public async Task Remote_Validation_Allows_Absolute_Http_Reference_When_Enabled()
     {
-        var content = MainTemplate.Replace("__REF__", "http://example.org/schema.json#/components/schemas/Pet");
+        var content = MainTemplate.Replace("__REF__", "http://127.0.0.1:1/schema.json#/components/schemas/Pet");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     [TestMethod]
@@ -273,7 +275,7 @@ components:
     {
         var content = MainTemplate.Replace("__REF__", "file:///etc/passwd");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -283,7 +285,7 @@ components:
     {
         var content = MainTemplate.Replace("__REF__", "schema.json#/components/schemas/Pet");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -293,7 +295,7 @@ components:
     {
         var content = MainTemplate.Replace("__REF__", "schema.json#/components/schemas/Pet");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
 
         await act.Should().NotThrowAsync();
     }
@@ -301,7 +303,7 @@ components:
     [TestMethod]
     public async Task Throws_When_Remote_Entry_Cannot_Be_Downloaded()
     {
-        var act = () => ReferenceGuard.ValidateAsync("http://127.0.0.1:1/openapi.json", allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("http://127.0.0.1:1/openapi.json", allowRemoteReferences: true);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*Failed to read OpenAPI document*");
@@ -314,7 +316,7 @@ components:
             .Replace("\"components\": { \"schemas\": {} }", "\"components\": { \"schemas\": { \"InlineSchema\": { \"type\": \"object\" } } }");
         await using var server = new LocalHttpServer(remoteSpec);
 
-        var act = () => ReferenceGuard.ValidateAsync(server.Url, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(server.Url, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -326,7 +328,7 @@ components:
         Write(root, "a.json", MainTemplate.Replace("__REF__", "./b.json"));
         Write(root, "b.json", MainTemplate.Replace("__REF__", "./a.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(Path.Combine(root, "a.json"), allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(Path.Combine(root, "a.json"), allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -337,7 +339,7 @@ components:
         var root = NewRoot();
         var path = Write(root, "spec.json", MainTemplate.Replace("__REF__", "./missing.json"));
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -351,7 +353,7 @@ components:
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false, cts.Token);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false, cts.Token);
 
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
@@ -362,7 +364,7 @@ components:
         // Neither an absolute URI nor resolvable against the document URI, so it is treated as remote
         var content = MainTemplate.Replace("__REF__", "http://[unparseable");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>();
     }
@@ -372,7 +374,7 @@ components:
     {
         var content = MainTemplate.Replace("__REF__", "http://[unparseable");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: true);
 
         await act.Should().NotThrowAsync();
     }
@@ -383,7 +385,7 @@ components:
         // Unparseable as a URI but root-relative, so it is not treated as a remote reference
         var content = MainTemplate.Replace("__REF__", "//");
 
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", content, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
@@ -399,7 +401,7 @@ components:
         // well as on Windows - verified against .NET 10 on both.
         using var exclusive = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*Failed to read OpenAPI document*");
@@ -428,7 +430,7 @@ components:
     {
         var path = Write(NewRoot(), "spec.json", contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*http://127.0.0.1:1/schema.json*");
@@ -439,7 +441,7 @@ components:
     [DataRow(EscapedValueJson)]
     public async Task Remote_Validation_Blocks_Json_Escaped_Remote_Reference_By_Default(string contents)
     {
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.json", contents, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.json", contents, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*http://127.0.0.1:1/schema.json*");
@@ -452,9 +454,10 @@ components:
     {
         var path = Write(NewRoot(), "spec.json", contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     private const string YamlHeader = @"openapi: 3.0.0
@@ -500,7 +503,7 @@ components:
     {
         var path = Write(NewRoot(), "spec.yaml", contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*http://127.0.0.1:1/schema.json*");
@@ -512,7 +515,7 @@ components:
     [DataRow(AliasedValueYaml)]
     public async Task Remote_Validation_Blocks_Yaml_Obfuscated_Remote_Reference_By_Default(string contents)
     {
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*http://127.0.0.1:1/schema.json*");
@@ -526,9 +529,10 @@ components:
     {
         var path = Write(NewRoot(), "spec.yaml", contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     private const string UnterminatedJson = @"{ ""openapi"": ""3.0.0"", ""paths"": { ""$ref"": ";
@@ -552,7 +556,7 @@ paths: [unterminated
     {
         var path = Write(NewRoot(), fileName, contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*could not be parsed*");
@@ -564,7 +568,7 @@ paths: [unterminated
     [DataRow(DuplicateRefKeyYaml)]
     public async Task Remote_Validation_Blocks_Document_That_Cannot_Be_Parsed(string contents)
     {
-        var act = () => ReferenceGuard.ValidateAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync("https://example.com/openapi.yaml", contents, allowRemoteReferences: true);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*could not be parsed*");
@@ -593,7 +597,7 @@ paths: [unterminated
     {
         var path = Write(NewRoot(), "spec.json", contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*Remote '$ref' \"http://127.0.0.1:1/schema.json\"*");
@@ -608,9 +612,10 @@ paths: [unterminated
     {
         var path = Write(NewRoot(), "spec.json", contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
-        await act.Should().NotThrowAsync();
+        // Allowed references are downloaded; port 1 refuses the connection, which is not a rejection
+        await act.Should().NotThrowAsync<ReferenceResolutionException>();
     }
 
     [TestMethod]
@@ -618,7 +623,7 @@ paths: [unterminated
     {
         var path = Write(NewRoot(), "spec.yaml", "just some text\n");
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: true);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: true);
 
         await act.Should().ThrowAsync<ReferenceResolutionException>()
             .WithMessage("*could not be parsed*");
@@ -631,7 +636,7 @@ paths: [unterminated
     {
         var path = Write(NewRoot(), fileName, contents);
 
-        var act = () => ReferenceGuard.ValidateAsync(path, allowRemoteReferences: false);
+        var act = () => OpenApiDocumentReader.ReadAsync(path, allowRemoteReferences: false);
 
         await act.Should().NotThrowAsync();
     }
