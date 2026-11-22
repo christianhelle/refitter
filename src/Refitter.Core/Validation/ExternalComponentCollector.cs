@@ -182,7 +182,7 @@ internal sealed class ExternalComponentCollector
         return new KeyValuePair<string, JsonNode?>(key, root[key]);
     }
 
-    private static readonly Dictionary<ReferenceType, Kind> Kinds = new()
+    private static readonly Dictionary<ReferenceType, IKind> Kinds = new()
     {
         [ReferenceType.Schema] = new Kind<IOpenApiSchema, OpenApiSchema>(c => c.Schemas, (c, d) => c.Schemas = d),
         [ReferenceType.Response] = new Kind<IOpenApiResponse, OpenApiResponse>(c => c.Responses, (c, d) => c.Responses = d),
@@ -201,13 +201,13 @@ internal sealed class ExternalComponentCollector
     /// <summary>
     /// A kind of component, and where the components of that kind are kept.
     /// </summary>
-    private abstract class Kind
+    private interface IKind
     {
         /// <summary>
         /// Adds the component the file defines under the id, or the whole file, and returns a document holding
         /// only it, to walk for the references it holds.
         /// </summary>
-        public abstract OpenApiDocument? Add(
+        OpenApiDocument? Add(
             ExternalComponentCollector collector,
             OpenApiComponents? defined,
             string file,
@@ -217,11 +217,11 @@ internal sealed class ExternalComponentCollector
 
     private sealed class Kind<TComponent, TElement>(
         Func<OpenApiComponents, IDictionary<string, TComponent>?> get,
-        Action<OpenApiComponents, IDictionary<string, TComponent>> set) : Kind
+        Action<OpenApiComponents, IDictionary<string, TComponent>> set) : IKind
         where TComponent : class
         where TElement : class, TComponent, IOpenApiElement
     {
-        public override OpenApiDocument? Add(
+        public OpenApiDocument? Add(
             ExternalComponentCollector collector,
             OpenApiComponents? defined,
             string file,
