@@ -107,7 +107,8 @@ public static class OpenApiDocumentFactory
         }
 
         await ReferenceGuard.ValidateAsync(openApiPath, allowRemoteReferences, cancellationToken).ConfigureAwait(false);
-        IDocumentLoader documentLoader = Refitter.Core.DocumentLoader.Create(CreatePolicy(openApiPath, allowRemoteReferences));
-        return await documentLoader.LoadAsync(openApiPath, cancellationToken).ConfigureAwait(false);
+        return await DocumentLoader
+            .LoadAsync(openApiPath, CreatePolicy(openApiPath, allowRemoteReferences), cancellationToken)
+            .ConfigureAwait(false);
     }
 }

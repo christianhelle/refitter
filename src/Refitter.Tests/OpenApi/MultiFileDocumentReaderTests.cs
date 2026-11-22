@@ -1,13 +1,17 @@
 using AwesomeAssertions;
 using Microsoft.OpenApi.Reader;
 using Refitter.Core;
+using Refitter.Tests.TestUtilities;
 
 namespace Refitter.Tests.OpenApi;
 
 
 [TestClass]
-public class OpenApiReaderDocumentStrategyTests
+public class MultiFileDocumentReaderTests
 {
+    private static Task<NSwag.OpenApiDocument?> Read(string path) =>
+        MultiFileDocumentReader.TryReadAsync(path, ReferencePolicy.Unrestricted);
+
 
 
     [TestMethod]
@@ -19,8 +23,7 @@ public class OpenApiReaderDocumentStrategyTests
   ""paths"": {}
 }";
         var swaggerFile = await TestFile.CreateSwaggerFile(spec, "no-refs.json");
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(swaggerFile);
+        var result = await Read(swaggerFile);
 
         result.Should().BeNull();
     }
@@ -72,8 +75,7 @@ public class OpenApiReaderDocumentStrategyTests
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(mainFile);
+        var result = await Read(mainFile);
 
         result.Should().NotBeNull();
         result!.Info.Title.Should().Be("External Ref Test");
@@ -117,8 +119,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(componentsFile, componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(mainFile);
+        var result = await Read(mainFile);
 
         result.Should().NotBeNull();
         result!.Info.Title.Should().Be("YAML External Ref Test");
@@ -172,8 +173,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
-        OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        NSwag.OpenApiDocument? result = await Read(mainFile);
 
         result.Should().NotBeNull();
 
@@ -225,8 +225,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.yaml"), componentsSpec);
 
-        OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        NSwag.OpenApiDocument? result = await Read(mainFile);
 
         result.Should().NotBeNull();
         result!.OpenApi.Should().Be("3.0.4");
@@ -278,8 +277,7 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
-        OpenApiReaderDocumentStrategy strategy = new();
-        NSwag.OpenApiDocument? result = await strategy.TryLoadAsync(mainFile);
+        NSwag.OpenApiDocument? result = await Read(mainFile);
 
         result.Should().NotBeNull();
         result!.Info.Should().NotBeNull();
@@ -296,8 +294,7 @@ paths:
         var swaggerFile = await TestFile.CreateSwaggerFile(
             "not valid",
             "invalid.json");
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(swaggerFile);
+        var result = await Read(swaggerFile);
 
         result.Should().BeNull();
     }
@@ -305,10 +302,8 @@ paths:
     [TestMethod]
     public async Task Returns_Null_When_Remote_Document_Cannot_Be_Read()
     {
-        // Port 1 refuses the connection, so the reader fails and the NSwag fallback
-        // declines to retry remote documents
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync("http://127.0.0.1:1/openapi.json");
+        // Port 1 refuses the connection, so the reader cannot read it
+        var result = await Read("http://127.0.0.1:1/openapi.json");
 
         result.Should().BeNull();
     }
@@ -359,8 +354,7 @@ paths:
         await File.WriteAllTextAsync(Path.Combine(folder, "main.json"), mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, "components.json"), componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(Path.Combine(folder, "main.json"));
+        var result = await Read(Path.Combine(folder, "main.json"));
 
         result.Should().BeNull();
 
@@ -413,13 +407,33 @@ paths:
         await File.WriteAllTextAsync(mainFile, mainSpec);
         await File.WriteAllTextAsync(Path.Combine(folder, $"components.{extension}"), componentsSpec);
 
-        var strategy = new OpenApiReaderDocumentStrategy();
-        var result = await strategy.TryLoadAsync(mainFile);
+        var result = await Read(mainFile);
 
         result.Should().NotBeNull();
         LargeNumericBoundsSpecs.GetMaximum(result!).Should().Be(decimal.MaxValue);
         LargeNumericBoundsSpecs.GetMinimum(result!).Should().Be(decimal.MinValue);
 
         Directory.Delete(folder, true);
+    }
+
+    [TestMethod]
+    public async Task Rethrows_Policy_Rejection()
+    {
+        // The remote reference sits in a referenced file, so the reader parses it after the round trip.
+        // Port 1 refuses connections, so a fetch that was not blocked would surface as an HTTP failure
+        var folder = TestDirectory.CreateFolder();
+        var path = Path.Combine(folder, "spec.json");
+        await File.WriteAllTextAsync(
+            path,
+            "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{\"/p\":{\"get\":{" +
+            "\"operationId\":\"g\",\"responses\":{\"200\":{\"description\":\"ok\",\"content\":{\"application/json\":{" +
+            "\"schema\":{\"$ref\":\"./child.json\"}}}}}}}}}");
+        await File.WriteAllTextAsync(
+            Path.Combine(folder, "child.json"),
+            "{\"type\":\"object\",\"properties\":{\"x\":{\"$ref\":\"http://127.0.0.1:1/s.json\"}}}");
+
+        var act = () => MultiFileDocumentReader.TryReadAsync(path, new ReferencePolicy(allowRemoteReferences: false));
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*127.0.0.1:1*");
     }
 }
