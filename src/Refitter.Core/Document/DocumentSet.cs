@@ -44,9 +44,4 @@ internal sealed class DocumentSet
     /// Gets a referenced remote document by its URL without the fragment.
     /// </summary>
     public bool TryGetUrl(string url, out string json) => urls.TryGetValue(url, out json!);
-
-    /// <summary>
-    /// The same referenced files with a different OpenAPI document, such as one the multi-file reader merged.
-    /// </summary>
-    public DocumentSet WithRootJson(string rootJson) => new(RootDocumentPath, rootJson, files, urls);
 }

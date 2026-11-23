@@ -21,6 +21,14 @@ public class OpenApiDocumentFactoryTests
     }
 
     [TestMethod]
+    public async Task Create_From_No_Document_Sets_Throws()
+    {
+        var act = () => OpenApiDocumentFactory.CreateAsync(Array.Empty<DocumentSet>());
+
+        await act.Should().ThrowAsync<ArgumentException>();
+    }
+
+    [TestMethod]
     public async Task Create_From_Remote_Json_Uses_Remote_Branch()
     {
         var openApiSpec = EmbeddedResources.GetSwaggerPetstore(SampleOpenSpecifications.SwaggerPetstoreJsonV3);
@@ -560,8 +568,8 @@ paths:
         var folder = Path.Combine(TestDirectory.Root, Guid.NewGuid().ToString());
         Directory.CreateDirectory(folder);
 
-        // Spec with minimal info and external reference - OpenAPI requires info.title and info.version
-        // but OpenApiMultiFileReader can handle missing info and PopulateMissingRequiredFields fills it in
+        // Spec without info and with an external reference - OpenAPI requires info.title and info.version,
+        // but the document is parsed with NSwag, which does not
         var mainSpec = @"{
   ""openapi"": ""3.0.0"",
   ""paths"": {
@@ -607,8 +615,7 @@ paths:
         var document = await OpenApiDocumentFactory.CreateAsync(mainFile);
 
         document.Should().NotBeNull();
-        // When info is missing entirely, PopulateMissingRequiredFields should create it
-        // Note: This test verifies the code doesn't crash, actual behavior depends on OpenAPI reader implementation
+        // This test verifies that a missing info does not make loading fail
     }
 
     [TestMethod]

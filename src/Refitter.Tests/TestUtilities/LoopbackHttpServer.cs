@@ -10,7 +10,7 @@ namespace Refitter.Tests.TestUtilities;
 public sealed class LoopbackHttpServer : IDisposable
 {
     private readonly HttpListener listener = new();
-    private readonly byte[] body;
+    private readonly Func<string, byte[]?> bodyFor;
     private readonly string contentType;
     private int requestCount;
 
@@ -25,17 +25,33 @@ public sealed class LoopbackHttpServer : IDisposable
     public LoopbackHttpServer(Func<string, string> responseBody, string contentType = "application/json")
     {
         this.contentType = contentType;
+        BaseUrl = StartListening();
+        var body = Encoding.UTF8.GetBytes(responseBody(BaseUrl));
+        bodyFor = _ => body;
+    }
 
+    /// <summary>
+    /// Answers each path with its own body, and any other path with 404
+    /// </summary>
+    public LoopbackHttpServer(IReadOnlyDictionary<string, string> bodiesByPath, string contentType = "application/json")
+    {
+        this.contentType = contentType;
+        BaseUrl = StartListening();
+        bodyFor = path => bodiesByPath.TryGetValue(path, out var body) ? Encoding.UTF8.GetBytes(body) : null;
+    }
+
+    private string StartListening()
+    {
         var probe = new TcpListener(IPAddress.Loopback, 0);
         probe.Start();
         var port = ((IPEndPoint)probe.LocalEndpoint).Port;
         probe.Stop();
 
-        BaseUrl = $"http://127.0.0.1:{port}/";
-        body = Encoding.UTF8.GetBytes(responseBody(BaseUrl));
-        listener.Prefixes.Add(BaseUrl);
+        var baseUrl = $"http://127.0.0.1:{port}/";
+        listener.Prefixes.Add(baseUrl);
         listener.Start();
         _ = Task.Run(ServeAsync);
+        return baseUrl;
     }
 
     /// <summary>
@@ -56,6 +72,14 @@ public sealed class LoopbackHttpServer : IDisposable
             {
                 var context = await listener.GetContextAsync().ConfigureAwait(false);
                 Interlocked.Increment(ref requestCount);
+                var body = bodyFor(context.Request.Url!.AbsolutePath);
+                if (body is null)
+                {
+                    context.Response.StatusCode = 404;
+                    context.Response.Close();
+                    continue;
+                }
+
                 context.Response.StatusCode = 200;
                 context.Response.ContentType = contentType;
                 context.Response.ContentLength64 = body.Length;

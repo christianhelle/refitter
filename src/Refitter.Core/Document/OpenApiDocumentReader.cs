@@ -64,17 +64,6 @@ internal static class OpenApiDocumentReader
     }
 
     /// <summary>
-    /// Replaces the OpenAPI document of <paramref name="set"/> with <paramref name="content"/>, such as a document
-    /// the multi-file reader merged, keeping the referenced files that were read with it.
-    /// </summary>
-    public static DocumentSet WithRootContent(DocumentSet set, string content)
-    {
-        var source = set.RootDocumentPath ?? "the OpenAPI document";
-        var (json, _) = ReadContent(content, source, readAsYaml: false);
-        return set.WithRootJson(OpenApiJsonNormalizer.NormalizeDocument(json));
-    }
-
-    /// <summary>
     /// Converts YAML to JSON the way the reader does, applying the nesting and alias expansion limits.
     /// </summary>
     internal static string ConvertYamlToJson(
@@ -403,12 +392,6 @@ internal static class OpenApiDocumentReader
             if (ContainsLinkBelowRoot(rootDirectory, resolved, rootDocumentPath))
                 throw SymbolicLinkBlocked(reference, resolved);
 
-            // OasReader resolves a reference whose file is missing at its literal path by searching the
-            // whole tree for a file whose path ends with the reference, so a link elsewhere can be read
-            if (!File.Exists(resolved) &&
-                FindLinkedSearchMatch(rootDirectory, fileRef, rootDocumentPath) is { } linked)
-                throw SymbolicLinkBlocked(reference, linked);
-
             await ReadLocalFileAsync(resolved).ConfigureAwait(false);
         }
     }
@@ -424,7 +407,8 @@ internal static class OpenApiDocumentReader
 
     /// <summary>
     /// Reads the content of one file: the JSON the schema resolver parses, and the references to check. Content
-    /// that is valid JSON is used as is; anything else is read as YAML and converted to JSON.
+    /// that is valid JSON is used as is; anything else, and any file read as YAML, is read as YAML and converted
+    /// to JSON.
     /// </summary>
     private static (string Json, List<string> References) ReadContent(
         string content,
@@ -434,24 +418,23 @@ internal static class OpenApiDocumentReader
         int maxAmplification = YamlAliasExpansionGuard.MaxAmplification,
         long maxExpandedSize = YamlAliasExpansionGuard.MaxExpandedSize)
     {
-        // Always try JSON first: the JSON parsers downstream accept comments, so a document can be
-        // valid JSON without starting with '{' or '['
-        List<string>? jsonReferences = null;
-        try
+        // A document a YAML reader reads, because its root is YAML or its file has a YAML extension, is read as
+        // YAML only, the way NSwag reads it. The text of a comment such as "/*: null, "$ref": "x" # */" is a mapping
+        // entry in YAML, so reading it as JSON as well would check references that are never followed: the
+        // parsers read the document set, which holds the YAML reading
+        if (!readAsYaml && !MayBeReadAsYaml(source))
         {
-            jsonReferences = ExtractJsonReferences(content, source);
+            // The JSON parsers downstream accept comments, so a document can be valid JSON without starting
+            // with '{' or '['
+            try
+            {
+                return (content, ExtractJsonReferences(content, source));
+            }
+            catch (JsonReaderException)
+            {
+                // Not valid JSON, fall through to the YAML reader
+            }
         }
-        catch (JsonReaderException)
-        {
-            // Not valid JSON, fall through to the YAML reader
-        }
-
-        // A document can be valid JSON with comments and still read differently as YAML, where the text of a
-        // comment such as "/*: null, "$ref": "x" # */" is a mapping entry. When a YAML loader (the multi-file
-        // reader) can read the document, either because the root is YAML or because the file has a YAML
-        // extension, check the references of both readings
-        if (jsonReferences != null && !readAsYaml && !MayBeReadAsYaml(source))
-            return (content, jsonReferences);
 
         // The YAML reader recurses per nesting level, and a stack overflow is uncatchable. The JSON reader
         // above is iterative and checks the depth as it reads, so only the YAML path needs this walk first.
@@ -462,9 +445,6 @@ internal static class OpenApiDocumentReader
         {
             var root = DeserializeYaml(content, source, maxExpandedNodes, maxAmplification, maxExpandedSize);
             var references = ExtractYamlReferences(root);
-            if (jsonReferences != null)
-                references.AddRange(jsonReferences);
-
             // A document a YAML loader reads is parsed as YAML, even when it is also valid JSON, the way NSwag
             // reads a YAML document. Same conversion as NSwag's OpenApiYamlDocument and NJsonSchema's JsonSchemaYaml
             return (new SerializerBuilder().JsonCompatible().Build().Serialize(root!), references);
@@ -739,51 +719,6 @@ internal static class OpenApiDocumentReader
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Mirrors the file search of OasReader: a file whose path ends with the reference, anywhere below the root.
-    /// Directories are enumerated by hand so that links are never followed into a cycle; the files of a
-    /// linked directory are still reported, because their path passes through the link.
-    /// </summary>
-    private static string? FindLinkedSearchMatch(string rootDirectory, string fileReference, string? rootDocumentPath)
-    {
-        var separator = Path.DirectorySeparatorChar;
-        var suffix = fileReference.Replace('\\', separator).Replace('/', separator);
-        while (suffix.StartsWith("." + separator, StringComparison.Ordinal))
-            suffix = suffix.Substring(2);
-
-        if (suffix.Length == 0)
-            return null;
-
-        var pending = new Stack<(string Directory, bool ThroughLink)>();
-        pending.Push((Path.GetFullPath(rootDirectory), false));
-        while (pending.Count > 0)
-        {
-            var (directory, throughLink) = pending.Pop();
-            try
-            {
-                foreach (var file in Directory.EnumerateFiles(directory))
-                {
-                    if (file.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) &&
-                        ContainsLinkBelowRoot(rootDirectory, file, rootDocumentPath))
-                        return file;
-                }
-
-                foreach (var subdirectory in Directory.EnumerateDirectories(directory))
-                {
-                    var isLink = (File.GetAttributes(subdirectory) & FileAttributes.ReparsePoint) != 0;
-                    if (!(isLink && throughLink))
-                        pending.Push((subdirectory, throughLink || isLink));
-                }
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                // A directory that cannot be listed cannot be searched by the resolver either
-            }
-        }
-
-        return null;
     }
 
     internal static bool IsWithin(string rootDirectory, string candidate)

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Refitter.Core.Validation;
 
 namespace Refitter.Core;
 
@@ -34,8 +35,13 @@ public class RefitterRunner
 
         try
         {
+            var documentSets = await RefitGenerator.ReadDocumentSetsAsync(
+                settings,
+                cancellationToken);
+
             var generator = await RefitGenerator.CreateAsync(
                 settings,
+                documentSets,
                 cancellationToken);
 
             var output = GenerateCode(generator, settings);
@@ -50,6 +56,7 @@ public class RefitterRunner
             {
                 await ValidateOpenApiSpecsAsync(
                     settings,
+                    documentSets,
                     validator,
                     diagnostics,
                     cancellationToken);
@@ -110,17 +117,22 @@ public class RefitterRunner
 
     private static async Task ValidateOpenApiSpecsAsync(
         RefitGeneratorSettings settings,
+        IReadOnlyList<DocumentSet> documentSets,
         IValidator validator,
         List<RunnerDiagnostic> diagnostics,
         CancellationToken cancellationToken)
     {
         var openApiPaths = GetOpenApiPaths(settings);
-        foreach (var specPath in openApiPaths.Where(path => !string.IsNullOrWhiteSpace(path)))
+        for (var i = 0; i < documentSets.Count; i++)
         {
-            var validationResult = await validator.ValidateAsync(
-                specPath,
-                settings.AllowRemoteReferences,
-                cancellationToken);
+            // The built-in validator validates what was read for generation. A custom validator is handed the
+            // path, and reads the document itself
+            var validationResult = validator is OpenApiValidatorAdapter
+                ? await OpenApiValidator.ValidateAsync(documentSets[i], cancellationToken)
+                : await validator.ValidateAsync(
+                    openApiPaths[i],
+                    settings.AllowRemoteReferences,
+                    cancellationToken);
 
             foreach (var error in validationResult.Diagnostics.Errors)
                 diagnostics.Add(new RunnerDiagnostic(error.Message, IsError: true));

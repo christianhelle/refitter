@@ -16,7 +16,7 @@ flowchart LR
     Source --> DLL["Refitter.SourceGenerator.dll<br/>netstandard2.0"]
 
     subgraph PKG["Refitter.SourceGenerator.nupkg"]
-        AN["analyzers/dotnet/cs/<br/>Refitter.SourceGenerator.dll<br/>+ NSwag, NJsonSchema, OasReader,<br/>Microsoft.OpenApi, YamlDotNet, ..."]
+        AN["analyzers/dotnet/cs/<br/>Refitter.SourceGenerator.dll<br/>+ NSwag, NJsonSchema,<br/>Microsoft.OpenApi, YamlDotNet, ..."]
         BLD["build/<br/>Refitter.SourceGenerator.props<br/>Refitter.SourceGenerator.targets"]
     end
 
