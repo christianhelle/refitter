@@ -2,6 +2,10 @@
 
 ## [Unreleased Changes]
 
+### Merged Pull Requests
+- Update dependency Microsoft.Extensions.Http.Resilience to 11.0.1 ([#1387](https://github.com/christianhelle/refitter/pull/1387)) (@renovate[bot])
+- Update dependency Microsoft.OpenApi to 3.11.1 ([#1447](https://github.com/christianhelle/refitter/pull/1447)) (@renovate[bot])
+
 ### Features
 - Replace OasReader with Microsoft.OpenApi and read documents once per run ([#1446](https://github.com/christianhelle/refitter/pull/1446)) ([@christianhelle](https://github.com/christianhelle/))
 - Read each OpenAPI file once into a document set ([#1445](https://github.com/christianhelle/refitter/pull/1445)) ([@christianhelle](https://github.com/christianhelle/))
