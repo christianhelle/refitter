@@ -108,7 +108,7 @@ internal sealed class ExternalComponentCollector
     {
         var components = new JsonObject { [WholeFileComponent] = node.DeepClone() };
         var document = new JsonObject { [versionField.Key] = versionField.Value?.DeepClone() };
-        if (versionField.Key == "swagger")
+        if (versionField.Key == SwaggerField)
             document[swaggerSection] = components;
         else
             document["components"] = new JsonObject { [section] = components };
@@ -156,7 +156,7 @@ internal sealed class ExternalComponentCollector
         if (node?.DeepClone() is JsonObject content)
         {
             // Microsoft.OpenApi reads no document without a version, and a referenced file often has none
-            if (!content.ContainsKey("openapi") && !content.ContainsKey("swagger"))
+            if (!content.ContainsKey(OpenApiField) && !content.ContainsKey(SwaggerField))
                 content[versionField.Key] = versionField.Value?.DeepClone();
 
             document = new OpenApiJsonReader().Read(content, new Uri(file), Settings).Document;
@@ -186,10 +186,12 @@ internal sealed class ExternalComponentCollector
     private static KeyValuePair<string, JsonNode?> ReadVersionField(string rootJson)
     {
         var root = JsonObjectOf(rootJson)!;
-        var key = root.ContainsKey("swagger") ? "swagger" : "openapi";
+        var key = root.ContainsKey(SwaggerField) ? SwaggerField : OpenApiField;
         return new KeyValuePair<string, JsonNode?>(key, root[key]);
     }
 
+    private const string OpenApiField = "openapi";
+    private const string SwaggerField = "swagger";
     private const string WholeFileComponent = "whole";
 
     // Each kind of component with its section in an OpenAPI document, and in a Swagger one where it has one
