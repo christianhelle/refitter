@@ -96,6 +96,18 @@ public class GeneratedCodeLiteralSweepTests
         BuildHelper.BuildCSharp(generatedCode).Should().BeTrue();
     }
 
+    [TestMethod]
+    [TestCategory("Integration")]
+    public async Task Sweep_Compiles_With_JsonStringEnumMemberName()
+    {
+        // JsonLibraryVersion 9.0 adds [JsonStringEnumMemberName(@"...")] beside [EnumMember(Value = @"...")],
+        // so the enum value reaches one more verbatim string literal
+        string generatedCode = await GenerateCode(SweepSpec(), settings =>
+            settings.CodeGeneratorSettings = new CodeGeneratorSettings { JsonLibraryVersion = 9.0m });
+
+        BuildHelper.BuildCSharpForTargetFramework("net11.0", generatedCode).Should().BeTrue();
+    }
+
     private static async Task<string> GenerateCode(string spec, Action<RefitGeneratorSettings> configure)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
