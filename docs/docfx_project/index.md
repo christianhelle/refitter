@@ -157,6 +157,7 @@ For details on how code generation works internally in each of these forms, and 
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/greenwicharbitrage"><img src="https://avatars.githubusercontent.com/u/355538371?v=4?s=100" width="100px;" alt="Greenwich Arbitrage"/><br /><sub><b>Greenwich Arbitrage</b></sub></a><br /><a href="#security-greenwicharbitrage" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/swinshu1"><img src="https://avatars.githubusercontent.com/u/324209981?v=4?s=100" width="100px;" alt="swinshu1"/><br /><sub><b>swinshu1</b></sub></a><br /><a href="#security-swinshu1" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/glenaster"><img src="https://avatars.githubusercontent.com/u/348564390?v=4?s=100" width="100px;" alt="glenaster"/><br /><sub><b>glenaster</b></sub></a><br /><a href="#security-glenaster" title="Security">🛡️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/garnetarc"><img src="https://avatars.githubusercontent.com/u/348495781?v=4?s=100" width="100px;" alt="garnetarc"/><br /><sub><b>garnetarc</b></sub></a><br /><a href="#security-garnetarc" title="Security">🛡️</a></td>
     </tr>
   </tbody>
 </table>
