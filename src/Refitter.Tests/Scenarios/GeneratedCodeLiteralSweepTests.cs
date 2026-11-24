@@ -31,7 +31,8 @@ public class GeneratedCodeLiteralSweepTests
          "info":{"title":"sweepPAYLOADX","version":"1.0.0"},
          "security":[{"schemePAYLOADX":[]}],
          "paths":{
-           "/p\u2028x":{"get":{"operationId":"GetPAYLOADX","tags":["tPAYLOADX"],
+          "/p\u2028x":{"post":{"operationId":"GetPAYLOADX","tags":["tPAYLOADX"],
+            "requestBody":{"content":{"application/jsonPAYLOADX":{"schema":{"type":"string"}}}},
              "parameters":[
                {"name":"hPAYLOADX","in":"header","schema":{"type":"string"}},
                {"name":"qPAYLOADX","in":"query","schema":{"type":"string","default":"aPAYLOADX"}}],
@@ -111,7 +112,11 @@ public class GeneratedCodeLiteralSweepTests
     private static async Task<string> GenerateCode(string spec, Action<RefitGeneratorSettings> configure)
     {
         string swaggerFile = await SwaggerFileHelper.CreateSwaggerJsonFile(spec);
-        RefitGeneratorSettings settings = new() { OpenApiPath = swaggerFile };
+        RefitGeneratorSettings settings = new()
+        {
+            OpenApiPath = swaggerFile,
+            AuthenticationHeaderStyle = AuthenticationHeaderStyle.Parameter,
+        };
         configure(settings);
         RefitGenerator generator = await RefitGenerator.CreateAsync(settings);
         return generator.Generate();
