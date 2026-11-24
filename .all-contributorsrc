@@ -1046,6 +1046,15 @@
       "contributions": [
         "security"
       ]
+    },
+    {
+      "login": "lanjianchun",
+      "name": "lanjianchun",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19635001?v=4",
+      "profile": "https://github.com/lanjianchun",
+      "contributions": [
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,
