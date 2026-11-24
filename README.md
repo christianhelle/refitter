@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-109-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-110-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1646,6 +1646,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/grapealbacore"><img src="https://avatars.githubusercontent.com/u/355117634?v=4?s=100" width="100px;" alt="Grape Albacore"/><br /><sub><b>Grape Albacore</b></sub></a><br /><a href="#security-grapealbacore" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/greenwicharbitrage"><img src="https://avatars.githubusercontent.com/u/355538371?v=4?s=100" width="100px;" alt="Greenwich Arbitrage"/><br /><sub><b>Greenwich Arbitrage</b></sub></a><br /><a href="#security-greenwicharbitrage" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/swinshu1"><img src="https://avatars.githubusercontent.com/u/324209981?v=4?s=100" width="100px;" alt="swinshu1"/><br /><sub><b>swinshu1</b></sub></a><br /><a href="#security-swinshu1" title="Security">🛡️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/glenaster"><img src="https://avatars.githubusercontent.com/u/348564390?v=4?s=100" width="100px;" alt="glenaster"/><br /><sub><b>glenaster</b></sub></a><br /><a href="#security-glenaster" title="Security">🛡️</a></td>
     </tr>
   </tbody>
 </table>
