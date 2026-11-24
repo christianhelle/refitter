@@ -135,6 +135,20 @@ public class SymlinkReferenceTests
     }
 
     [TestMethod]
+    public async Task Blocks_Input_Document_That_Is_A_Link_When_Content_Is_Supplied()
+    {
+        (string root, string outside) = CreateDirectories();
+        string document = Document(MarkerPet);
+        await File.WriteAllTextAsync(Path.Combine(outside, "real.json"), document);
+        string main = Path.Combine(root, "main.json");
+        CreateFileLink(main, Path.Combine(outside, "real.json"));
+
+        var act = () => OpenApiDocumentReader.ReadAsync(main, document, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
+    [TestMethod]
     public async Task Allows_Regular_Input_Document()
     {
         (string root, _) = CreateDirectories();
