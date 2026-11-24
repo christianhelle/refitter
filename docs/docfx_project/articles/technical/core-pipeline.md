@@ -112,7 +112,7 @@ flowchart TD
 The reader checks each `$ref` against two separate rules:
 
 - Remote `http(s)` references are rejected, to avoid server-side request forgery when Refitter runs on a build server. Setting `allowRemoteReferences` in the `.refitter` file allows them.
-- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths, and any referenced file that is, or sits below, a symbolic link inside the directory is rejected, because a link can point outside it. The input specification itself, and the directories above it, are not checked.
+- Local file references (absolute or `../`) that resolve outside the input specification's directory tree are always rejected. `allowRemoteReferences` does not change this; move the referenced files under the specification's directory instead. The check compares normalized paths, and any referenced file that is, or sits below, a symbolic link inside the directory is rejected, because a link can point outside it. The input specification is rejected if it is itself a symbolic link; the directories above it are not checked.
 
 ### Loading a local document
 
