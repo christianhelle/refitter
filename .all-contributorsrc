@@ -992,6 +992,15 @@
         "bug",
         "security"
       ]
+    },
+    {
+      "login": "grapealbacore",
+      "name": "Grape Albacore",
+      "avatar_url": "https://avatars.githubusercontent.com/u/355117634?v=4",
+      "profile": "https://github.com/grapealbacore",
+      "contributions": [
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,
