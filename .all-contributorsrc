@@ -1037,6 +1037,15 @@
       "contributions": [
         "security"
       ]
+    },
+    {
+      "login": "glyphanchor",
+      "name": "glyphanchor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/348550720?v=4",
+      "profile": "https://github.com/glyphanchor",
+      "contributions": [
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,
