@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-111-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-112-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1648,6 +1648,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/swinshu1"><img src="https://avatars.githubusercontent.com/u/324209981?v=4?s=100" width="100px;" alt="swinshu1"/><br /><sub><b>swinshu1</b></sub></a><br /><a href="#security-swinshu1" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/glenaster"><img src="https://avatars.githubusercontent.com/u/348564390?v=4?s=100" width="100px;" alt="glenaster"/><br /><sub><b>glenaster</b></sub></a><br /><a href="#security-glenaster" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/garnetarc"><img src="https://avatars.githubusercontent.com/u/348495781?v=4?s=100" width="100px;" alt="garnetarc"/><br /><sub><b>garnetarc</b></sub></a><br /><a href="#security-garnetarc" title="Security">🛡️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/glyphanchor"><img src="https://avatars.githubusercontent.com/u/348550720?v=4?s=100" width="100px;" alt="glyphanchor"/><br /><sub><b>glyphanchor</b></sub></a><br /><a href="#security-glyphanchor" title="Security">🛡️</a></td>
     </tr>
   </tbody>
 </table>
