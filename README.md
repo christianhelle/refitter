@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/christianhelle/refitter/graph/badge.svg?token=242YT1N6T2)](https://codecov.io/gh/christianhelle/refitter)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-107-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-108-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # Refitter
@@ -1644,6 +1644,7 @@ Please read our [contribution guidelines](CONTRIBUTING.md) if you'd like to cont
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://superbot.gg"><img src="https://avatars.githubusercontent.com/u/5358899?v=4?s=100" width="100px;" alt="Superbot Helper"/><br /><sub><b>Superbot Helper</b></sub></a><br /><a href="https://github.com/christianhelle/refitter/issues?q=author%3Asuperbot-helper" title="Bug reports">🐛</a> <a href="#security-superbot-helper" title="Security">🛡️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/grapealbacore"><img src="https://avatars.githubusercontent.com/u/355117634?v=4?s=100" width="100px;" alt="Grape Albacore"/><br /><sub><b>Grape Albacore</b></sub></a><br /><a href="#security-grapealbacore" title="Security">🛡️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/greenwicharbitrage"><img src="https://avatars.githubusercontent.com/u/355538371?v=4?s=100" width="100px;" alt="Greenwich Arbitrage"/><br /><sub><b>Greenwich Arbitrage</b></sub></a><br /><a href="#security-greenwicharbitrage" title="Security">🛡️</a></td>
     </tr>
   </tbody>
 </table>
