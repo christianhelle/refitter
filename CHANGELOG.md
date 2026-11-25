@@ -2,7 +2,20 @@
 
 ## [Unreleased Changes]
 
+### Features
+- GHSA-7m49-74q2-hxc9: Reject symbolic link as the input OpenAPI document ([#1457](https://github.com/christianhelle/refitter/pull/1457)) ([@christianhelle](https://github.com/christianhelle/))
+
+
+## [2.4.3](https://github.com/christianhelle/refitter/releases/tag/2.4.3) (2026-11-24)
+
 ### Merged Pull Requests
+- docs: add lanjianchun as a contributor for security ([#1455](https://github.com/christianhelle/refitter/pull/1455)) (@allcontributors[bot])
+- docs: add glyphanchor as a contributor for security ([#1454](https://github.com/christianhelle/refitter/pull/1454)) (@allcontributors[bot])
+- docs: add garnetarc as a contributor for security ([#1453](https://github.com/christianhelle/refitter/pull/1453)) (@allcontributors[bot])
+- docs: add glenaster as a contributor for security ([#1452](https://github.com/christianhelle/refitter/pull/1452)) (@allcontributors[bot])
+- docs: add swinshu1 as a contributor for security ([#1451](https://github.com/christianhelle/refitter/pull/1451)) (@allcontributors[bot])
+- docs: add greenwicharbitrage as a contributor for security ([#1450](https://github.com/christianhelle/refitter/pull/1450)) (@allcontributors[bot])
+- docs: add grapealbacore as a contributor for security ([#1449](https://github.com/christianhelle/refitter/pull/1449)) (@allcontributors[bot])
 - Update dependency Microsoft.Extensions.Http.Resilience to 11.0.1 ([#1387](https://github.com/christianhelle/refitter/pull/1387)) (@renovate[bot])
 - Update dependency Microsoft.OpenApi to 3.11.1 ([#1447](https://github.com/christianhelle/refitter/pull/1447)) (@renovate[bot])
 
