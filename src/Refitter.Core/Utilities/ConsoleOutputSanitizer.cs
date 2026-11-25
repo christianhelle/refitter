@@ -62,7 +62,8 @@ internal static class ConsoleOutputSanitizer
     {
         StringBuilder? builder = null;
         var lineStart = true;
-        for (var i = 0; i < text.Length; i++)
+        var i = 0;
+        while (i < text.Length)
         {
             var c = text[i];
 
@@ -71,6 +72,7 @@ internal static class ConsoleOutputSanitizer
                 builder = Start(builder, text, i);
                 builder.Append(": ");
                 lineStart = false;
+                i++;
                 continue;
             }
 
@@ -78,7 +80,7 @@ internal static class ConsoleOutputSanitizer
             {
                 builder = Start(builder, text, i);
                 builder.Append("## ");
-                i++;
+                i += 2;
                 lineStart = false;
                 continue;
             }
@@ -88,6 +90,7 @@ internal static class ConsoleOutputSanitizer
                 lineStart = true;
             else if (c is not (' ' or '\t'))
                 lineStart = false;
+            i++;
         }
 
         return builder?.ToString() ?? text;
