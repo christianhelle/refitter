@@ -408,7 +408,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
             {
                 if (diagnostic.IsError)
                 {
-                    diagnostics.Add(CreateErrorDiagnostic(diagnostic.Message));
+                    diagnostics.Add(CreateErrorDiagnostic(ConsoleOutputSanitizer.SanitizeLine(diagnostic.Message)));
                 }
             }
 
@@ -430,7 +430,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         }
         catch (Exception e)
         {
-            diagnostics.Add(CreateErrorDiagnostic($"Refitter failed to generate code: {e}"));
+            diagnostics.Add(CreateErrorDiagnostic(ConsoleOutputSanitizer.NeutralizeCommands($"Refitter failed to generate code: {e}")));
 
             return CreateFailedResult(file.Path, diagnostics);
         }
@@ -454,7 +454,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         }
         catch (Exception e)
         {
-            diagnostics.Add(CreateErrorDiagnostic($"Unable to read .refitter file: {file.Path}{Environment.NewLine}{e}"));
+            diagnostics.Add(CreateErrorDiagnostic(ConsoleOutputSanitizer.NeutralizeCommands($"Unable to read .refitter file: {file.Path}{Environment.NewLine}{e}")));
             return null;
         }
     }
@@ -470,7 +470,7 @@ internal sealed class RefitterSourceGenerator : IIncrementalGenerator
         }
         catch (Exception e)
         {
-            diagnostics.Add(CreateErrorDiagnostic($"Unable to deserialize .refitter file: {e}"));
+            diagnostics.Add(CreateErrorDiagnostic(ConsoleOutputSanitizer.NeutralizeCommands($"Unable to deserialize .refitter file: {e}")));
 
             return null;
         }
