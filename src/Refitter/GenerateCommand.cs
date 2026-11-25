@@ -90,8 +90,16 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             cancellationToken);
     }
 
-    internal static string FormatGeneratedFileMarker(string outputPath) =>
-        $"{GeneratedFileMarker}{ConsoleOutputSanitizer.SanitizeLine(Path.GetFullPath(outputPath))}";
+    internal static string FormatGeneratedFileMarker(string outputPath)
+    {
+        var fullPath = Path.GetFullPath(outputPath);
+        var sanitized = ConsoleOutputSanitizer.SanitizeLine(fullPath);
+
+        // a path that sanitizing changes cannot be reported faithfully, so it is not reported as a marker
+        return string.Equals(sanitized, fullPath, StringComparison.Ordinal)
+            ? $"{GeneratedFileMarker}{fullPath}"
+            : $"Unsafe generated file path not reported: {sanitized}";
+    }
 
     internal static async Task WriteRefitterSettingsFile(
         Settings settings,
