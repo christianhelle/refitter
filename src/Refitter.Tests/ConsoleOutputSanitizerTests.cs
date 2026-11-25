@@ -108,6 +108,18 @@ public class ConsoleOutputSanitizerTests
     }
 
     [TestMethod]
+    [DataRow(":")]
+    [DataRow("#")]
+    [DataRow("##")]
+    [DataRow("##x")]
+    [DataRow("##vso")]
+    [DataRow("C# ## heading")]
+    public void NeutralizeCommands_Returns_Non_Command_Text_Unchanged(string text)
+    {
+        ConsoleOutputSanitizer.NeutralizeCommands(text).Should().BeSameAs(text);
+    }
+
+    [TestMethod]
     public void NeutralizeCommands_Returns_Plain_Text_Unchanged()
     {
         const string text = "first\r\nsecond\nthird";
