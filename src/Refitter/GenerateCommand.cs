@@ -91,7 +91,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
     }
 
     internal static string FormatGeneratedFileMarker(string outputPath) =>
-        $"{GeneratedFileMarker}{ConsoleOutputSanitizer.SanitizeLine(Path.GetFullPath(ConsoleOutputSanitizer.SanitizeLine(outputPath)))}";
+        $"{GeneratedFileMarker}{ConsoleOutputSanitizer.SanitizeLine(Path.GetFullPath(outputPath))}";
 
     internal static async Task WriteRefitterSettingsFile(
         Settings settings,
