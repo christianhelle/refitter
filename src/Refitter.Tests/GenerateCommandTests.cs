@@ -794,6 +794,19 @@ public class GenerateCommandTests
         return withoutAnsi.ReplaceLineEndings("\n");
     }
 
+    [TestMethod]
+    public void FormatGeneratedFileMarker_Keeps_Marker_On_Single_Line_For_Multi_Line_Path()
+    {
+        var path = "out" + "\n" + "##vso[task.complete result=Succeeded]Api.cs";
+
+        var marker = GenerateCommand.FormatGeneratedFileMarker(path);
+
+        marker.Should().StartWith("GeneratedFile: ");
+        marker.Should().NotContain("\n");
+        marker.Should().NotContain("\r");
+        marker.Contains("##vso[", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+    }
+
     private static string QuoteArgument(string argument) =>
         argument.Contains(' ', StringComparison.Ordinal)
             ? $"\"{argument}\""
