@@ -12,6 +12,13 @@ public class SymlinkReferenceTests
 {
     private const string Schema = "{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}";
 
+    private const string MarkerPet =
+        "{\"type\":\"object\",\"description\":\"ROOT_LINK_SECRET_MARKER\",\"properties\":{\"name\":{\"type\":\"string\"}}}";
+
+    private static string Document(string pet) =>
+        "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{}," +
+        "\"components\":{\"schemas\":{\"Pet\":" + pet + "}}}";
+
     private static string Spec(string target) =>
         "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{}," +
         "\"components\":{\"schemas\":{\"Pet\":{\"$ref\":\"" + target + "\"}}}}";
@@ -102,21 +109,55 @@ public class SymlinkReferenceTests
     }
 
     [TestMethod]
-    public async Task Allows_Reference_Back_To_Input_Document_That_Is_A_Link()
+    public async Task Blocks_Input_Document_That_Is_A_Link_To_Out_Of_Tree_File()
     {
         (string root, string outside) = CreateDirectories();
-        string real = Path.Combine(outside, "real.json");
-        await File.WriteAllTextAsync(
-            real,
-            "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"t\",\"version\":\"1\"},\"paths\":{}," +
-            "\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"}}}," +
-            "\"Owner\":{\"type\":\"object\",\"properties\":{\"pet\":{\"$ref\":\"./main.json#/components/schemas/Pet\"}}}}}}");
+        await File.WriteAllTextAsync(Path.Combine(outside, "real.json"), Document(MarkerPet));
         string main = Path.Combine(root, "main.json");
-        CreateFileLink(main, real);
+        CreateFileLink(main, Path.Combine(outside, "real.json"));
 
-        string code = await GenerateCode(main);
+        var act = () => GenerateDocumentedCode(main);
 
-        code.Should().Contain("class Owner");
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
+    [TestMethod]
+    public async Task Blocks_Input_Document_That_Is_A_Link_To_In_Tree_File()
+    {
+        (string root, _) = CreateDirectories();
+        await File.WriteAllTextAsync(Path.Combine(root, "real.json"), Document(MarkerPet));
+        string main = Path.Combine(root, "main.json");
+        CreateFileLink(main, Path.Combine(root, "real.json"));
+
+        var act = () => GenerateCode(main);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
+    [TestMethod]
+    public async Task Blocks_Input_Document_That_Is_A_Link_When_Content_Is_Supplied()
+    {
+        (string root, string outside) = CreateDirectories();
+        string document = Document(MarkerPet);
+        await File.WriteAllTextAsync(Path.Combine(outside, "real.json"), document);
+        string main = Path.Combine(root, "main.json");
+        CreateFileLink(main, Path.Combine(outside, "real.json"));
+
+        var act = () => OpenApiDocumentReader.ReadAsync(main, document, allowRemoteReferences: false);
+
+        await act.Should().ThrowAsync<ReferenceResolutionException>().WithMessage("*symbolic link*");
+    }
+
+    [TestMethod]
+    public async Task Allows_Regular_Input_Document()
+    {
+        (string root, _) = CreateDirectories();
+        string main = Path.Combine(root, "main.json");
+        await File.WriteAllTextAsync(main, Document(MarkerPet));
+
+        string code = await GenerateDocumentedCode(main);
+
+        code.Should().Contain("ROOT_LINK_SECRET_MARKER");
     }
 
     [TestMethod]
@@ -179,6 +220,18 @@ public class SymlinkReferenceTests
     private static async Task<string> GenerateCode(string swaggerFile)
     {
         var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+        var sut = await RefitGenerator.CreateAsync(settings);
+        return sut.Generate();
+    }
+
+    private static async Task<string> GenerateDocumentedCode(string swaggerFile)
+    {
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            GenerateContracts = true,
+            GenerateXmlDocCodeComments = true,
+        };
         var sut = await RefitGenerator.CreateAsync(settings);
         return sut.Generate();
     }

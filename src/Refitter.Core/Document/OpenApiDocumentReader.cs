@@ -58,6 +58,9 @@ internal static class OpenApiDocumentReader
         }
 
         var fullPath = Path.GetFullPath(openApiPath);
+        if (File.Exists(fullPath) && (File.GetAttributes(fullPath) & FileAttributes.ReparsePoint) != 0)
+            throw InputDocumentLinkBlocked(fullPath);
+
         content ??= ReadRootFile(openApiPath, fullPath);
         var root = await reading.ReadLocalRootAsync(fullPath, content).ConfigureAwait(false);
         return reading.ToSet(fullPath, root);
@@ -681,6 +684,10 @@ internal static class OpenApiDocumentReader
         string rootDirectory) =>
         new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", outside the input directory " +
             $"\"{rootDirectory}\". Refitter confines local references to the input document's directory tree.");
+
+    internal static ReferenceResolutionException InputDocumentLinkBlocked(string path) =>
+        new($"The OpenAPI document \"{path}\" is a symbolic link. Symbolic links are not followed for the input " +
+            "document; pass the path of the actual file instead.");
 
     internal static ReferenceResolutionException SymbolicLinkBlocked(string reference, string resolved) =>
         new($"Local '$ref' \"{reference}\" resolves to \"{resolved}\", which is or passes through a symbolic " +
