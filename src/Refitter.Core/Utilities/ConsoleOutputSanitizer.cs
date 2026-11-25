@@ -88,7 +88,7 @@ internal static class ConsoleOutputSanitizer
             builder?.Append(c);
             if (c is '\r' or '\n')
                 lineStart = true;
-            else if (c is not (' ' or '\t'))
+            else if (!char.IsWhiteSpace(c))
                 lineStart = false;
             i++;
         }

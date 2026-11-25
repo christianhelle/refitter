@@ -81,6 +81,14 @@ public class ConsoleOutputSanitizerTests
     }
 
     [TestMethod]
+    public void NeutralizeCommands_Prefixes_Double_Colon_After_Unicode_Whitespace()
+    {
+        var input = "ok\n\u00a0::error::forged";
+
+        ConsoleOutputSanitizer.NeutralizeCommands(input).Should().Be("ok\n\u00a0: :error::forged");
+    }
+
+    [TestMethod]
     public void NeutralizeCommands_Keeps_Double_Colon_Mid_Line()
     {
         var input = "Type::Member";
