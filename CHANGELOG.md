@@ -3,6 +3,7 @@
 ## [Unreleased Changes]
 
 ### Features
+- GHSA-4j78-2jpc-xg6w: Neutralize OpenAPI text in console and build output ([#1458](https://github.com/christianhelle/refitter/pull/1458)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-7m49-74q2-hxc9: Reject symbolic link as the input OpenAPI document ([#1457](https://github.com/christianhelle/refitter/pull/1457)) ([@christianhelle](https://github.com/christianhelle/))
 
 
@@ -24,14 +25,13 @@
 - Read each OpenAPI file once into a document set ([#1445](https://github.com/christianhelle/refitter/pull/1445)) ([@christianhelle](https://github.com/christianhelle/))
 - Collapse the document loader and cap remote root downloads ([#1444](https://github.com/christianhelle/refitter/pull/1444)) ([@christianhelle](https://github.com/christianhelle/))
 
-### Bug Fixes
+### Security Vulnerability Fixes
 - GHSA-ch7x-rc9g-rhjc: Check the YAML reading of JSON-with-comments documents in the reference guard ([#1443](https://github.com/christianhelle/refitter/pull/1443)) ([@christianhelle](https://github.com/christianhelle/))
 
 
 ## [2.4.2](https://github.com/christianhelle/refitter/releases/tag/2.4.2) (2026-11-22)
 
 ### Bug Fixes
-- GHSA-r2hq-86ch-hf3x: Escape response status keys in generated XML documentation ([#1442](https://github.com/christianhelle/refitter/pull/1442)) ([@christianhelle](https://github.com/christianhelle/))
 - Load OpenAPI 3.1 array schemas with boolean items ([#1440](https://github.com/christianhelle/refitter/pull/1440)) ([@christianhelle](https://github.com/christianhelle/))
 - Drop integer defaults that do not fit the property type ([#1438](https://github.com/christianhelle/refitter/pull/1438)) ([@christianhelle](https://github.com/christianhelle/))
 - Load documents whose callbacks reference components/callbacks ([#1439](https://github.com/christianhelle/refitter/pull/1439)) ([@christianhelle](https://github.com/christianhelle/))
@@ -41,6 +41,9 @@
 - Strip XML-invalid control characters from descriptions ([#1433](https://github.com/christianhelle/refitter/pull/1433)) ([@christianhelle](https://github.com/christianhelle/))
 - Rename record constructors when applying ContractTypeSuffix ([#1437](https://github.com/christianhelle/refitter/pull/1437)) ([@christianhelle](https://github.com/christianhelle/))
 - Emit Content-Type header for referenced request bodies ([#1435](https://github.com/christianhelle/refitter/pull/1435)) ([@christianhelle](https://github.com/christianhelle/))
+
+### Security Vulnerability Fixes
+- GHSA-r2hq-86ch-hf3x: Escape response status keys in generated XML documentation ([#1442](https://github.com/christianhelle/refitter/pull/1442)) ([@christianhelle](https://github.com/christianhelle/))
 
 ### Closed Issues
 - OpenAPI 3.1 prefixItems together with items: false fails to load ([#1427](https://github.com/christianhelle/refitter/issues/1427)) ([@christianhelle](https://github.com/christianhelle/))
@@ -60,21 +63,21 @@
 - Bump version to 2.4.1 ([#1420](https://github.com/christianhelle/refitter/pull/1420)) ([@christianhelle](https://github.com/christianhelle/))
 - Add security policy ([#1408](https://github.com/christianhelle/refitter/pull/1408)) ([@christianhelle](https://github.com/christianhelle/))
 
-### Bug Fixes
+### Security Vulnerability Fixes
 - Escape schema names and reject non-literal values in generated contracts ([#1407](https://github.com/christianhelle/refitter/pull/1407)) ([@christianhelle](https://github.com/christianhelle/))
 - Escape Unicode line terminators and settings values in generated string literals ([#1409](https://github.com/christianhelle/refitter/pull/1409)) ([@christianhelle](https://github.com/christianhelle/))
-- Bound YAML alias expansion when loading OpenAPI documents ([#1423](https://github.com/christianhelle/refitter/pull/1423)) ([@christianhelle](https://github.com/christianhelle/))
-- Reject deeply nested OpenAPI documents before parsing ([#1422](https://github.com/christianhelle/refitter/pull/1422)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-7q2f-m7jf-3gp6: Refuse symlinked settings files and output directories ([#1421](https://github.com/christianhelle/refitter/pull/1421)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-r4f2-382w-frqc: Reject symbolic links in local reference paths ([#1416](https://github.com/christianhelle/refitter/pull/1416)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-rqpj-f34p-mr22: Validate discriminator mapping targets in the reference guard ([#1415](https://github.com/christianhelle/refitter/pull/1415)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-wp69-6hgq-9cc3: Confine every file the resolver reads to the input directory ([#1414](https://github.com/christianhelle/refitter/pull/1414)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-5w8x-vqhx-3jrh: Classify references by URI scheme and block remote fetches in the resolver ([#1413](https://github.com/christianhelle/refitter/pull/1413)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-25j7-xpj3-7jf9: Use filesystem-aware comparison for visited reference files ([#1412](https://github.com/christianhelle/refitter/pull/1412)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-mgqj-ph59-3r6r: Match $ref keys case-insensitively in the reference guard ([#1411](https://github.com/christianhelle/refitter/pull/1411)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-7q2f-m7jf-3gp6: Refuse to write generated output through a symbolic link ([#1419](https://github.com/christianhelle/refitter/pull/1419)) ([@christianhelle](https://github.com/christianhelle/))
-- GHSA-7hgj-q592-v892: Reject network-path operation routes ([#1418](https://github.com/christianhelle/refitter/pull/1418)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-25j7-xpj3-7jf9: Use filesystem-aware comparison for visited reference files ([#1412](https://github.com/christianhelle/refitter/pull/1412)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-5w8x-vqhx-3jrh: Classify references by URI scheme and block remote fetches in the resolver ([#1413](https://github.com/christianhelle/refitter/pull/1413)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-wp69-6hgq-9cc3: Confine every file the resolver reads to the input directory ([#1414](https://github.com/christianhelle/refitter/pull/1414)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-rqpj-f34p-mr22: Validate discriminator mapping targets in the reference guard ([#1415](https://github.com/christianhelle/refitter/pull/1415)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-r4f2-382w-frqc: Reject symbolic links in local reference paths ([#1416](https://github.com/christianhelle/refitter/pull/1416)) ([@christianhelle](https://github.com/christianhelle/))
 - GHSA-2p8r-7mx6-gh86: Map operation keys to fixed Refit attribute names ([#1417](https://github.com/christianhelle/refitter/pull/1417)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-7hgj-q592-v892: Reject network-path operation routes ([#1418](https://github.com/christianhelle/refitter/pull/1418)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-7q2f-m7jf-3gp6: Refuse to write generated output through a symbolic link ([#1419](https://github.com/christianhelle/refitter/pull/1419)) ([@christianhelle](https://github.com/christianhelle/))
+- GHSA-7q2f-m7jf-3gp6: Refuse symlinked settings files and output directories ([#1421](https://github.com/christianhelle/refitter/pull/1421)) ([@christianhelle](https://github.com/christianhelle/))
+- Reject deeply nested OpenAPI documents before parsing ([#1422](https://github.com/christianhelle/refitter/pull/1422)) ([@christianhelle](https://github.com/christianhelle/))
+- Bound YAML alias expansion when loading OpenAPI documents ([#1423](https://github.com/christianhelle/refitter/pull/1423)) ([@christianhelle](https://github.com/christianhelle/))
 
 
 ## [2.4.0](https://github.com/christianhelle/refitter/releases/tag/2.4.0) (2026-11-16)
