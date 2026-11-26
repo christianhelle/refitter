@@ -74,7 +74,7 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
     public void ReportValidationDiagnostic(OpenApiError error, bool isError)
     {
         var label = isError ? "Error" : "Warning";
-        Console.WriteLine($"{label}:{Crlf}{error}{Crlf}");
+        Console.WriteLine($"{label}:{Crlf}{ConsoleOutputSanitizer.SanitizeLine(error.ToString())}{Crlf}");
     }
 
     public void ReportValidationStatistics(OpenApiValidationResult validationResult)
@@ -154,14 +154,14 @@ internal sealed class SimpleGenerationReporter : IGenerationReporter
 
     public void ReportUnsupportedVersion(string specificationVersion)
     {
-        Console.WriteLine($"Unsupported OpenAPI version: {specificationVersion}");
+        Console.WriteLine($"Unsupported OpenAPI version: {ConsoleOutputSanitizer.SanitizeLine(specificationVersion)}");
         Console.WriteLine();
     }
 
     public void ReportExceptionDetails(Exception exception)
     {
         Console.WriteLine("Exception Details:");
-        Console.WriteLine(exception.ToString());
+        Console.WriteLine(ConsoleOutputSanitizer.NeutralizeCommands(exception.ToString()));
         Console.WriteLine();
     }
 

@@ -794,6 +794,36 @@ public class GenerateCommandTests
         return withoutAnsi.ReplaceLineEndings("\n");
     }
 
+    [TestMethod]
+    public void FormatGeneratedFileMarker_Rejects_Multi_Line_Path_On_Single_Line()
+    {
+        var path = "out" + "\n" + "##vso[task.complete result=Succeeded]Api.cs";
+
+        var marker = GenerateCommand.FormatGeneratedFileMarker(path);
+
+        marker.Should().NotStartWith("GeneratedFile:");
+        marker.Should().NotContain("\n");
+        marker.Should().NotContain("\r");
+        marker.Contains("##vso[", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void FormatGeneratedFileMarker_Rejects_Path_Changed_By_Sanitizing()
+    {
+        var marker = GenerateCommand.FormatGeneratedFileMarker("##[group]Api.cs");
+
+        marker.Should().NotStartWith("GeneratedFile:");
+        marker.Should().NotContain("##[");
+    }
+
+    [TestMethod]
+    public void FormatGeneratedFileMarker_Reports_Ordinary_Path()
+    {
+        var marker = GenerateCommand.FormatGeneratedFileMarker("Api.cs");
+
+        marker.Should().Be("GeneratedFile: " + Path.GetFullPath("Api.cs"));
+    }
+
     private static string QuoteArgument(string argument) =>
         argument.Contains(' ', StringComparison.Ordinal)
             ? $"\"{argument}\""

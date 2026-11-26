@@ -119,9 +119,10 @@ internal sealed class RichGenerationReporter : IGenerationReporter
         var color = isError ? "red" : "yellow";
         var label = isError ? "Error" : "Warning";
 
+        var text = ConsoleOutputSanitizer.SanitizeLine(error.ToString());
         try
         {
-            AnsiConsole.MarkupLine($"[{color}]{label}:{Crlf}{error}{Crlf}[/]");
+            AnsiConsole.MarkupLine($"[{color}]{Markup.Escape($"{label}:{Crlf}{text}{Crlf}")}[/]");
         }
         catch
         {
@@ -133,7 +134,7 @@ internal sealed class RichGenerationReporter : IGenerationReporter
                 _ => originalColor
             };
 
-            Console.WriteLine($"{label}:{Crlf}{error}{Crlf}");
+            Console.WriteLine($"{label}:{Crlf}{text}{Crlf}");
 
             Console.ForegroundColor = originalColor;
         }
@@ -274,7 +275,7 @@ internal sealed class RichGenerationReporter : IGenerationReporter
     public void ReportUnsupportedVersion(string specificationVersion)
     {
         var versionPanel = new Panel(
-            $"[bold red]🚫 Unsupported OpenAPI version: {specificationVersion}[/]"
+            $"[bold red]🚫 Unsupported OpenAPI version: {Markup.Escape(ConsoleOutputSanitizer.SanitizeLine(specificationVersion))}[/]"
         )
         .BorderColor(Color.Red)
         .RoundedBorder();
@@ -286,7 +287,7 @@ internal sealed class RichGenerationReporter : IGenerationReporter
     public void ReportExceptionDetails(Exception exception)
     {
         AnsiConsole.MarkupLine("[bold red]🐛 Exception Details:[/]");
-        AnsiConsole.WriteException(exception);
+        AnsiConsole.WriteLine(ConsoleOutputSanitizer.NeutralizeCommands(exception.ToString()));
         AnsiConsole.WriteLine();
     }
 
