@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased Changes]
+## [2.4.4](https://github.com/christianhelle/refitter/releases/tag/2.4.4) (2026-11-27)
 
 ### Features
 - GHSA-4j78-2jpc-xg6w: Neutralize OpenAPI text in console and build output ([#1458](https://github.com/christianhelle/refitter/pull/1458)) ([@christianhelle](https://github.com/christianhelle/))
